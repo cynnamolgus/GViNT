@@ -1,0 +1,74 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://UI/Textbox test/TextBox.gd" type="Script" id=1]
+[ext_resource path="res://UI/Textbox test/TextInputs.tscn" type="PackedScene" id=3]
+[ext_resource path="res://GViNT/GvintRuntime.gd" type="Script" id=4]
+[ext_resource path="res://GViNT/SequenceTranslator.gd" type="Script" id=5]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchor_left = 0.1
+anchor_top = 1.0
+anchor_right = 0.9
+anchor_bottom = 1.0
+margin_top = -14.0
+margin_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+rect_min_size = Vector2( 600, 150 )
+
+[node name="NameLabelContainer" type="MarginContainer" parent="PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 53.0
+margin_bottom = 29.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+
+[node name="NameLabel" type="Label" parent="PanelContainer/NameLabelContainer"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 46.0
+margin_bottom = 22.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Name"
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 812.2
+margin_bottom = 143.0
+custom_constants/margin_right = 32
+custom_constants/margin_top = 32
+custom_constants/margin_left = 32
+custom_constants/margin_bottom = 32
+
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer"]
+margin_left = 32.0
+margin_top = 32.0
+margin_right = 773.0
+margin_bottom = 104.0
+bbcode_enabled = true
+script = ExtResource( 1 )
+
+[node name="TextInputs" parent="." instance=ExtResource( 3 )]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -250.0
+margin_right = 250.0
+
+[node name="GvintRuntime" type="Node" parent="."]
+script = ExtResource( 4 )
+
+[node name="SequenceTranslator" type="Node" parent="GvintRuntime"]
+script = ExtResource( 5 )
+
+[connection signal="text_cleared" from="TextInputs" to="PanelContainer/MarginContainer/RichTextLabel" method="clear"]
+[connection signal="text_submitted" from="TextInputs" to="PanelContainer/MarginContainer/RichTextLabel" method="append_text"]
+[connection signal="text" from="GvintRuntime" to="PanelContainer/MarginContainer/RichTextLabel" method="append_text"]
