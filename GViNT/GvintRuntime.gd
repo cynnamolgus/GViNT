@@ -1,32 +1,16 @@
 class_name GvintRuntime extends Node
 
-signal text
-signal text_undo
+const Context = preload("res://GViNT/GvintContext.gd")
 
-var action_queue := []
+var runtime_variables := {}
+var context_stack := []
+var current_context: Context
 
-var action_history := []
+var foo := "test"
 
-
-
-#can't preload due to cyclic deps...
-#*looks longingly at 4.0-beta6*
-#todo: add separate system to auto-load action types?
-var TextAction = load("res://GViNT/Actions/TextAction.gd")
-
-
-
-func _ready():
-	var action = TextAction.new()
-	action.runtime = self
-	action._validate_methods()
-	action.execute()
-	pass
-
-
-func do_a_thing(message: String):
-	emit_signal("text", message)
-	pass
+func _get(property):
+	if property in runtime_variables:
+		return runtime_variables[property]
 
 
 func next_action():

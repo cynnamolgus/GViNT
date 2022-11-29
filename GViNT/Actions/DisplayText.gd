@@ -1,9 +1,10 @@
 extends "res://GViNT/Actions/BaseAction.gd"
 
+var text: String
+var params: Array
 
 
 func execute():
-	runtime.do_a_thing("hello world! lorem ipsum dolor sit amet")
 	emit_signal("action_completed")
 
 

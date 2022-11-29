@@ -5,14 +5,13 @@ signal undo_completed
 
 var runtime: GvintRuntime
 
+var translator_metadata := {}
+
 var _required_methods := [
 	"execute",
 	"undo"
 ]
 
-var action_flags := {
-	"auto_advance": false
-}
 
 
 func _validate_methods():

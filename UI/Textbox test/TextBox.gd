@@ -28,7 +28,7 @@ func _display_next_character():
 	append_bbcode(_text_queue[0])
 	_text_queue = _text_queue.right(1)
 	if not _text_queue:
-		emit_signal("text_queue_emptied")
+		emit_signal("queue_emptied")
 
 
 func append_text(text: String):
