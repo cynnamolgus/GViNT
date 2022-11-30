@@ -2,29 +2,63 @@ extends Reference
 
 const SPACE = " "
 const LINEBREAK = "\n"
+const BACKSLASH = "\\"
 
 const UNDERSCORE = "_"
+const COLON = ":"
 const DOT = "."
-const COMA = ","
+const COMMA = ","
 
 const DIGITS = "0123456789"
 const LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
 const UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const LETTERS = LOWERCASE + UPPERCASE
+const ALPHANUMERIC = LETTERS + DIGITS
+const HEX = "abcdefABCDEF" + DIGITS
+const BINARY = "01"
 
-const APOSTROPHE = "'"
+const IDENTIFIER_CHARSET = ALPHANUMERIC + UNDERSCORE
+const REGULAR_INTEGER_CHARSET = DIGITS + UNDERSCORE
+const HEX_INTEGER_CHARSET = HEX + UNDERSCORE
+const BINARY_INTEGER_CHARSET = BINARY + UNDERSCORE
+
 const QUOTE = "\""
 
-const PARENTHESIS_OPEN = "("
-const PARENTHESIS_CLOSE = ")"
 
-const BRACKET_OPEN = "["
-const BRACKET_CLOSE = "]"
+const OPEN_BRACE = "{"
+const CLOSE_BRACE = "}"
 
-const BRACE_OPEN = "{"
-const BRACE_CLOSE = "}"
+const OPEN_BRACKET = "["
+const CLOSE_BRACKET = "]"
 
-const ASSIGN = "="
+const OPEN_PARENTHESIS = "("
+const CLOSE_PARENTHESIS = ")"
 
-#todo: operators
-#not sure if that goes in this file
+const WRAPPING_CHARS = (
+	OPEN_BRACE + CLOSE_BRACE
+	+ OPEN_BRACKET + CLOSE_BRACKET
+	+ OPEN_PARENTHESIS + CLOSE_PARENTHESIS
+)
+
+
+const ARITHMETIC_OPERATORS = "+-*/%"
+const LOGICAL_OPERATORS = "!><="
+const BITWISE_OPERATORS = "~&|^"
+
+const OPERATOR_CHARS = (
+	ARITHMETIC_OPERATORS
+	+ LOGICAL_OPERATORS
+	+ BITWISE_OPERATORS
+)
+
+
+const TERMINATING_CHARS = (
+	SPACE 
+	+ LINEBREAK 
+	+ COMMA
+	+ COLON
+	+ WRAPPING_CHARS
+)
+
+
+
