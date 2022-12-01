@@ -1,8 +1,14 @@
 extends Reference
 
 
+const BUILTIN_CONSTANTS = [
+	"PI",
+	"TAU",
+	"INF",
+	"NAN"
+]
 
-const GDSCRIPT_BUILTIN_FUNCTIONS = [
+const BUILTIN_FUNCTIONS = [
 #	any identifier starting with a capital letter
 #	will automatically be assumed to be a built-in type,
 #	so declaring Color8 and ColorN here is redundant
@@ -92,7 +98,7 @@ const GDSCRIPT_BUILTIN_FUNCTIONS = [
 
 #functions that have no use in expressions,
 #and as such should never appear in GvintScript
-const GDSCRIPT_DISALLOWED_FUNCTIONS = [
+const BLOCKED_FUNCTIONS = [
 	"assert",
 	"print",
 	"print_debug",
@@ -109,7 +115,7 @@ const GDSCRIPT_DISALLOWED_FUNCTIONS = [
 ]
 
 
-const GDSCRIPT_RESERVED_KEYWORDS = [
+const RESERVED_KEYWORDS = [
 	"class",
 	"class_name",
 	"extends",

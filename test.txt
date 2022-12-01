@@ -1,17 +1,15 @@
-Lorem ipsum
+Lorem ipsum #comment!
 "dolor \"sit \n amet"
 foo = [12345, 0xfafafa / 0b101010, "hello"]
 _bar = {
 "asdf": 1.0 * (42.0e3 + 1.0e+1)
 }
 some_variable = some_value() + [foo, bar, etc]
-
+foo.member += randi() - PI
 if true {
-
 do_something()
 alice: hello world!
 "lorem ipsum
 dolor
 sit amet"
-
 }

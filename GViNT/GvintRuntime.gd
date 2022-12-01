@@ -14,16 +14,15 @@ func _get(property):
 
 
 func _ready():
-	
 	var text = load_test_file_data()
-	
+
 	tokenizer.tokenize_text(text)
 	var i = 1
 	var message = ""
 	for line in tokenizer.tokenized_lines:
 		message = str(i) + ": "
 		for token in line:
-			message += "'" + (token.text if token.text != "\n" else "LINEBREAK") + "'" + ", "
+			message += (token.type) + ", "
 		print(message)
 		i += 1
 	pass
