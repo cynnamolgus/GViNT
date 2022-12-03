@@ -1,4 +1,4 @@
-extends Node
+extends Reference
 
 const TokenizeResult = preload("res://GViNT/Translator/Tokenizer/TokenizeResult.gd")
 const Token = preload("res://GViNT/Translator/Tokenizer/Token.gd")
@@ -7,14 +7,18 @@ const Chars = preload("res://GViNT/Translator/Characters.gd")
 const Tokens = preload("res://GViNT/Translator/Tokenizer/Tokens.gd")
 const Gdscript = preload("res://GViNT/Translator/GDScriptBuiltins.gd")
 
-var current_line: int
-var tokenized_lines := []
-
 var source_code: String
 var source_filename: String
+
+var tokens := []
+var current_line: int
+var tokenized_lines := [[]]
+
 var current_character: int
 var current_token: Token
+var last_token: Token
 
+var identifiers := []
 var used_blocked_keywords := []
 var used_blocked_functions := []
 var used_builtin_functions := []
@@ -25,12 +29,21 @@ var tokenize_result: TokenizeResult
 
 
 func clear():
-	current_line = -1
-	tokenized_lines = []
 	source_code = ""
 	source_filename = ""
+	tokens = []
+	current_line = -1
+	tokenized_lines = [[]]
 	current_character = -1
 	current_token = null
+	last_token = Token.new() # init to non-null value to avoid extra checks
+	
+	identifiers = []
+	used_blocked_keywords = []
+	used_blocked_functions = []
+	used_builtin_functions = []
+	used_builtin_constants = []
+	
 	tokenize_result = null
 
 
@@ -41,10 +54,7 @@ func update_line(tokenize_result, line_index, script):
 	pass
 
 
-func tokenize_text(text: String):
-	tokenized_lines = [[]]
-	update_builtin_check_cache(text)
-	
+func tokenize_text(text: String) -> TokenizeResult:
 	current_line = 0
 	current_character = 0
 	source_code = text
@@ -60,23 +70,28 @@ func tokenize_text(text: String):
 	while current_character < source_length:
 		process_source()
 	
+	add_eof_token()
+	
+	update_builtin_check_cache()
 	mark_token_types(tokenized_lines)
+	
 	tokenize_result = TokenizeResult.new()
 	store_result_data(tokenize_result)
+	return tokenize_result
 
 
-func update_builtin_check_cache(text: String):
+func update_builtin_check_cache():
 	for function in Gdscript.BLOCKED_FUNCTIONS:
-		if function in text:
+		if function in identifiers:
 			used_blocked_functions.append(function)
 	for keyword in Gdscript.RESERVED_KEYWORDS:
-		if keyword in text:
+		if keyword in identifiers:
 			used_blocked_keywords.append(keyword)
 	for function in Gdscript.BUILTIN_FUNCTIONS:
-		if function in text:
+		if function in identifiers:
 			used_builtin_functions.append(function)
 	for constant in Gdscript.BUILTIN_CONSTANTS:
-		if constant in text:
+		if constant in identifiers:
 			used_builtin_constants.append(constant)
 
 
@@ -99,10 +114,16 @@ func store_result_data(tokenize_result: TokenizeResult):
 	tokenize_result.used_builtin_functions = used_builtin_functions
 	tokenize_result.used_builtin_constants = used_builtin_constants
 	tokenize_result.tokenized_lines = tokenized_lines
+	tokenize_result.tokens = tokens
+	
 
 
 func start_new_token():
 	assert(current_token.type or current_token.text)
+	if current_token.is_valid_identifier:
+		identifiers.append(current_token.text)
+	last_token = current_token
+	tokens.append(current_token)
 	tokenized_lines.back().append(current_token)
 	current_token = Token.new()
 	current_token.source_filename = source_filename
@@ -110,15 +131,15 @@ func start_new_token():
 
 
 func process_source():
-	if current_token.is_inline_text:
+	if current_token.is_inline_text or last_token.text == Chars.COLON:
 		tokenize_inline_text()
 	
 	var character: String = source_code[current_character]
 	
 	if character == Chars.SPACE:
 		skip_consecutive_spaces()
-	elif character == Chars.COMMENT_MARK:
-		current_character = source_code.find(Chars.LINEBREAK, current_character)
+	if character == Chars.COMMENT_MARK:
+		skip_comments()
 		character = source_code[current_character]
 	
 	if current_token.text.empty():
@@ -152,21 +173,27 @@ func skip_consecutive_spaces():
 		current_character += 1
 
 
-#todo - multiline comments. too tired to implement this right now
-#func skip_comments():
-#	var consecutive_comment_marks: int = 1
-#	while consecutive_comment_marks < 3:
-#		if source_code[current_character + 1] == Chars.COMMENT_MARK:
-#			consecutive_comment_marks += 1
-#			current_character += 1
-#		else:
-#			break
-#	if consecutive_comment_marks == 3:
-#		var multiline_comment_end = source_code.find(Chars.MULTILINE_COMMENT_MARK, current_character)
-#		if multiline_comment_end != -1:
-#			current_character = multiline_comment_end + 3
-#	else:
-#		current_character = source_code.find(Chars.LINEBREAK, current_character)
+func skip_comments():
+	var consecutive_comment_marks: int = 1
+	while consecutive_comment_marks < 3:
+		if source_code[current_character + 1] == Chars.COMMENT_MARK:
+			consecutive_comment_marks += 1
+			current_character += 1
+		else:
+			break
+	
+	if consecutive_comment_marks == 3:
+		current_character += 1
+		var multiline_comment_end = source_code.find(Chars.MULTILINE_COMMENT_MARK, current_character) + 3
+		if multiline_comment_end == 2: #adding 3, so -1 (for 'not found') becomes 2!
+			multiline_comment_end = len(source_code) - 1
+		var comment := source_code.substr(current_character, multiline_comment_end - current_character)
+		for i in range(comment.count(Chars.LINEBREAK)):
+			current_line += 1
+			tokenized_lines.append([])
+		current_character = multiline_comment_end
+	else:
+		current_character = source_code.find(Chars.LINEBREAK, current_character)
 
 
 func tokenize_single_character(character: String):
@@ -250,9 +277,8 @@ func check_end_of_token(character: String):
 
 
 func add_eof_token():
-	start_new_token()
 	current_token.type = Tokens.END_OF_FILE
-	pass
+	start_new_token()
 
 
 func mark_token_types(lines):

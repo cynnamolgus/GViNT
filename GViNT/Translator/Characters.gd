@@ -1,5 +1,7 @@
 extends Reference
 
+
+
 const SPACE = " "
 const LINEBREAK = "\n"
 const BACKSLASH = "\\"
@@ -44,8 +46,6 @@ const HEX_INTEGER_CHARSET = HEX + UNDERSCORE
 const BINARY_INTEGER_CHARSET = BINARY + UNDERSCORE
 
 
-
-
 const ARITHMETIC_OPERATORS = "+-*/%"
 const LOGICAL_OPERATORS = "!><="
 const BITWISE_OPERATORS = "~&|^"
@@ -64,6 +64,3 @@ const TERMINATING_CHARS = (
 	+ COLON
 	+ WRAPPING_CHARS
 )
-
-
-

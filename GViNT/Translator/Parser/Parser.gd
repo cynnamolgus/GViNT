@@ -1,4 +1,4 @@
-extends Node
+extends Reference
 
 
 func parse_action_instructions(tokenized_lines) -> Array:

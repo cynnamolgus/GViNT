@@ -1,10 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://UI/Textbox test/TextBox.gd" type="Script" id=1]
 [ext_resource path="res://UI/Textbox test/TextInputs.tscn" type="PackedScene" id=3]
 [ext_resource path="res://GViNT/GvintRuntime.gd" type="Script" id=4]
-[ext_resource path="res://GViNT/Translator/SequenceTranslator.gd" type="Script" id=5]
-[ext_resource path="res://GViNT/Translator/Tokenizer/Tokenizer.gd" type="Script" id=6]
 
 [node name="TextBox Test" type="Control"]
 anchor_right = 1.0
@@ -66,12 +64,6 @@ margin_right = 250.0
 
 [node name="GvintRuntime" type="Node" parent="."]
 script = ExtResource( 4 )
-
-[node name="SequenceTranslator" type="Node" parent="GvintRuntime"]
-script = ExtResource( 5 )
-
-[node name="Tokenizer" type="Node" parent="GvintRuntime/SequenceTranslator"]
-script = ExtResource( 6 )
 
 [connection signal="text_cleared" from="TextInputs" to="PanelContainer/MarginContainer/RichTextLabel" method="clear"]
 [connection signal="text_submitted" from="TextInputs" to="PanelContainer/MarginContainer/RichTextLabel" method="append_text"]

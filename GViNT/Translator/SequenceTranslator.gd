@@ -1,14 +1,17 @@
-extends Node
+extends Reference
 
+const Tokenizer = preload("res://GViNT/Translator/Tokenizer/Tokenizer.gd")
 
-onready var runtime = get_parent()
+var tokenizer := Tokenizer.new()
 
-var callbacks := {
-	"some_gvint_method": {
-		"target_object": runtime,
-		"method": "some_gdscript_method"
-	}
-}
+#onready var runtime = get_parent()
+
+#var callbacks := {
+#	"some_gvint_method": {
+#		"target_object": runtime,
+#		"method": "some_gdscript_method"
+#	}
+#}
 
 
 #translate parse result into array of action objects

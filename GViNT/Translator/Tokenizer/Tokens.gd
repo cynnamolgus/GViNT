@@ -11,6 +11,9 @@ const DOT = "DOT"
 const COMMA = "COMMA"
 const COLON = "COLON"
 
+const COMMENT = "COMMENT"
+const COMMENT_CONT = "COMMENT_CONT"
+
 const STRING = "STRING"
 const STRING_MULTILINE_CONT = "STRING_CONT"
 const INT = "INT"
@@ -26,7 +29,7 @@ const CLOSE_BRACKET = "CLOSE_BRACKET"
 const OPEN_BRACE = "OPEN_BRACE"
 const CLOSE_BRACE = "CLOSE_BRACE"
 
-const END_OF_FILE = "EOF"
+const END_OF_FILE = "END_FILE"
 
 const ASSIGN = "ASSIGN"
 const ASSIGN_ADD = "ASSIGN_ADD"
@@ -41,6 +44,7 @@ const ASSIGN_SHIFT_LEFT = "ASSIGN_BITSHIFT_LEFT"
 
 
 const INVALID_OPERATOR = "INVALID_OPERATOR"
+
 # arithmetic operators
 const OP_ADD = "ADD"
 const OP_SUBTRACT = "SUB"
@@ -65,6 +69,7 @@ const OP_BITWISE_AND = "BIT_AND"
 const OP_BITWISE_XOR = "BIT_XOR"
 const OP_BITWISE_NOT = "BIT_NOT"
 
+# keywords
 const KEYWORD_RETURN = "RETURN"
 const KEYWORD_TRUE = "TRUE"
 const KEYWORD_FALSE = "FALSE"
@@ -76,5 +81,3 @@ const KEYWORD_AS = "AS"
 const KEYWORD_IF = "IF"
 const KEYWORD_ELSE = "ELSE"
 const KEYWORD_ELIF = "ELIF"
-
-

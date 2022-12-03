@@ -1,12 +1,14 @@
 class_name GvintRuntime extends Node
 
 const Context = preload("res://GViNT/GvintContext.gd")
+const Translator = preload("res://GViNT/Translator/SequenceTranslator.gd")
 
 var runtime_variables := {}
 var context_stack := []
 var current_context: Context
 
-onready var tokenizer := $SequenceTranslator/Tokenizer
+var translator := Translator.new()
+var tokenizer := translator.tokenizer
 
 func _get(property):
 	if property in runtime_variables:
@@ -15,16 +17,20 @@ func _get(property):
 
 func _ready():
 	var text = load_test_file_data()
-
-	tokenizer.tokenize_text(text)
+	
+	tokenizer.clear()
+	var start_time = OS.get_ticks_msec()
+	var result := tokenizer.tokenize_text(text)
+	var run_time = OS.get_ticks_msec() - start_time
 	var i = 1
 	var message = ""
-	for line in tokenizer.tokenized_lines:
+	for line in result.tokenized_lines:
 		message = str(i) + ": "
 		for token in line:
 			message += (token.type) + ", "
 		print(message)
 		i += 1
+	print("tokenized in " + str(run_time) + "ms")
 	pass
 
 
