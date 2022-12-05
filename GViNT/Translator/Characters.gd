@@ -50,6 +50,46 @@ const ARITHMETIC_OPERATORS = "+-*/%"
 const LOGICAL_OPERATORS = "!><="
 const BITWISE_OPERATORS = "~&|^"
 
+const ASSIGNMENT_OPERATORS = [
+	"=",
+	"+=",
+	"-=",
+	"*=",
+	"/=",
+	"%=",
+	"&=",
+	"|=",
+	">>=",
+	"<<=",
+]
+
+const EXPRESSION_OPERATORS = [
+	# arithmetic
+	"+",
+	"-",
+	"*",
+	"/",
+	"%",
+	
+	# logical
+	"==",
+	">=",
+	"<=",
+	"!=",
+	"!",
+	"&&",
+	"||",
+	
+	# bitwise
+	">>",
+	"<<",
+	"|",
+	"&",
+	"^",
+	"~",
+]
+
+
 const OPERATOR_CHARS = (
 	ARITHMETIC_OPERATORS
 	+ LOGICAL_OPERATORS

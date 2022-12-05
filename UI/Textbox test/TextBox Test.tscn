@@ -55,6 +55,7 @@ margin_right = 773.0
 margin_bottom = 104.0
 bbcode_enabled = true
 script = ExtResource( 1 )
+characters_per_second = 100.0
 
 [node name="TextInputs" parent="." instance=ExtResource( 3 )]
 anchor_left = 0.5
@@ -62,8 +63,12 @@ anchor_right = 0.5
 margin_left = -250.0
 margin_right = 250.0
 
+[node name="TextEdit" parent="TextInputs" index="0"]
+text = ""
+
 [node name="GvintRuntime" type="Node" parent="."]
 script = ExtResource( 4 )
 
-[connection signal="text_cleared" from="TextInputs" to="PanelContainer/MarginContainer/RichTextLabel" method="clear"]
-[connection signal="text_submitted" from="TextInputs" to="PanelContainer/MarginContainer/RichTextLabel" method="append_text"]
+[connection signal="text_submitted" from="TextInputs" to="." method="_on_TextInputs_text_submitted"]
+
+[editable path="TextInputs"]

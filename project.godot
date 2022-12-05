@@ -8,16 +8,6 @@
 
 config_version=4
 
-_global_script_classes=[ {
-"base": "Node",
-"class": "GvintRuntime",
-"language": "GDScript",
-"path": "res://GViNT/GvintRuntime.gd"
-} ]
-_global_script_class_icons={
-"GvintRuntime": ""
-}
-
 [application]
 
 config/name="GViNT"

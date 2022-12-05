@@ -3,7 +3,7 @@ extends Reference
 signal action_completed
 signal undo_completed
 
-var runtime: GvintRuntime
+var runtime
 
 var translator_metadata := {}
 

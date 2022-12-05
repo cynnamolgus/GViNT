@@ -7,6 +7,7 @@ const Chars = preload("res://GViNT/Translator/Characters.gd")
 const Tokens = preload("res://GViNT/Translator/Tokenizer/Tokens.gd")
 const Gdscript = preload("res://GViNT/Translator/GDScriptBuiltins.gd")
 
+
 var source_code: String
 var source_filename: String
 
@@ -326,49 +327,55 @@ func mark_token_identifier_type(token: Token):
 			"not": token.type = Tokens.KEYWORD_NOT
 			"or": token.type = Tokens.KEYWORD_OR
 			"and": token.type = Tokens.KEYWORD_AND
-			"in": token.type = Tokens.KEYWORD_IN
+			"in": token.type = Tokens.OPERATOR
 			"return": token.type = Tokens.KEYWORD_RETURN
-			"as": token.type = Tokens.KEYWORD_AS
+			"as": token.type = Tokens.OPERATOR
 			_: token.type = Tokens.IDENTIFIER
 
 
 func mark_token_operator_type(token: Token):
-	match token.text:
-		#arithmetic operators
-		"+": token.type = Tokens.OP_ADD
-		"-": token.type = Tokens.OP_SUBTRACT
-		"*": token.type = Tokens.OP_MULTIPLY
-		"/": token.type = Tokens.OP_DIVIDE
-		"%": token.type = Tokens.OP_MODULO
-		
-		#assigmnent
-		"=": token.type = Tokens.ASSIGN
-		"+=": token.type = Tokens.ASSIGN_ADD
-		"-=": token.type = Tokens.ASSIGN_SUBTRACT
-		"*=": token.type = Tokens.ASSIGN_MULTIPLY
-		"/=": token.type = Tokens.ASSIGN_DIVIDE
-		"%=": token.type = Tokens.ASSIGN_MODULO
-		"&=": token.type = Tokens.ASSIGN_AND
-		"|=": token.type = Tokens.ASSIGN_OR
-		">>=": token.type = Tokens.ASSIGN_SHIFT_RIGHT
-		"<<=": token.type = Tokens.ASSIGN_SHIFT_LEFT
-		
-		#logical operators
-		"==": token.type = Tokens.OP_EQUAL
-		">=": token.type = Tokens.OP_GREATER_OR_EQUAL
-		"<=": token.type = Tokens.OP_LESS_OR_EQUAL
-		"!=": token.type = Tokens.OP_NOT_EQUAL
-		"!": token.type = Tokens.OP_NEGATE
-		"&&": token.type = Tokens.OP_AND
-		"||": token.type = Tokens.OP_OR
-		
-		#bitwise operators
-		">>": token.type = Tokens.OP_SHIFT_RIGHT
-		"<<": token.type = Tokens.OP_SHIFT_LEFT
-		"|": token.type = Tokens.OP_BITWISE_OR
-		"&": token.type = Tokens.OP_BITWISE_AND
-		"^": token.type = Tokens.OP_BITWISE_XOR
-		"~": token.type = Tokens.OP_BITWISE_NOT
-		
-		_: token.type = Tokens.INLINE_TEXT
+	if token.text in Chars.ASSIGNMENT_OPERATORS:
+		token.type = Tokens.ASSIGN
+	elif token.text in Chars.EXPRESSION_OPERATORS:
+		token.type = Tokens.OPERATOR
+	else:
+		token.type = Tokens.INVALID_OPERATOR
+#	match token.text:
+#		#arithmetic operators
+#		"+": token.type = Tokens.OP_ADD
+#		"-": token.type = Tokens.OP_SUBTRACT
+#		"*": token.type = Tokens.OP_MULTIPLY
+#		"/": token.type = Tokens.OP_DIVIDE
+#		"%": token.type = Tokens.OP_MODULO
+#
+#		#assigmnent
+#		"=": token.type = Tokens.ASSIGN
+#		"+=": token.type = Tokens.ASSIGN_ADD
+#		"-=": token.type = Tokens.ASSIGN_SUBTRACT
+#		"*=": token.type = Tokens.ASSIGN_MULTIPLY
+#		"/=": token.type = Tokens.ASSIGN_DIVIDE
+#		"%=": token.type = Tokens.ASSIGN_MODULO
+#		"&=": token.type = Tokens.ASSIGN_AND
+#		"|=": token.type = Tokens.ASSIGN_OR
+#		">>=": token.type = Tokens.ASSIGN_SHIFT_RIGHT
+#		"<<=": token.type = Tokens.ASSIGN_SHIFT_LEFT
+#
+#		#logical operators
+#		"==": token.type = Tokens.OP_EQUAL
+#		">=": token.type = Tokens.OP_GREATER_OR_EQUAL
+#		"<=": token.type = Tokens.OP_LESS_OR_EQUAL
+#		"!=": token.type = Tokens.OP_NOT_EQUAL
+#		"!": token.type = Tokens.OP_NEGATE
+#		"&&": token.type = Tokens.OP_AND
+#		"||": token.type = Tokens.OP_OR
+#
+#		#bitwise operators
+#		">>": token.type = Tokens.OP_SHIFT_RIGHT
+#		"<<": token.type = Tokens.OP_SHIFT_LEFT
+#		"|": token.type = Tokens.OP_BITWISE_OR
+#		"&": token.type = Tokens.OP_BITWISE_AND
+#		"^": token.type = Tokens.OP_BITWISE_XOR
+#		"~": token.type = Tokens.OP_BITWISE_NOT
+#
+#		_: token.type = Tokens.INLINE_TEXT
 
