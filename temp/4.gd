@@ -1,9 +1,10 @@
 extends "res://GViNT/Translator/Templates/BaseAction.gd"
 
 static func execute(runtime):
-	runtime.callv("display_text", ["""It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.""", []])
+	assert(runtime.i is GvintVariable)
+	runtime.i.value = 0
 	runtime.emit_signal("action_completed")
 
 static func undo(runtime):
-	runtime.call("undo_display_text")
+	runtime.i.undo_last_change()
 	runtime.emit_signal("undo_completed")

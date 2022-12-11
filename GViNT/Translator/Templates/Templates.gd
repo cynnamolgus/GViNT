@@ -3,7 +3,7 @@ extends Reference
 const CALL_FUNCTION = """extends "res://GViNT/Translator/Templates/BaseAction.gd"
 
 static func execute(runtime):
-	{target}.callv("{method}", {params})
+	{target}.callv("{method}", [{params}])
 	runtime.emit_signal("action_completed")
 
 static func undo(runtime):
@@ -14,6 +14,7 @@ static func undo(runtime):
 const SET_VARIABLE = """extends "res://GViNT/Translator/Templates/BaseAction.gd"
 
 static func execute(runtime):
+	assert({target} is GvintVariable)
 	{target}.value {operator} {value}
 	runtime.emit_signal("action_completed")
 

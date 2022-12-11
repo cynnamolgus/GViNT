@@ -2,7 +2,7 @@ extends "res://GViNT/Translator/Templates/BaseAction.gd"
 
 static func execute(runtime):
 	assert(runtime.i is GvintVariable)
-	runtime.i.value += 3
+	runtime.i.value *= 5
 	runtime.emit_signal("action_completed")
 
 static func undo(runtime):

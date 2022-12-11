@@ -2,6 +2,11 @@ class_name GvintRuntime extends Node
 
 
 
+signal action_completed
+signal undo_completed
+
+
+
 const Context = preload("res://GViNT/GvintContext.gd")
 const Translator = preload("res://GViNT/Translator/Translator.gd")
 

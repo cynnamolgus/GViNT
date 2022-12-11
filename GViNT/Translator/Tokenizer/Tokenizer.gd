@@ -14,6 +14,7 @@ var source_filename: String
 var tokens := []
 var current_line: int
 var tokenized_lines := [[]]
+var dict_level: int = 0
 
 var current_character: int
 var current_token: Token
@@ -138,7 +139,7 @@ func start_new_token():
 func process_source():
 	var character: String = source_code[current_character]
 	
-	if last_token.text == Chars.COLON:
+	if last_token.text == Chars.COLON and dict_level == 0:
 		tokenize_displayed_text()
 		return
 	
@@ -196,11 +197,13 @@ func skip_comments():
 
 func tokenize_single_character(character: String):
 	current_token.text = character
+	mark_single_character_token(current_token)
 	start_new_token()
 	if character == Chars.LINEBREAK:
 		tokenized_lines.append([])
 		current_line += 1
 	current_character += 1
+	
 
 
 func tokenize_displayed_text():
@@ -309,8 +312,6 @@ func mark_token_types(lines):
 					mark_token_identifier_type(token)
 				elif token.is_operator:
 					mark_token_operator_type(token)
-				elif len(token.text) == 1:
-					mark_single_character_token(token)
 
 
 func mark_single_character_token(token: Token):
@@ -319,8 +320,12 @@ func mark_single_character_token(token: Token):
 		Chars.DOT: token.type = Tokens.DOT
 		Chars.COMMA: token.type = Tokens.COMMA
 		Chars.COLON: token.type = Tokens.COLON
-		Chars.OPEN_BRACE: token.type = Tokens.OPEN_BRACE
-		Chars.CLOSE_BRACE: token.type = Tokens.CLOSE_BRACE
+		Chars.OPEN_BRACE:
+			token.type = Tokens.OPEN_BRACE
+			dict_level += 1
+		Chars.CLOSE_BRACE: 
+			token.type = Tokens.CLOSE_BRACE
+			dict_level -= 1
 		Chars.OPEN_BRACKET: token.type = Tokens.OPEN_BRACKET
 		Chars.CLOSE_BRACKET: token.type = Tokens.CLOSE_BRACKET
 		Chars.OPEN_PARENTHESIS: token.type = Tokens.OPEN_PARENTHESIS

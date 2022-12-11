@@ -57,5 +57,5 @@ func to_gdscript():
 		"target": target,
 		"method": method,
 		"undo_method": undo_method,
-		"params": "[\"\"\"" + text + "\"\"\", [" + params_string + "]]"
+		"params": "\"\"\"" + text + "\"\"\", [" + params_string + "]"
 	})
