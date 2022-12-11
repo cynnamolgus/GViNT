@@ -122,6 +122,7 @@ func end_instruction():
 	current_instruction.construct_from_tokens(instruction_buffer)
 	instruction_buffer.clear()
 	
+	# todo: generalize script translation config
 	if current_instruction is DisplayText:
 		current_instruction.target = "runtime"
 		current_instruction.method = "display_text"
@@ -133,6 +134,10 @@ func end_instruction():
 
 
 func check_buffered_instruction_type():
+	assert(instruction_buffer)
+	if instruction_buffer[0].type == Tokens.STRING:
+		return DisplayText
+	
 	var colons := 0
 	var assignments := 0
 	var dict_level := 0
@@ -155,6 +160,4 @@ func check_buffered_instruction_type():
 		assert(assignments == 1)
 		return SetVariable
 	return CallFunction
-	
-
 

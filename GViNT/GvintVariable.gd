@@ -20,4 +20,4 @@ func undo_last_change():
 
 
 func _to_string() -> String:
-	return str(value) + "#("  + str(len(history)) + ")"
+	return str(value) + "##("  + str(len(history)) + ")"

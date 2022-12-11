@@ -256,7 +256,7 @@ func tokenize_inline_text():
 
 func get_next_nonescaped_quote_index(text: String, after: int):
 	assert(not text.empty())
-	assert(after >= 1)
+	assert(after >= 0)
 	var next_quote_index = text.find(Chars.QUOTE, after + 1)
 	var is_escaped = text[next_quote_index - 1] == Chars.BACKSLASH
 	while is_escaped and next_quote_index != -1:

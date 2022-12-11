@@ -8,8 +8,8 @@ var runtime
 var translator_metadata := {}
 
 var _required_methods := [
-	"execute",
-	"undo"
+	"execute_gvint_action",
+	"undo_gvint_action"
 ]
 
 
