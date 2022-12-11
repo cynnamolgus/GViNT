@@ -71,7 +71,6 @@ func tokenize_text(text: String) -> TokenizeResult:
 	while current_character < source_length:
 		process_source()
 	
-	start_new_token()
 	add_eof_token()
 	
 	update_builtin_check_cache()

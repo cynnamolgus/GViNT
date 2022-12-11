@@ -1,4 +1,4 @@
-extends Node
+class_name GvintRuntime extends Node
 
 
 
@@ -11,7 +11,6 @@ var context_stack := []
 var current_context: Context
 
 var translator := Translator.new()
-var tokenizer := translator.tokenizer
 
 
 
@@ -21,23 +20,15 @@ func _get(property):
 
 
 func _ready():
-	translator.translate_file("res://test2.txt")
-#	var text = load_test_file_data()
-#	tokenizer.clear()
-#	var start_time = OS.get_ticks_msec()
-#	var result := tokenizer.tokenize_text(text)
-#	var run_time = OS.get_ticks_msec() - start_time
-#	result.pretty_print()
-#	print("tokenized in " + str(run_time) + "ms")
-	pass
+	var gdscript = translator.translate_file("res://lorem.txt")
+	for i in gdscript:
+		print(i)
 
 
-func load_test_file_data():
-	var f := File.new()
-	f.open("res://test.txt", File.READ)
-	var text := f.get_as_text()
-	f.close()
-	return text
+func init_runtime_var(identifier: String):
+	if not identifier in runtime_variables:
+		runtime_variables[identifier] = GvintVariable.new()
+	return runtime_variables[identifier]
 
 
 func next_action():

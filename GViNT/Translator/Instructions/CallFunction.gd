@@ -1,4 +1,6 @@
-extends Reference
+extends "res://GViNT/Translator/Instructions/Instruction.gd"
+
+
 
 var target_tokens := []
 var method_tokens := []
@@ -10,7 +12,17 @@ var params_string := ""
 
 var undo_method: String
 
-func apply_to_template(template: String):
+
+
+func _init():
+	template = Templates.CALL_FUNCTION
+
+
+func construct_from_tokens(tokens: Array):
+	pass
+
+
+func to_gdscript():
 	for t in target_tokens:
 		target_string += t.text
 	for t in method_tokens:
@@ -23,4 +35,3 @@ func apply_to_template(template: String):
 		"undo_method": undo_method,
 		"params": params_string
 	})
-	
