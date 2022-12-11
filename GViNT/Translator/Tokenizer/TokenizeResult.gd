@@ -18,3 +18,15 @@ func pretty_print():
 			message += (token.type) + ", "
 		print(message)
 		line_index += 1
+
+
+func pretty_print_alt():
+	var line_index := 1
+	var message = ""
+	for line in tokenized_lines:
+		for token in line:
+			message = "[" + str(line_index) + "] "
+			message += (token.type) + ": " + token.text
+			print(message)
+		line_index += 1
+

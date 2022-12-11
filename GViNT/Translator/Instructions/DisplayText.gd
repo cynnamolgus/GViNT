@@ -28,7 +28,7 @@ func construct_from_string_literal(tokens: Array):
 	for t in tokens:
 		assert(t.type == Tokens.STRING
 		  or t.type == Tokens.STRING_MULTILINE_CONT)
-		text += t.text
+		text += t.text.trim_prefix('"').trim_suffix('"')
 
 
 func construct_from_params_and_text(tokens: Array):
@@ -41,10 +41,13 @@ func construct_from_params_and_text(tokens: Array):
 		if not params_ended:
 			params_tokens.append(t)
 		else:
-			assert(t.type == Tokens.INLINE_TEXT
-			  or t.type == Tokens.STRING
-			  or t.type == Tokens.STRING_MULTILINE_CONT)
-			text += t.text
+			if t.type == Tokens.INLINE_TEXT:
+				assert(t == tokens.back())
+				text = t.text
+			else:
+				assert(t.type == Tokens.STRING
+				  or t.type == Tokens.STRING_MULTILINE_CONT)
+				text += t.text.trim_prefix('"').trim_suffix('"')
 
 
 func to_gdscript():

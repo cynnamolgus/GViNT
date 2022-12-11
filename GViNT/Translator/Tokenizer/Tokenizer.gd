@@ -68,8 +68,12 @@ func tokenize_text(text: String) -> TokenizeResult:
 		source_code += Chars.LINEBREAK
 	
 	var source_length := len(text)
+	var previous = current_character
 	while current_character < source_length:
 		process_source()
+		assert(current_character > previous)
+		if current_character <= previous:
+			Engine.get_main_loop().quit()
 	
 	add_eof_token()
 	
@@ -132,10 +136,11 @@ func start_new_token():
 
 
 func process_source():
-	if current_token.is_inline_text or last_token.text == Chars.COLON:
-		tokenize_inline_text()
-	
 	var character: String = source_code[current_character]
+	
+	if last_token.text == Chars.COLON:
+		tokenize_displayed_text()
+		return
 	
 	if character == Chars.SPACE:
 		skip_consecutive_spaces()
@@ -159,14 +164,6 @@ func process_source():
 		else:
 			current_token.add_character(character)
 			current_character += 1
-
-
-func tokenize_inline_text():
-	var next_linebreak_index = source_code.find(Chars.LINEBREAK, current_character) - 1
-	current_token.type = Tokens.INLINE_TEXT
-	current_token.text += source_code.substr(current_character, next_linebreak_index - 1)
-	current_character += (next_linebreak_index - current_character) + 1
-	start_new_token()
 
 
 func skip_consecutive_spaces():
@@ -206,6 +203,16 @@ func tokenize_single_character(character: String):
 	current_character += 1
 
 
+func tokenize_displayed_text():
+	while source_code[current_character] == Chars.SPACE:
+		current_character += 1
+	
+	if source_code[current_character] == Chars.QUOTE:
+		tokenize_string_literal()
+	else:
+		tokenize_inline_text()
+
+
 func tokenize_string_literal():
 	var end_index = get_next_nonescaped_quote_index(source_code, current_character)
 	if end_index == -1:
@@ -235,6 +242,15 @@ func tokenize_string_literal():
 	start_new_token()
 
 
+func tokenize_inline_text():
+	if source_code[current_character] == Chars.SPACE:
+		current_character += 1
+	var next_linebreak_index = source_code.find(Chars.LINEBREAK, current_character) - 1
+	current_token.type = Tokens.INLINE_TEXT
+	current_token.text += source_code.substr(current_character, next_linebreak_index - current_character + 1)
+	current_character += (next_linebreak_index - current_character) + 1
+	start_new_token()
+
 func get_next_nonescaped_quote_index(text: String, after: int):
 	assert(not text.empty())
 	assert(after >= 1)
@@ -243,7 +259,10 @@ func get_next_nonescaped_quote_index(text: String, after: int):
 	while is_escaped and next_quote_index != -1:
 		after = next_quote_index
 		next_quote_index = text.find(Chars.QUOTE, after + 1)
-		is_escaped = text[next_quote_index - 1] == Chars.BACKSLASH
+		if next_quote_index != -1:
+			is_escaped = text[next_quote_index - 1] == Chars.BACKSLASH
+		else:
+			break
 	if next_quote_index == -1:
 		assert(false, "string literal missing closing quote mark") #todo - proper error handling
 	return next_quote_index

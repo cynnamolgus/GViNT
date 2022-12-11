@@ -60,7 +60,6 @@ func translate_file(file: String):
 	var source_code := read_file(file)
 	tokenizer.clear()
 	var tokenize_result := tokenizer.tokenize_text(source_code)
-#	tokenize_result.pretty_print()
 	return translate_tokens(tokenize_result.tokens)
 
 
@@ -82,7 +81,7 @@ func token_ends_instruction(token: Token) -> bool:
 	return (
 		token.type == Tokens.LINEBREAK 
 		and unpaired_tokens.empty()
-	)
+	) or token.type == Tokens.END_OF_FILE
 
 
 func update_identifier_buffer(token: Token):
@@ -127,11 +126,9 @@ func flush_identifier_buffer():
 	if identifier_buffer.empty():
 		return
 	
-	var identifier: String = ""
-	for t in identifier_buffer:
-		identifier += t.text
+	#todo: proper identifier expansion. placeholder for testing.
+	identifier_buffer[0].text = "runtime." + identifier_buffer[0].text
 	identifier_buffer.clear()
-#	print("Processing identifier: " + identifier)
 
 
 func end_instruction():

@@ -21,8 +21,13 @@ func _get(property):
 
 func _ready():
 	var gdscript = translator.translate_file("res://lorem.txt")
-	for i in gdscript:
-		print(i)
+	var f = File.new()
+	var i = 0
+	for source in gdscript:
+		i += 1
+		f.open("res://temp/" + str(i) + ".gd", File.WRITE)
+		f.store_string(source)
+		f.close()
 
 
 func init_runtime_var(identifier: String):
