@@ -57,7 +57,7 @@ func add_character(character: String):
 		text += character
 		is_operator = false
 		is_inline_text = true
-		type = Tokens.RAW_TEXT
+		type = Tokens.INLINE_TEXT
 	elif is_regular_integer and (not character in Chars.REGULAR_INTEGER_CHARSET):
 		if character == Chars.DOT:
 			text += character
@@ -77,7 +77,7 @@ func add_character(character: String):
 		else:
 			is_regular_integer = false
 			is_inline_text = true
-			type = Tokens.RAW_TEXT
+			type = Tokens.INLINE_TEXT
 	elif is_regular_float and (not character in Chars.DIGITS):
 		if character == "e":
 			text += character
@@ -89,12 +89,12 @@ func add_character(character: String):
 			if not character in "+-" + Chars.DIGITS:
 				is_scientific_notation_float = false
 				is_inline_text = true
-				type = Tokens.RAW_TEXT
+				type = Tokens.INLINE_TEXT
 		else:
 			if not character in Chars.DIGITS:
 				is_scientific_notation_float = false
 				is_inline_text = true
-				type = Tokens.RAW_TEXT
+				type = Tokens.INLINE_TEXT
 		text += character
 	else:
 		text += character

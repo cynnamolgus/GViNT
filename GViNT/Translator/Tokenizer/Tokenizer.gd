@@ -71,6 +71,7 @@ func tokenize_text(text: String) -> TokenizeResult:
 	while current_character < source_length:
 		process_source()
 	
+	start_new_token()
 	add_eof_token()
 	
 	update_builtin_check_cache()
@@ -319,6 +320,8 @@ func mark_token_identifier_type(token: Token):
 		token.type = Tokens.BLOCKED_FUNC
 	else:
 		match token.text:
+			"in": token.type = Tokens.OPERATOR
+			"as": token.type = Tokens.OPERATOR
 			"true": token.type = Tokens.KEYWORD_TRUE
 			"false": token.type = Tokens.KEYWORD_FALSE
 			"if": token.type = Tokens.KEYWORD_IF
@@ -327,9 +330,7 @@ func mark_token_identifier_type(token: Token):
 			"not": token.type = Tokens.KEYWORD_NOT
 			"or": token.type = Tokens.KEYWORD_OR
 			"and": token.type = Tokens.KEYWORD_AND
-			"in": token.type = Tokens.OPERATOR
 			"return": token.type = Tokens.KEYWORD_RETURN
-			"as": token.type = Tokens.OPERATOR
 			_: token.type = Tokens.IDENTIFIER
 
 
@@ -340,42 +341,4 @@ func mark_token_operator_type(token: Token):
 		token.type = Tokens.OPERATOR
 	else:
 		token.type = Tokens.INVALID_OPERATOR
-#	match token.text:
-#		#arithmetic operators
-#		"+": token.type = Tokens.OP_ADD
-#		"-": token.type = Tokens.OP_SUBTRACT
-#		"*": token.type = Tokens.OP_MULTIPLY
-#		"/": token.type = Tokens.OP_DIVIDE
-#		"%": token.type = Tokens.OP_MODULO
-#
-#		#assigmnent
-#		"=": token.type = Tokens.ASSIGN
-#		"+=": token.type = Tokens.ASSIGN_ADD
-#		"-=": token.type = Tokens.ASSIGN_SUBTRACT
-#		"*=": token.type = Tokens.ASSIGN_MULTIPLY
-#		"/=": token.type = Tokens.ASSIGN_DIVIDE
-#		"%=": token.type = Tokens.ASSIGN_MODULO
-#		"&=": token.type = Tokens.ASSIGN_AND
-#		"|=": token.type = Tokens.ASSIGN_OR
-#		">>=": token.type = Tokens.ASSIGN_SHIFT_RIGHT
-#		"<<=": token.type = Tokens.ASSIGN_SHIFT_LEFT
-#
-#		#logical operators
-#		"==": token.type = Tokens.OP_EQUAL
-#		">=": token.type = Tokens.OP_GREATER_OR_EQUAL
-#		"<=": token.type = Tokens.OP_LESS_OR_EQUAL
-#		"!=": token.type = Tokens.OP_NOT_EQUAL
-#		"!": token.type = Tokens.OP_NEGATE
-#		"&&": token.type = Tokens.OP_AND
-#		"||": token.type = Tokens.OP_OR
-#
-#		#bitwise operators
-#		">>": token.type = Tokens.OP_SHIFT_RIGHT
-#		"<<": token.type = Tokens.OP_SHIFT_LEFT
-#		"|": token.type = Tokens.OP_BITWISE_OR
-#		"&": token.type = Tokens.OP_BITWISE_AND
-#		"^": token.type = Tokens.OP_BITWISE_XOR
-#		"~": token.type = Tokens.OP_BITWISE_NOT
-#
-#		_: token.type = Tokens.INLINE_TEXT
 

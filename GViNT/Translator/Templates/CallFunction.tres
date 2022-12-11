@@ -1,0 +1,11 @@
+[gd_resource type="GDScript" format=2]
+
+[resource]
+script/source = "extends \"res://GViNT/Translator/Templates/BaseAction.gd\"
+
+static func execute(runtime):
+	{target}.callv(\"{method}\", {params})
+
+static func undo(runtime):
+	{target}.callv(\"{undo_method}\", {params})
+"

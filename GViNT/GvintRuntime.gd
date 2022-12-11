@@ -3,7 +3,7 @@ extends Node
 
 
 const Context = preload("res://GViNT/GvintContext.gd")
-const Translator = preload("res://GViNT/Translator/SequenceTranslator.gd")
+const Translator = preload("res://GViNT/Translator/Translator.gd")
 
 
 var runtime_variables := {}
@@ -21,13 +21,14 @@ func _get(property):
 
 
 func _ready():
-	var text = load_test_file_data()
-	tokenizer.clear()
-	var start_time = OS.get_ticks_msec()
-	var result := tokenizer.tokenize_text(text)
-	var run_time = OS.get_ticks_msec() - start_time
-	result.pretty_print()
-	print("tokenized in " + str(run_time) + "ms")
+	translator.translate_file("res://test2.txt")
+#	var text = load_test_file_data()
+#	tokenizer.clear()
+#	var start_time = OS.get_ticks_msec()
+#	var result := tokenizer.tokenize_text(text)
+#	var run_time = OS.get_ticks_msec() - start_time
+#	result.pretty_print()
+#	print("tokenized in " + str(run_time) + "ms")
 	pass
 
 

@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Reference",
+"class": "GvintVariable",
+"language": "GDScript",
+"path": "res://GViNT/GvintVariable.gd"
+} ]
+_global_script_class_icons={
+"GvintVariable": ""
+}
+
 [application]
 
 config/name="GViNT"

@@ -1,0 +1,10 @@
+foo.bar[
+  abc(
+    some_param, 
+    some_other_param[
+      idx
+    ].property
+  )
+].do_a_thing(
+  another_param
+).some_property = something.some_other_thing
