@@ -3,12 +3,14 @@ extends Reference
 const CALL_FUNCTION = """extends "res://GViNT/Translator/Templates/BaseAction.gd"
 
 static func execute_gvint_action(runtime):
-	{target}.callv("{method}", [{params}])
-	runtime.emit_signal("action_completed")
+	var result = {target}.callv("{method}", [{params}])
+	if result is GDScriptFunctionState:
+		yield(result, "completed")
 
 static func undo_gvint_action(runtime):
-	{target}.call("{undo_method}")
-	runtime.emit_signal("undo_completed")
+	var result = {target}.call("{undo_method}")
+	if result is GDScriptFunctionState:
+		yield(result, "completed")
 """
 
 const SET_VARIABLE = """extends "res://GViNT/Translator/Templates/BaseAction.gd"

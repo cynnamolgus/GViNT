@@ -36,10 +36,11 @@ func _get(property):
 			return init_runtime_var(property)
 
 func _set(property, value):
-	if property == "foo":
-		pass
-	runtime_variables[property] = value
-	return true
+	if property in runtime_variables:
+#		print("set " + property + " = " + str(value))
+		runtime_variables[property] = value
+		return true
+	return false
 
 
 func _ready():
@@ -56,7 +57,10 @@ func _ready():
 		actions.append(action)
 	
 	for a in actions:
-		a.execute_gvint_action(self)
+		print(Engine.get_physics_frames())
+		var result = a.execute_gvint_action(self)
+		if result is GDScriptFunctionState:
+			yield(result, "completed")
 	pass
 
 
@@ -80,14 +84,14 @@ func undo_last_action():
 func display_text(text: String, params: Array):
 	print(str(params) + ": " + text)
 
-func undo_display_text():
-	print("undo")
-
 func get_some_value():
 	return 42
 
 func do_a_thing():
 	print("foo is '" + str(runtime_variables.foo) + "'")
+	yield(get_tree().create_timer(3.0), "timeout")
+	print("did a thing")
+
 
 
 
