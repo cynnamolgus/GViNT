@@ -17,7 +17,6 @@ var current_context: Context
 
 var translator := Translator.new()
 
-var bar = GvintVariable.new()
 
 func _get(property):
 	var stack = get_stack()
@@ -44,7 +43,12 @@ func _set(property, value):
 
 
 func _ready():
-	var gdscript = translator.translate_file("res://test.txt")
+	execute_story_script("res://test.txt")
+	pass
+
+
+func execute_story_script(file: String):
+	var gdscript = translator.translate_file(file)
 	var actions := []
 	var action: Reference
 	var script: GDScript
@@ -55,10 +59,10 @@ func _ready():
 		script.reload()
 		action.set_script(script)
 		actions.append(action)
-	
+	var result
 	for a in actions:
 		print(Engine.get_physics_frames())
-		var result = a.execute_gvint_action(self)
+		result = a.execute_gvint_action(self)
 		if result is GDScriptFunctionState:
 			yield(result, "completed")
 	pass
@@ -83,6 +87,7 @@ func undo_last_action():
 
 func display_text(text: String, params: Array):
 	print(str(params) + ": " + text)
+	yield(get_tree().create_timer(0.5), "timeout")
 
 func get_some_value():
 	return 42

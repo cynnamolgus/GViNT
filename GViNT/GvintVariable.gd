@@ -8,7 +8,10 @@ var history := []
 
 func set_value(new_value):
 	history.push_back(value)
-	value = new_value
+	if typeof(new_value) == typeof(self):
+		value = new_value.value
+	else:
+		value = new_value
 	emit_signal("value_changed", value)
 
 
@@ -20,4 +23,4 @@ func undo_last_change():
 
 
 func _to_string() -> String:
-	return str(value) + "##("  + str(len(history)) + ")"
+	return str(value) + "#("  + str(len(history)) + ")"

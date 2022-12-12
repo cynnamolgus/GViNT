@@ -38,11 +38,22 @@ func read_file(file: String) -> String:
 	return content
 
 
-func translate_file(file: String):
-	var source_code := read_file(file)
+func clear():
 	tokenizer.clear()
+	current_instruction = null
+	instruction_buffer.clear()
+	identifier_buffer.clear()
+	identifier_is_settable = false
+	identifier_buffer_open = true
+
+
+func translate_file(file: String):
+	clear()
+	var source_code := read_file(file)
 	var tokenize_result := tokenizer.tokenize_text(source_code)
 	var gdscript_sources := translate_tokens(tokenize_result.tokens)
+	assert(instruction_buffer.empty())
+	assert(identifier_buffer.empty())
 	return gdscript_sources
 
 
@@ -55,7 +66,8 @@ func translate_tokens(tokens) -> Array:
 		if token_ends_instruction(t) and instruction_buffer:
 			var gdscript_instruction = end_instruction()
 			gdscript_sources.append(gdscript_instruction)
-		elif t.type != Tokens.LINEBREAK:
+		elif (t.type != Tokens.LINEBREAK
+		  and t.type != Tokens.END_OF_FILE):
 			instruction_buffer.append(t)
 	
 	return gdscript_sources
@@ -117,8 +129,7 @@ func flush_identifier_buffer():
 
 
 func end_instruction():
-	var InstructionType = check_buffered_instruction_type()
-	current_instruction = InstructionType.new()
+	current_instruction = instantiate_instruction_from_buffer()
 	current_instruction.construct_from_tokens(instruction_buffer)
 	instruction_buffer.clear()
 	
@@ -133,10 +144,8 @@ func end_instruction():
 	return current_instruction.to_gdscript()
 
 
-func check_buffered_instruction_type():
+func instantiate_instruction_from_buffer():
 	assert(instruction_buffer)
-	if instruction_buffer[0].type == Tokens.STRING:
-		return DisplayText
 	
 	var colons := 0
 	var assignments := 0
@@ -153,11 +162,16 @@ func check_buffered_instruction_type():
 			Tokens.ASSIGN:
 				assignments += 1
 	
+	var instance
 	if colons:
 		assert(colons == 1)
-		return DisplayText
+		instance = DisplayText.new()
+		instance.has_params = true
+		return instance
+	elif instruction_buffer[0].type == Tokens.STRING:
+		return DisplayText.new()
 	if assignments:
 		assert(assignments == 1)
-		return SetVariable
-	return CallFunction
+		return SetVariable.new()
+	return CallFunction.new()
 

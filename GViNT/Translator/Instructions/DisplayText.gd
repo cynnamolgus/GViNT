@@ -10,18 +10,17 @@ var target := ""
 var method := ""
 var undo_method := ""
 
-
+var has_params: bool = false
 
 func _init():
 	template = Templates.CALL_FUNCTION
 
 
 func construct_from_tokens(tokens: Array):
-	var has_params := false
-	if tokens[0].type == Tokens.STRING:
-		construct_from_string_literal(tokens)
-	else:
+	if has_params:
 		construct_from_params_and_text(tokens)
+	else:
+		construct_from_string_literal(tokens)
 
 
 func construct_from_string_literal(tokens: Array):
