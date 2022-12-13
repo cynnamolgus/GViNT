@@ -9,17 +9,29 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Reference",
+"class": "GvintContext",
+"language": "GDScript",
+"path": "res://addons/GViNT/Core/Context.gd"
+}, {
+"base": "Reference",
+"class": "GvintContextLoader",
+"language": "GDScript",
+"path": "res://addons/GViNT/Core/ContextLoader.gd"
+}, {
 "base": "Node",
 "class": "GvintRuntime",
 "language": "GDScript",
-"path": "res://GViNT/GvintRuntime.gd"
+"path": "res://addons/GViNT/Core/Runtime.gd"
 }, {
 "base": "Reference",
 "class": "GvintVariable",
 "language": "GDScript",
-"path": "res://GViNT/GvintVariable.gd"
+"path": "res://addons/GViNT/Core/Variable.gd"
 } ]
 _global_script_class_icons={
+"GvintContext": "",
+"GvintContextLoader": "",
 "GvintRuntime": "",
 "GvintVariable": ""
 }
@@ -29,6 +41,10 @@ _global_script_class_icons={
 config/name="GViNT"
 config/icon="res://icon.png"
 
+[autoload]
+
+GvintScripts="*res://addons/GViNT/Core/ScriptManager.gd"
+
 [debug]
 
 gdscript/warnings/exclude_addons=false
@@ -36,6 +52,10 @@ gdscript/warnings/unused_variable=false
 gdscript/warnings/unused_argument=false
 gdscript/warnings/unused_signal=false
 gdscript/warnings/return_value_discarded=false
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/GViNT/plugin.cfg" )
 
 [gui]
 
