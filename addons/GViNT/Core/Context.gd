@@ -2,7 +2,7 @@ class_name GvintContext extends Reference
 
 var source_filename: String
 var instructions: Array
-var current_instruction: int = -1
+var current_instruction: int = 0
 
 
 func next_instruction():

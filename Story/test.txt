@@ -1,11 +1,3 @@
 "Hello, world!"
 foo = "test"
-bar = "asdfg"
-foo = bar
-execute_story_script("res://test2.txt")
-foo: Lorem ipsum
-foo, bar: dolor sit amet.
-foo = get_some_value()
-do_a_thing()
-foo: "hmm"
-"asdf"
+foo: Lorem ipsum dolor sit amet.
