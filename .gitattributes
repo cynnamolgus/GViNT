@@ -1,0 +1,3 @@
+# prevent GitHub's automatic language detection on story scripts
+*.story linguist-vendored
+/Story/ linguist-vendored
