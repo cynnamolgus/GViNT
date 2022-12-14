@@ -3,7 +3,7 @@ extends Reference
 
 
 const Tokens = preload("res://addons/GViNT/Core/Translator/Tokenizer/Tokens.gd")
-const Templates = preload("res://addons/GViNT/Core/Translator/Templates/Templates.gd")
+const ScriptTemplates = preload("res://addons/GViNT/Core/Translator/Templates/ScriptTemplates.gd")
 
 
 var template: String

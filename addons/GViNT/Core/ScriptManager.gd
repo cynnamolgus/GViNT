@@ -3,11 +3,16 @@ extends Node
 
 
 const DEFAULT_SCRIPT_DIR = "res://Story/"
+const DEFAULT_SCRIPT_EXTENSION = ".story"
+
 const SCRIPT_INFO_FILE = "res://addons/GViNT/Config/scripts.json"
 const COMPILED_SCRIPTS_DIR = "res://addons/GViNT/Config/ScriptCache/"
-const INSTRUCTION_PREFIX = "Instruction_"
 
-const Templates = preload("res://addons/GViNT/Core/Translator/Templates/Templates.gd")
+const _INSTRUCTION_PREFIX = "Instruction_"
+
+
+const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
+const ScriptTemplates = preload("res://addons/GViNT/Core/Translator/Templates/ScriptTemplates.gd")
 const Translator = preload("res://addons/GViNT/Core/Translator/Translator.gd")
 
 
@@ -16,61 +21,72 @@ var script_info := {}
 
 
 func _ready():
-	load_script_info()
+	_load_script_info()
 
-func read_file(file: String) -> String:
-	var f := File.new()
-	var error = f.open(file, File.READ)
-	assert(not error)
-	if error:
-		push_error(str(error))
-	
-	var data: String
-	if f.is_open():
-		data = f.get_as_text()
-		f.close()
-	
-	return data
 
-func load_script_info():
-	var json_string := read_file(SCRIPT_INFO_FILE)
-	var parse_result := JSON.parse(json_string)
-	assert(not parse_result.error)
-	if parse_result.error:
-		push_error(parse_result.error_string)
-	else:
-		script_info = (parse_result.result) as Dictionary
-		assert(script_info != null)
+func _load_script_info():
+	script_info = GvintUtils.load_json_dict(SCRIPT_INFO_FILE)
+	assert(script_info != null)
 	
-	var loader_filename: String
-	delete_removed_scripts()
-	save_script_info()
+	delete_obsolete_script_info()
+	_load_context_factories()
+
+
+func _load_context_factories():
+	var context_factory_filename: String
 	for script_filename in script_info:
-		loader_filename = script_info[script_filename]["loader_filename"]
-		script_info[script_filename]["loader"] = load(loader_filename)
+		context_factory_filename = script_info[script_filename]["context_factory_filename"]
+		script_info[script_filename]["context_factory"] = load(context_factory_filename)
+
+
+func save_script_info():
+	var saved_data := script_info.duplicate(true)
+	for script in saved_data:
+		saved_data[script].erase("context_factory")
+	
+	var indentation := "  "
+	var json_string := JSON.print(saved_data, indentation)
+	var f = File.new()
+	f.open(SCRIPT_INFO_FILE, File.WRITE)
+	f.store_string(json_string)
 
 
 func load_script(source_filename: String) -> GvintContext:
-	if not source_filename.begins_with("res://"):
-		source_filename = DEFAULT_SCRIPT_DIR + source_filename
+	source_filename = _expand_source_filename(source_filename)
+	
 	var d := Directory.new()
-	assert(d.file_exists(source_filename), "Script '" + source_filename + "' not found")
-	var loader: GDScript
+	var script_exists := d.file_exists(source_filename)
+	assert(script_exists, "Script '" + source_filename + "' not found")
+	
+	if not script_exists:
+		return null
+	
+	var context_factory: GDScript
 	if script_needs_compiling(source_filename):
 		print("compiling script: " + source_filename)
-		loader = compile_script(source_filename)
+		context_factory = compile_script(source_filename)
 	else:
 		print("loading compiled script: " + source_filename)
-		loader = script_info[source_filename]["loader"]
-	return loader.get_context()
+		context_factory = script_info[source_filename]["context_factory"]
+	return context_factory.get_context()
+
+
+func _expand_source_filename(source_filename):
+	if not source_filename.begins_with("res://"):
+		source_filename = DEFAULT_SCRIPT_DIR + source_filename
+	if not "." in source_filename:
+		source_filename += DEFAULT_SCRIPT_EXTENSION
+	return source_filename
 
 
 func script_needs_compiling(script: String):
 	var f = File.new()
-	if not f.file_exists(script):
-		return true
+	
+	assert(f.file_exists(script))
+	
 	if not script in script_info:
 		return true
+	
 	var modify_time: int = f.get_modified_time(script)
 	var last_compiled: int = script_info[script]["last_compiled"]
 	if modify_time > last_compiled:
@@ -78,93 +94,82 @@ func script_needs_compiling(script: String):
 	return false
 
 
-func delete_removed_scripts():
+func delete_obsolete_script_info():
 	var d := Directory.new()
+	var cached_script_directory: String
 	for script_filename in script_info:
 		if not d.file_exists(script_filename):
 			script_info.erase(script_filename)
-			delete_compiled_script(script_filename.md5_text())
-
-
-func delete_compiled_script(filename_hash: String):
-	var d := Directory.new()
-	d.open(COMPILED_SCRIPTS_DIR)
-	if d.dir_exists(filename_hash):
-		OS.move_to_trash(ProjectSettings.globalize_path(COMPILED_SCRIPTS_DIR + filename_hash))
+			cached_script_directory = COMPILED_SCRIPTS_DIR + script_filename.md5_text()
+			GvintUtils.delete_directory(cached_script_directory)
+	save_script_info()
 
 
 func compile_script(script: String):
-	script_info[script] = {}
 	var filename_hash := script.md5_text()
-	delete_compiled_script(filename_hash)
+	var compiled_script_directory := COMPILED_SCRIPTS_DIR + filename_hash + "/"
+	
+	script_info[script] = {}
+	GvintUtils.delete_directory(compiled_script_directory)
+	
 	var d := Directory.new()
-	d.open(COMPILED_SCRIPTS_DIR)
-	d.make_dir(filename_hash)
+	d.make_dir(compiled_script_directory)
 	
 	translator.clear()
 	var gdscript_sources: Array = translator.translate_file(script)
-	
-	var compiled_script_dir := COMPILED_SCRIPTS_DIR + filename_hash + "/"
-	var instruction_files := save_sources(compiled_script_dir, gdscript_sources)
-	var loader := create_loader(compiled_script_dir, script, instruction_files)
+	var instruction_files := _save_compiled_instructions(compiled_script_directory, gdscript_sources)
+	var context_factory := _create_context_factory(compiled_script_directory, script, instruction_files)
 	
 	var current_time: int = floor(Time.get_unix_time_from_system())
 	script_info[script]["last_compiled"] = current_time
-	script_info[script]["loader"] = loader
 	save_script_info()
-	return loader
+	return context_factory
 
-func save_sources(dir: String, sources: Array) -> Array:
-	var files: int = len(sources)
-	var saved_files := []
-	dir += INSTRUCTION_PREFIX
+
+func _save_compiled_instructions(directory: String, gdscript_sources: Array) -> Array:
+	var instructions := {}
+	var instruction_filename_template := _INSTRUCTION_PREFIX + "%s.gd"
+	var instruction_filename: String
+	var i: int = 0
+	for instruction_gdscript in gdscript_sources:
+		instruction_filename = _INSTRUCTION_PREFIX + str(i) + ".gd"
+		instructions[instruction_filename] = instruction_gdscript
+		i+= 1
+	return GvintUtils.save_files(directory, instructions)
+
+
+func _create_context_factory(directory: String, source_filename: String, instruction_filenames: Array) -> GDScript:
+	var context_factory_filename: String = directory + "Loader.gd"
+	var context_factory_source: String = _construct_context_factory_script(source_filename, instruction_filenames)
 	
-	var saved_filename: String
-	var i = 0
 	var f := File.new()
-	for source in sources:
-		saved_filename = dir + str(i) + ".gd"
-		f.open(saved_filename, File.WRITE)
-		f.store_string(source)
-		f.close()
-		saved_files.append(saved_filename)
-		i+= 1 
-	return saved_files
+	f.open(context_factory_filename, File.WRITE)
+	f.store_string(context_factory_source)
+	f.close()
+	
+	var context_factory := load(context_factory_filename) as GDScript
+	script_info[source_filename]["context_factory_filename"] = context_factory_filename
+	script_info[source_filename]["context_factory"] = context_factory
+	return context_factory
 
-func create_loader(dir: String, source_filename: String, instruction_files: Array) -> GDScript:
-	var loader_filename: String = dir + "Loader.gd"
+
+func _construct_context_factory_script(source_filename, instruction_files):
 	var instruction_preloads := ""
 	var instruction_list := "[\n"
 	var instruction_identifier: String
 	var i: int = 0
 	for instruction_filename in instruction_files:
-		instruction_identifier = "	" + INSTRUCTION_PREFIX + str(i)
+		instruction_identifier = "	" + _INSTRUCTION_PREFIX + str(i)
 		instruction_list += instruction_identifier + ",\n"
-		instruction_preloads += Templates.LOADER_INSTRUCTION.format({
+		instruction_preloads += ScriptTemplates.LOADER_INSTRUCTION.format({
 			"instruction_index": i,
 			"instruction_filename": instruction_filename
 		}) + "\n"
 		i += 1
 	instruction_list += "]"
-	
-	var f := File.new()
-	f.open(loader_filename, File.WRITE)
-	f.store_string(Templates.LOADER.format({
+	return ScriptTemplates.LOADER.format({
 		"instruction_preloads": instruction_preloads,
 		"instruction_list": instruction_list,
 		"source_filename": source_filename,
-	}))
-	f.close()
-	
-	script_info[source_filename]["loader_filename"] = loader_filename
-	
-	return load(loader_filename) as GDScript
-
-
-func save_script_info():
-	var json_string := JSON.print(script_info)
-	var f = File.new()
-	f.open(SCRIPT_INFO_FILE, File.WRITE)
-	f.store_string(json_string)
-
+	})
 

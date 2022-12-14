@@ -11,7 +11,7 @@ var operator: String
 
 
 func _init():
-	template = Templates.SET_VARIABLE
+	template = ScriptTemplates.SET_VARIABLE
 
 
 func construct_from_tokens(tokens: Array):

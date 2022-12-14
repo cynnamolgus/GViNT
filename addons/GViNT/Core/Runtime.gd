@@ -7,6 +7,9 @@ signal undo_completed
 
 
 
+const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
+
+
 var runtime_variables := {}
 var context_stack := []
 var current_context: GvintContext
@@ -14,37 +17,26 @@ var current_context: GvintContext
 
 
 func _get(property):
-	var stack := get_stack()
-	var calling_method = check_calling_method(stack)
+	var calling_method = GvintUtils.check_calling_method()
 	var called_by_runtime_action = (
 		calling_method == "execute_script_instruction"
 		or calling_method == "undo_script_instruction"
 	)
 	if called_by_runtime_action:
-#		print(calling_method + " GET " + property)
 		if property in runtime_variables:
 			return runtime_variables[property]
 		else:
 			return init_runtime_var(property)
 
-func check_calling_method(stack: Array):
-	if len(stack) <= 1:
-		return null
-	#index 0 is _get
-	#index 1 is method that called the _get
-	var calling_method = stack[1]["function"]
-	return calling_method
-
 func _set(property, value):
 	if property in runtime_variables:
-#		print("set " + property + " = " + str(value))
 		runtime_variables[property] = value
 		return true
 	return false
 
 
 func _ready():
-	execute_script("test.txt")
+	execute_script("test")
 	pass
 
 

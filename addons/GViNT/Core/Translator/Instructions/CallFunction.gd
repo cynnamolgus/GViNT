@@ -14,7 +14,7 @@ var undo_method: String
 
 
 func _init():
-	template = Templates.CALL_FUNCTION
+	template = ScriptTemplates.CALL_FUNCTION
 
 
 func construct_from_tokens(tokens: Array):
