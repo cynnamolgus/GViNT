@@ -8,6 +8,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
 
+[node name="Button" type="Button" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -21.5
+margin_top = -10.0
+margin_right = 21.5
+margin_bottom = 10.0
+text = "advance"
+
 [node name="PanelContainer" type="PanelContainer" parent="."]
 anchor_left = 0.1
 anchor_top = 1.0
@@ -58,18 +69,6 @@ margin_right = 773.0
 margin_bottom = 104.0
 bbcode_enabled = true
 script = ExtResource( 2 )
-
-[node name="Button" type="Button" parent="."]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -21.5
-margin_top = -10.0
-margin_right = 21.5
-margin_bottom = 10.0
-focus_mode = 0
-text = "advance"
 
 [node name="GViNT" parent="." instance=ExtResource( 1 )]
 autostart_script = "res://Story/start.story"

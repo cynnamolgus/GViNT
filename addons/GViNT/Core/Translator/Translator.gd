@@ -47,24 +47,29 @@ func clear():
 	identifier_buffer_open = true
 
 
-func translate_file(file: String):
-	clear()
+func translate_file(file: String, config: Dictionary) -> Array:
 	var source_code := read_file(file)
+	var gdscript_sources := translate_source_code(source_code, config)
+	return gdscript_sources
+
+
+func translate_source_code(source_code: String, config: Dictionary) -> Array:
+	clear()
 	var tokenize_result := tokenizer.tokenize_text(source_code)
-	var gdscript_sources := translate_tokens(tokenize_result.tokens)
+	var gdscript_sources := translate_tokens(tokenize_result.tokens, config)
 	assert(instruction_buffer.empty())
 	assert(identifier_buffer.empty())
 	return gdscript_sources
 
 
-func translate_tokens(tokens) -> Array:
+func translate_tokens(tokens: Array, config: Dictionary) -> Array:
 	var gdscript_sources := []
 	
 	for t in tokens:
 		update_paired_tokens(t)
-		update_identifier_buffer(t)
+		update_identifier_buffer(t, config)
 		if token_ends_instruction(t) and instruction_buffer:
-			var gdscript_instruction = end_instruction()
+			var gdscript_instruction = end_instruction(config)
 			gdscript_sources.append(gdscript_instruction)
 		elif (t.type != Tokens.LINEBREAK
 		  and t.type != Tokens.END_OF_FILE):
@@ -80,7 +85,7 @@ func token_ends_instruction(token: Token) -> bool:
 	) or token.type == Tokens.END_OF_FILE
 
 
-func update_identifier_buffer(token: Token):
+func update_identifier_buffer(token: Token, config: Dictionary):
 	identifier_is_settable = (
 		token.type == Tokens.IDENTIFIER
 		or token.type == Tokens.CLOSE_BRACKET
@@ -100,9 +105,9 @@ func update_identifier_buffer(token: Token):
 		  or token.type == Tokens.DOT):
 			identifier_buffer.append(token)
 		elif token_opens_buffer:
-			flush_identifier_buffer()
+			flush_identifier_buffer(config)
 		else:
-			flush_identifier_buffer()
+			flush_identifier_buffer(config)
 			identifier_buffer_open = false
 	elif token_opens_buffer:
 		identifier_buffer_open = true
@@ -116,7 +121,7 @@ func update_paired_tokens(token: Token):
 			unpaired_tokens.pop_back()
 
 
-func flush_identifier_buffer():
+func flush_identifier_buffer(config: Dictionary):
 	if identifier_buffer.empty():
 		return
 	
@@ -124,22 +129,29 @@ func flush_identifier_buffer():
 	var first_identifier: Token = identifier_buffer[0]
 	var is_builtin_or_global = first_identifier.text[0] in Chars.UPPERCASE
 	if not is_builtin_or_global:
-		identifier_buffer[0].text = "runtime." + identifier_buffer[0].text
+		var identifier: String = identifier_buffer[0].text
+		if identifier in config.shorthands:
+			identifier = config.shorthands[identifier]
+		identifier_buffer[0].text = "runtime." + identifier
 	identifier_buffer.clear()
 
 
-func end_instruction():
+func end_instruction(config: Dictionary):
 	current_instruction = instantiate_instruction_from_buffer()
 	current_instruction.construct_from_tokens(instruction_buffer)
 	instruction_buffer.clear()
 	
 	# todo: generalize script translation config
 	if current_instruction is DisplayText:
-		current_instruction.target = "runtime.text_preprocessor"
-		current_instruction.method = "display_text"
-		current_instruction.undo_method = "undo_display_text"
+		current_instruction.target = config.display_text_target
+		current_instruction.method = config.display_text_method
+		current_instruction.undo_method = config.display_text_undo
 	elif current_instruction is CallFunction:
-		current_instruction.undo_method = "undo_" + current_instruction.method
+		current_instruction.undo_method = (
+			config.default_undo_prefix
+			+ current_instruction.method 
+			+ config.default_undo_suffix 
+		)
 	
 	return current_instruction.to_gdscript()
 

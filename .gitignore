@@ -1,4 +1,3 @@
 /import/
 *.import
-/addons/GViNT/*/ScriptCache/
-/addons/GViNT/*/scripts.json
+/addons/GViNT/ScriptCache/*

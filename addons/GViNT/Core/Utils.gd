@@ -3,8 +3,6 @@ extends Reference
 static func read_file(file: String) -> String:
 	var f := File.new()
 	var error = f.open(file, File.READ)
-	if error:
-		push_error(str(error))
 	
 	var data: String
 	if f.is_open():

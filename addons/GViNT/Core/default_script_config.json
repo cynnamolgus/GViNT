@@ -1,0 +1,17 @@
+{
+  "id": "default",
+  "default_undo_prefix": "undo_",
+  "default_undo_suffix": "",
+  
+  "display_text_target": "runtime.text_preprocessor",
+  "display_text_method": "display_text",
+  "display_text_undo": "undo_display_text",
+  
+  "shorthands": {
+    "play_sound": "audio.play_sound"
+  },
+  
+  "exposed_methods": [
+  
+  ]
+}

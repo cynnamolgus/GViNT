@@ -9,9 +9,14 @@ signal undo_completed
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
+const DEFAULT_CONFIG_FILE = "res://addons/GViNT/Core/default_script_config.json" 
+
 export(String, FILE, "*.story") var autostart_script := ""
+export(String, FILE, "*.json") var config_override := ""
 
 var _regex: RegEx
+
+var _script_config: Dictionary
 
 var runtime_variables := {}
 var context_stack := []
@@ -39,11 +44,17 @@ func _set(property, value):
 
 
 func _ready():
+	_load_config()
 	_init_pascal_case_regex()
 	register_children(self)
 	runtime_variables.erase(to_snake_case(name))
 	if autostart_script:
 		execute_script(autostart_script)
+
+
+func _load_config():
+	var config_filename := config_override if config_override else DEFAULT_CONFIG_FILE
+	_script_config = GvintUtils.load_json_dict(config_filename)
 
 
 func _init_pascal_case_regex():
@@ -52,7 +63,7 @@ func _init_pascal_case_regex():
 
 
 func execute_script(file: String):
-	var new_context := GvintScripts.load_script(file)
+	var new_context := GvintScripts.load_script(file, _script_config)
 	var result
 	for instruction in new_context.instructions:
 		result = instruction.execute_script_instruction(self)
