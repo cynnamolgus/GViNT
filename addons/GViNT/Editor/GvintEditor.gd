@@ -2,6 +2,10 @@ tool
 extends Control
 
 
+
 func _ready():
 	print("GViNT editor ready")
-	pass
+
+
+func _on_ClearCacheButton_pressed():
+	GvintScripts.clear_script_info()

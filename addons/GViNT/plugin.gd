@@ -47,9 +47,9 @@ func get_plugin_icon():
 	)
 
 
-func handles(object):
-	if object is GvintRuntime:
-		return true
+#func handles(object):
+#	if object is GvintRuntime:
+#		return true
 
 
 func spawn_ui():

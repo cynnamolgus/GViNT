@@ -9,6 +9,9 @@ signal undo_completed
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
+export(String, FILE, "*.story") var autostart_script := ""
+
+var _regex: RegEx
 
 var runtime_variables := {}
 var context_stack := []
@@ -36,8 +39,16 @@ func _set(property, value):
 
 
 func _ready():
-	execute_script("test")
-	pass
+	_init_pascal_case_regex()
+	register_children(self)
+	runtime_variables.erase(to_snake_case(name))
+	if autostart_script:
+		execute_script(autostart_script)
+
+
+func _init_pascal_case_regex():
+	_regex = RegEx.new()
+	_regex.compile('((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))')
 
 
 func execute_script(file: String):
@@ -55,20 +66,17 @@ func init_runtime_var(identifier: String):
 	return runtime_variables[identifier]
 
 
-func display_text(test, params):
-	print(str(params) + ": " + test)
-	yield(get_tree().create_timer(0.25), "timeout")
+func to_snake_case(identifier: String):
+	return _regex.sub(identifier, "_$1", true).to_lower()
 
-func undo_display_text():
-	pass
 
-func get_some_value():
-	return 42
-
-func do_a_thing():
-	print(runtime_variables.foo)
-
-func undo_do_a_thing():
-	pass
+func register_children(node: Node):
+	var snake_case_name = to_snake_case(node.name)
+	if snake_case_name in runtime_variables:
+		push_warning("Duplicate runtime node '" + node.name + "'")
+	if not snake_case_name.begins_with("_"):
+		runtime_variables[snake_case_name] = node
+	for child in node.get_children():
+		register_children(child)
 
 

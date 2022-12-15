@@ -59,6 +59,7 @@ func to_gdscript():
 		target_string += t.text
 	for t in params_tokens:
 		params_string += t.text
+	target_string.trim_suffix(".")
 	return template.format({
 		"target": target_string,
 		"method": method,

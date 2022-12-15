@@ -135,7 +135,7 @@ func end_instruction():
 	
 	# todo: generalize script translation config
 	if current_instruction is DisplayText:
-		current_instruction.target = "runtime"
+		current_instruction.target = "runtime.text_preprocessor"
 		current_instruction.method = "display_text"
 		current_instruction.undo_method = "undo_display_text"
 	elif current_instruction is CallFunction:

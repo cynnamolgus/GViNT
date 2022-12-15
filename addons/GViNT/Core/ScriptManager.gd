@@ -2,6 +2,7 @@ tool
 extends Node
 
 
+
 const DEFAULT_SCRIPT_DIR = "res://Story/"
 const DEFAULT_SCRIPT_EXTENSION = ".story"
 
@@ -49,6 +50,7 @@ func save_script_info():
 	var f = File.new()
 	f.open(SCRIPT_INFO_FILE, File.WRITE)
 	f.store_string(json_string)
+	f.close()
 
 
 func load_script(source_filename: String) -> GvintContext:
@@ -94,15 +96,23 @@ func script_needs_compiling(script: String):
 	return false
 
 
+func clear_script_info():
+	for script_filename in script_info:
+		delete_compiled_script(script_filename)
+	save_script_info()
+
+
 func delete_obsolete_script_info():
 	var d := Directory.new()
-	var cached_script_directory: String
 	for script_filename in script_info:
 		if not d.file_exists(script_filename):
-			script_info.erase(script_filename)
-			cached_script_directory = COMPILED_SCRIPTS_DIR + script_filename.md5_text()
-			GvintUtils.delete_directory(cached_script_directory)
+			delete_compiled_script(script_filename)
 	save_script_info()
+
+
+func delete_compiled_script(script_filename: String):
+	script_info.erase(script_filename)
+	GvintUtils.delete_directory(COMPILED_SCRIPTS_DIR + script_filename.md5_text())
 
 
 func compile_script(script: String):

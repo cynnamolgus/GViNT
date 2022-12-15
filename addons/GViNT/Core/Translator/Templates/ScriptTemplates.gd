@@ -11,7 +11,8 @@ static func execute_script_instruction(runtime: GvintRuntime):
 		yield(result, "completed")
 
 static func undo_script_instruction(runtime: GvintRuntime):
-	var result = {target}.call("{undo_method}")
+	var target = {target}
+	var result = target.call("{undo_method}")
 	if result is GDScriptFunctionState:
 		yield(result, "completed")
 """
@@ -19,11 +20,13 @@ static func undo_script_instruction(runtime: GvintRuntime):
 const SET_VARIABLE = """extends Reference
 
 static func execute_script_instruction(runtime: GvintRuntime):
-	assert({target} is GvintVariable)
-	{target}.value {operator} {value}
+	var target = {target}
+	assert(target is GvintVariable)
+	target.value {operator} {value}
 
 static func undo_script_instruction(runtime: GvintRuntime):
-	{target}.undo_last_change()
+	var target = {target}
+	target.undo_last_change()
 """
 
 const LOADER_INSTRUCTION = "const Instruction_{instruction_index} = preload(\"{instruction_filename}\")"
