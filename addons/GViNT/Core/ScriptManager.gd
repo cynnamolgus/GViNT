@@ -146,18 +146,18 @@ func compile_script(script: String, config: Dictionary):
 	d.make_dir(compiled_script_directory)
 	
 	translator.clear()
-	var gdscript_sources: Array = translator.translate_file(script, config)
-	var instruction_files := _save_compiled_instructions(compiled_script_directory, gdscript_sources)
-	var context_factory_filename := _create_context_factory(compiled_script_directory, script, instruction_files)
-	
-	var context_factory := load(context_factory_filename) as GDScript
-	script_info[config.id][script]["context_factory_filename"] = context_factory_filename
-	script_info[config.id][script]["context_factory"] = context_factory
-	
-	var current_time: int = floor(Time.get_unix_time_from_system())
-	script_info[config.id][script]["last_compiled"] = current_time
-	save_script_info()
-	return context_factory
+#	var gdscript_sources: Array = translator.translate_file(script, config)
+#	var instruction_files := _save_compiled_instructions(compiled_script_directory, gdscript_sources)
+#	var context_factory_filename := _create_context_factory(compiled_script_directory, script, instruction_files)
+#
+#	var context_factory := load(context_factory_filename) as GDScript
+#	script_info[config.id][script]["context_factory_filename"] = context_factory_filename
+#	script_info[config.id][script]["context_factory"] = context_factory
+#
+#	var current_time: int = floor(Time.get_unix_time_from_system())
+#	script_info[config.id][script]["last_compiled"] = current_time
+#	save_script_info()
+#	return context_factory
 
 
 func _save_compiled_instructions(directory: String, gdscript_sources: Array) -> Array:

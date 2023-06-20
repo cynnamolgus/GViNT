@@ -2,6 +2,10 @@ extends Reference
 
 
 
+const Templates = preload("res://addons/GViNT/Core/Translator/Templates/Templates.gd")
+
+const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
+
 const Tokenizer = preload("res://addons/GViNT/Core/Translator/Tokenizer/Tokenizer.gd")
 const TokenizeResult = preload("res://addons/GViNT/Core/Translator/Tokenizer/TokenizeResult.gd")
 const Token = preload("res://addons/GViNT/Core/Translator/Tokenizer/Token.gd")
@@ -9,24 +13,29 @@ const Token = preload("res://addons/GViNT/Core/Translator/Tokenizer/Token.gd")
 const Tokens = preload("res://addons/GViNT/Core/Translator/Tokenizer/Tokens.gd")
 const Chars = preload("res://addons/GViNT/Core/Translator/Characters.gd")
 
-const SetVariable = preload("res://addons/GViNT/Core/Translator/Instructions/SetVariable.gd")
-const CallFunction = preload("res://addons/GViNT/Core/Translator/Instructions/CallFunction.gd")
-const DisplayText = preload("res://addons/GViNT/Core/Translator/Instructions/DisplayText.gd")
-
+const Statement = preload("res://addons/GViNT/Core/Translator/Statements/Statement.gd")
+const SetVariable = preload("res://addons/GViNT/Core/Translator/Statements/SetVariable.gd")
+const CallFunction = preload("res://addons/GViNT/Core/Translator/Statements/CallFunction.gd")
+const DisplayText = preload("res://addons/GViNT/Core/Translator/Statements/DisplayText.gd")
+const IfCondition = preload("res://addons/GViNT/Core/Translator/Statements/IfCondition.gd")
+const ConditionalBranch = preload("res://addons/GViNT/Core/Translator/Statements/ConditionalBranch.gd")
+const EndConditional = preload("res://addons/GViNT/Core/Translator/Statements/EndConditional.gd")
 
 
 var tokenizer := Tokenizer.new()
 
 var unpaired_tokens := []
 
-var current_instruction
+var current_statement
+var statements := []
 
-var instruction_buffer := []
+var statement_buffer := []
 var identifier_buffer := []
 
 var identifier_is_settable := false
 var identifier_buffer_open := true
 
+var last_statement_was_conditional := false
 
 
 func read_file(file: String) -> String:
@@ -40,49 +49,118 @@ func read_file(file: String) -> String:
 
 func clear():
 	tokenizer.clear()
-	current_instruction = null
-	instruction_buffer.clear()
+	current_statement = null
+	statement_buffer.clear()
 	identifier_buffer.clear()
 	identifier_is_settable = false
 	identifier_buffer_open = true
 
 
-func translate_file(file: String, config: Dictionary) -> Array:
+func translate_file(file: String, config: Dictionary) -> String:
 	var source_code := read_file(file)
 	var gdscript_sources := translate_source_code(source_code, config)
 	return gdscript_sources
 
 
-func translate_source_code(source_code: String, config: Dictionary) -> Array:
+func translate_source_code(source_code: String, config: Dictionary) -> String:
 	clear()
 	var tokenize_result := tokenizer.tokenize_text(source_code)
-	var gdscript_sources := translate_tokens(tokenize_result.tokens, config)
-	assert(instruction_buffer.empty())
-	assert(identifier_buffer.empty())
-	return gdscript_sources
-
-
-func translate_tokens(tokens: Array, config: Dictionary) -> Array:
-	var gdscript_sources := []
 	
+	var result_gdscript := translate_tokens(tokenize_result.tokens, config)
+	assert(statement_buffer.empty())
+	assert(identifier_buffer.empty())
+	return result_gdscript
+
+
+func translate_tokens(tokens: Array, config: Dictionary) -> String:
+	parse_statements(tokens, config)
+	collapse_conditionals()
+	
+	var index: int = 0
+	var statement_class_names_list = []
+	var statement_class_definitions = ""
+	for s in statements:
+		s.statement_id = str(index)
+		statement_class_names_list.append(Templates.STATEMENT_PREFIX + s.statement_id)
+		statement_class_definitions += s.to_string()
+		index += 1
+	
+	var statement_class_names = GvintUtils.pretty_print_array(statement_class_names_list)
+	
+	
+	var result = Templates.BASE.format({
+		"statement_class_definitions": statement_class_definitions,
+		"statement_class_names": statement_class_names
+	})
+	
+	return result
+
+
+func parse_statements(tokens: Array, config: Dictionary):
+	statements = []
 	for t in tokens:
 		update_paired_tokens(t)
 		update_identifier_buffer(t, config)
-		if token_ends_instruction(t) and instruction_buffer:
-			var gdscript_instruction = end_instruction(config)
-			gdscript_sources.append(gdscript_instruction)
+		if last_statement_was_conditional and t.type == Tokens.CLOSE_BRACE:
+			statements.append(EndConditional.new())
+			continue
+		if statement_buffer and token_ends_statement(t):
+			var statement = end_statement(config)
+			statements.append(statement)
 		elif (t.type != Tokens.LINEBREAK
 		  and t.type != Tokens.END_OF_FILE):
-			instruction_buffer.append(t)
+			statement_buffer.append(t)
+
+
+func collapse_conditionals():
+	var conditional_stack = []
+	var collapsed_statements = []
 	
-	return gdscript_sources
+	for s in statements:
+		if s is IfCondition:
+			conditional_stack.push_back(s)
+			s.indent_amount = conditional_stack.size()
+			continue
+		
+		if s is ConditionalBranch:
+			assert(conditional_stack)
+			
+			var cond = collapsed_statements.pop_back()
+			assert(cond is IfCondition)
+			conditional_stack.push_back(cond)
+			
+			conditional_stack.back().branches.append(s)
+			conditional_stack.back().current_branch += 1
+			continue
+		
+		if s is EndConditional:
+			assert(conditional_stack)
+			conditional_stack.back().current_branch -= 1
+			
+			var cond = conditional_stack.pop_back()
+			collapsed_statements.push_back(cond)
+			continue
+		
+		if conditional_stack:
+			var cond: IfCondition = conditional_stack.back()
+			cond.branches[cond.current_branch].branch_statements.push_back(s)
+		else:
+			collapsed_statements.push_back(s)
+	
+	statements = collapsed_statements
 
 
-func token_ends_instruction(token: Token) -> bool:
-	return (
-		token.type == Tokens.LINEBREAK 
-		and unpaired_tokens.empty()
-	) or token.type == Tokens.END_OF_FILE
+func token_ends_statement(token: Token) -> bool:
+	if statement_buffer.front() in Tokens.CONDITIONALS:
+		return (
+			token.type == Tokens.LINEBREAK 
+			and unpaired_tokens.back() == Tokens.OPEN_BRACE
+		) or token.type == Tokens.END_OF_FILE
+	else:
+		return (
+			token.type == Tokens.LINEBREAK 
+			and unpaired_tokens.empty()
+		) or token.type == Tokens.END_OF_FILE
 
 
 func update_identifier_buffer(token: Token, config: Dictionary):
@@ -98,6 +176,7 @@ func update_identifier_buffer(token: Token, config: Dictionary):
 		or token.type == Tokens.COMMA
 		or token.type == Tokens.COLON
 		or token.type in Tokens.OPENING_TOKENS
+		or token.type in Tokens.CONDITIONALS
 	)
 	
 	if identifier_buffer_open:
@@ -114,6 +193,7 @@ func update_identifier_buffer(token: Token, config: Dictionary):
 
 
 func update_paired_tokens(token: Token):
+	
 	if token.type in Tokens.OPENING_TOKENS:
 		unpaired_tokens.append(token.type)
 	elif unpaired_tokens:
@@ -136,33 +216,50 @@ func flush_identifier_buffer(config: Dictionary):
 	identifier_buffer.clear()
 
 
-func end_instruction(config: Dictionary):
-	current_instruction = instantiate_instruction_from_buffer()
-	current_instruction.construct_from_tokens(instruction_buffer)
-	instruction_buffer.clear()
+func end_statement(config: Dictionary) -> Statement:
+	current_statement = instantiate_statement_from_buffer()
+	current_statement.construct_from_tokens(statement_buffer)
+	statement_buffer.clear()
 	
 	# todo: generalize script translation config
-	if current_instruction is DisplayText:
-		current_instruction.target = config.display_text_target
-		current_instruction.method = config.display_text_method
-		current_instruction.undo_method = config.display_text_undo
-	elif current_instruction is CallFunction:
-		current_instruction.undo_method = (
+	if current_statement is DisplayText:
+		current_statement.target = config.display_text_target
+		current_statement.method = config.display_text_method
+		current_statement.undo_method = config.display_text_undo
+	elif current_statement is CallFunction:
+		current_statement.undo_method = (
 			config.default_undo_prefix
-			+ current_instruction.method 
+			+ current_statement.method 
 			+ config.default_undo_suffix 
 		)
 	
-	return current_instruction.to_gdscript()
+	return current_statement
 
 
-func instantiate_instruction_from_buffer():
-	assert(instruction_buffer)
+func instantiate_statement_from_buffer():
+	assert(statement_buffer)
+	
+	var instance
+	
+	var first_token = statement_buffer.front()
+	last_statement_was_conditional = true
+	match first_token.type:
+		Tokens.KEYWORD_IF:
+			instance = IfCondition.new()
+			instance.template = Templates.CONDITIONAL_STATEMENT
+			return instance
+		Tokens.KEYWORD_ELSE:
+			instance = ConditionalBranch.new()
+			return instance
+		Tokens.KEYWORD_ELIF:
+			instance = ConditionalBranch.new()
+			return instance
+	last_statement_was_conditional = false
 	
 	var colons := 0
 	var assignments := 0
 	var dict_level := 0
-	for t in instruction_buffer:
+	for t in statement_buffer:
 		match t.type:
 			Tokens.OPEN_BRACE:
 				dict_level += 1
@@ -174,16 +271,27 @@ func instantiate_instruction_from_buffer():
 			Tokens.ASSIGN:
 				assignments += 1
 	
-	var instance
 	if colons:
 		assert(colons == 1)
 		instance = DisplayText.new()
 		instance.has_params = true
+		instance.template = Templates.CALL_FUNCTION
 		return instance
-	elif instruction_buffer[0].type == Tokens.STRING:
+	elif statement_buffer[0].type == Tokens.STRING:
+		instance = DisplayText.new()
+		instance.template = Templates.CALL_FUNCTION
+		
 		return DisplayText.new()
 	if assignments:
 		assert(assignments == 1)
-		return SetVariable.new()
-	return CallFunction.new()
+		instance = SetVariable.new()
+		instance.template = Templates.SET_WITHOUT_UNDO
+		return instance
+	
+	if instance == null:
+		instance = CallFunction.new()
+		instance.template = Templates.CALL_FUNCTION
+	
+	assert(instance)
+	return instance
 

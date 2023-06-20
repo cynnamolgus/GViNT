@@ -1,4 +1,4 @@
-extends "res://addons/GViNT/Core/Translator/Instructions/Instruction.gd"
+extends "res://addons/GViNT/Core/Translator/Statements/Statement.gd"
 
 
 
@@ -50,17 +50,20 @@ func construct_from_tokens(tokens: Array):
 		target_string = method_helper.trim_suffix("." + method)
 	else:
 		target_tokens.invert()
+		if target_tokens.back().type == Tokens.DOT:
+			target_tokens.pop_back()
 	
 	pass
 
 
-func to_gdscript():
+func _to_string():
 	for t in target_tokens:
 		target_string += t.text
 	for t in params_tokens:
 		params_string += t.text
 	target_string.trim_suffix(".")
 	return template.format({
+		"statement_id": statement_id,
 		"target": target_string,
 		"method": method,
 		"undo_method": undo_method,

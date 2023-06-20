@@ -1,4 +1,4 @@
-extends "res://addons/GViNT/Core/Translator/Instructions/Instruction.gd"
+extends "res://addons/GViNT/Core/Translator/Statements/Statement.gd"
 
 
 
@@ -8,10 +8,6 @@ var value_tokens := []
 var target_string := ""
 var value_string := ""
 var operator: String
-
-
-func _init():
-	template = ScriptTemplates.SET_VARIABLE
 
 
 func construct_from_tokens(tokens: Array):
@@ -27,12 +23,13 @@ func construct_from_tokens(tokens: Array):
 			value_tokens.append(t)
 
 
-func to_gdscript():
+func _to_string():
 	for t in target_tokens:
 		target_string += t.text
 	for t in value_tokens:
 		value_string += t.text
 	return template.format({
+		"statement_id": statement_id,
 		"target": target_string,
 		"operator": operator,
 		"value": value_string,

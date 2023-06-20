@@ -8,7 +8,7 @@ var history := []
 
 func set_value(new_value):
 	history.push_back(value)
-	if typeof(new_value) == typeof(self):
+	if "value" in new_value:
 		value = new_value.value
 	else:
 		value = new_value

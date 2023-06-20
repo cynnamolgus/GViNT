@@ -63,3 +63,21 @@ static func check_calling_method():
 	#index 2 is what it wants to know
 	var calling_method = stack[2]["function"]
 	return calling_method
+
+
+static func indent_text_lines(text, indent_amount):
+	var lines = text.split("\n")
+	var result = ""
+	var indentation = ""
+	for i in range(indent_amount):
+		indentation += "	"
+	for line in lines:
+		result += indentation + line + "\n"
+	return result
+
+static func pretty_print_array(arr: Array):
+	var result = "[\n"
+	for element in arr:
+		result += "	" + str(element) + ",\n"
+	result += "]"
+	return result

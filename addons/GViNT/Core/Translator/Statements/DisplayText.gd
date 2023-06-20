@@ -1,4 +1,4 @@
-extends "res://addons/GViNT/Core/Translator/Instructions/Instruction.gd"
+extends "res://addons/GViNT/Core/Translator/Statements/Statement.gd"
 
 
 
@@ -49,7 +49,7 @@ func construct_from_params_and_text(tokens: Array):
 				text += t.text.trim_prefix('"').trim_suffix('"')
 
 
-func to_gdscript():
+func _to_string():
 	for t in params_tokens:
 		params_string += t.text
 	return template.format({
