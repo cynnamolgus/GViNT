@@ -12,6 +12,9 @@ if true {
 	foo = 5
 } elif foo {
 	foo = 10
+	if randi() % 2 {
+		foo = 15
+	}
 }
 """
 

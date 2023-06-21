@@ -78,6 +78,6 @@ static func indent_text_lines(text, indent_amount):
 static func pretty_print_array(arr: Array) -> String:
 	var result = "[\n"
 	for element in arr:
-		result += "	" + str(element) + ",\n	"
-	result += "]"
+		result += "	" + str(element) + ",\n"
+	result += "	]"
 	return result

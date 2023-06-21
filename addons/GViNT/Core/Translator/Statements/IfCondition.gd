@@ -4,8 +4,6 @@ extends "res://addons/GViNT/Core/Translator/Statements/ConditionalBranch.gd"
 var branches = [self]
 var current_branch = 0
 
-var indent_amount: int = 0
-
 
 func _to_string():
 	var result = Templates.CONDITIONAL_STATEMENT
@@ -23,7 +21,7 @@ func _to_string():
 			)
 			
 			var statement_class: String = s.to_string()
-			statement_class = GvintUtils.indent_text_lines(statement_class, indent_amount)
+			statement_class = GvintUtils.indent_text_lines(statement_class, 1)
 			
 			branch_class_definitions += statement_class + "\n"
 			branch_class_names.back().append(Templates.STATEMENT_PREFIX + s.statement_id)
@@ -38,7 +36,7 @@ func _to_string():
 		
 		var branch_id = "branch" + str(branch_index)
 		var class_names := GvintUtils.pretty_print_array(b)
-		class_names = GvintUtils.indent_text_lines(class_names, indent_amount)
+		class_names = GvintUtils.indent_text_lines(class_names, 1)
 		while class_names.begins_with("	"):
 			class_names = class_names.trim_prefix("	")
 		
@@ -48,9 +46,9 @@ func _to_string():
 			"branch_id": branch_id,
 			"statement_class_names": class_names
 		})
-		context_getter = GvintUtils.indent_text_lines(context_getter, indent_amount)
+		context_getter = GvintUtils.indent_text_lines(context_getter, 1)
 		branch_context_getters += context_getter + "\n"
-	
+	branch_context_getters = branch_context_getters.trim_suffix("\n")
 	
 	
 	result = result.format({

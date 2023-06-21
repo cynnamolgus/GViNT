@@ -86,7 +86,7 @@ func translate_tokens(tokens: Array, config: Dictionary) -> String:
 	for s in statements:
 		s.statement_id = str(index)
 		statement_class_names_list.append(Templates.STATEMENT_PREFIX + s.statement_id)
-		statement_class_definitions += s.to_string()
+		statement_class_definitions += s.to_string() + "\n"
 		index += 1
 	
 	var statement_class_names = GvintUtils.pretty_print_array(statement_class_names_list)
@@ -125,7 +125,6 @@ func collapse_conditionals():
 	for s in statements:
 		if s is IfCondition:
 			conditional_stack.push_back(s)
-			s.indent_amount = conditional_stack.size()
 			continue
 		
 		if s is ConditionalBranch:
@@ -144,8 +143,13 @@ func collapse_conditionals():
 			if conditional_stack.back().current_branch > 0:
 				conditional_stack.back().current_branch -= 1
 			
-			var cond = conditional_stack.pop_back()
-			collapsed_statements.push_back(cond)
+			var nested_conditional = conditional_stack.pop_back()
+			if conditional_stack:
+				var parent_conditional = conditional_stack.back()
+				var target_branch = parent_conditional.branches[parent_conditional.current_branch]
+				target_branch.branch_statements.push_back(nested_conditional)
+			else:
+				collapsed_statements.push_back(nested_conditional)
 			continue
 		
 		if conditional_stack:
