@@ -5,6 +5,7 @@ extends Reference
 const Templates = preload("res://addons/GViNT/Core/Translator/Templates/Templates.gd")
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
+const GvintConfig = preload("res://addons/GViNT/Core/Config.gd")
 
 const Tokenizer = preload("res://addons/GViNT/Core/Translator/Tokenizer/Tokenizer.gd")
 const TokenizeResult = preload("res://addons/GViNT/Core/Translator/Tokenizer/TokenizeResult.gd")
@@ -60,23 +61,23 @@ func clear():
 	identifier_buffer_open = true
 
 
-func translate_file(file: String, config: Dictionary) -> String:
+func translate_file(file: String, config: GvintConfig) -> String:
 	var source_code := read_file(file)
-	var gdscript_sources := translate_source_code(source_code, config)
-	return gdscript_sources
+	var gdscript_code := translate_source_code(source_code, config)
+	return gdscript_code
 
 
-func translate_source_code(source_code: String, config: Dictionary) -> String:
+func translate_source_code(source_code: String, config: GvintConfig) -> String:
 	clear()
 	var tokenize_result := tokenizer.tokenize_text(source_code)
 	
-	var result_gdscript := translate_tokens(tokenize_result.tokens, config)
+	var gdscript_code := translate_tokens(tokenize_result.tokens, config)
 	assert(statement_buffer.empty())
 	assert(identifier_buffer.empty())
-	return result_gdscript
+	return gdscript_code
 
 
-func translate_tokens(tokens: Array, config: Dictionary) -> String:
+func translate_tokens(tokens: Array, config: GvintConfig) -> String:
 	parse_statements(tokens, config)
 	collapse_conditionals()
 	
@@ -100,7 +101,7 @@ func translate_tokens(tokens: Array, config: Dictionary) -> String:
 	return result
 
 
-func parse_statements(tokens: Array, config: Dictionary):
+func parse_statements(tokens: Array, config: GvintConfig):
 	statements = []
 	for t in tokens:
 		if (unpaired_braces == nested_conditionals) and t.type == Tokens.CLOSE_BRACE:
@@ -174,7 +175,7 @@ func token_ends_statement(token: Token) -> bool:
 		) or token.type == Tokens.END_OF_FILE
 
 
-func update_identifier_buffer(token: Token, config: Dictionary):
+func update_identifier_buffer(token: Token, config: GvintConfig):
 	identifier_is_settable = (
 		token.type == Tokens.IDENTIFIER
 		or token.type == Tokens.CLOSE_BRACKET
@@ -218,7 +219,7 @@ func update_paired_tokens(token: Token):
 			unpaired_tokens.pop_back()
 
 
-func flush_identifier_buffer(config: Dictionary):
+func flush_identifier_buffer(config: GvintConfig):
 	if identifier_buffer.empty():
 		return
 	
@@ -233,7 +234,7 @@ func flush_identifier_buffer(config: Dictionary):
 	identifier_buffer.clear()
 
 
-func end_statement(config: Dictionary) -> Statement:
+func end_statement(config: GvintConfig) -> Statement:
 	current_statement = instantiate_statement_from_buffer()
 	current_statement.construct_from_tokens(statement_buffer)
 	statement_buffer.clear()
@@ -242,12 +243,11 @@ func end_statement(config: Dictionary) -> Statement:
 	if current_statement is DisplayText:
 		current_statement.target = config.display_text_target
 		current_statement.method = config.display_text_method
-		current_statement.undo_method = config.display_text_undo
+		current_statement.undo_method = config.undo_method_prefix + config.display_text_method
 	elif current_statement is CallFunction:
 		current_statement.undo_method = (
-			config.default_undo_prefix
+			config.undo_method_prefix
 			+ current_statement.method 
-			+ config.default_undo_suffix 
 		)
 	
 	return current_statement

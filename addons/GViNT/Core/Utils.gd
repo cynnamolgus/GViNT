@@ -11,6 +11,11 @@ static func read_file(file: String) -> String:
 	
 	return data
 
+static func save_file(filename: String, data: String):
+	var f := File.new()
+	f.open(filename, File.WRITE)
+	f.store_string(data)
+	f.close()
 
 static func save_files(directory: String, files: Dictionary) -> Array:
 	var saved_files := []
@@ -28,8 +33,8 @@ static func save_files(directory: String, files: Dictionary) -> Array:
 	return saved_files
 
 
-static func load_json_dict(file_path: String) -> Dictionary:
-	var json_string := read_file(file_path)
+static func load_json_dict(filename: String) -> Dictionary:
+	var json_string := read_file(filename)
 	if not json_string:
 		return {}
 	
@@ -42,6 +47,19 @@ static func load_json_dict(file_path: String) -> Dictionary:
 	else:
 		return (parse_result.result) as Dictionary
 
+static func load_json_array(filename: String) -> Array:
+	var json_string := read_file(filename)
+	if not json_string:
+		return []
+	
+	var parse_result := JSON.parse(json_string)
+	assert(not parse_result.error)
+	
+	if parse_result.error:
+		push_error(parse_result.error_string)
+		return []
+	else:
+		return (parse_result.result) as Array
 
 static func delete_directory(directory: String):
 	var d = Directory.new()

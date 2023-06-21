@@ -63,12 +63,13 @@ func _init_pascal_case_regex():
 
 
 func execute_script(file: String):
-	var new_context := GvintScripts.load_script(file, _script_config)
-	var result
-	for instruction in new_context.instructions:
-		result = instruction.execute_script_instruction(self)
-		if result is GDScriptFunctionState:
-			yield(result, "completed")
+#	var new_context := GvintScripts.load_script(file, _script_config)
+#	var result
+#	for instruction in new_context.instructions:
+#		result = instruction.execute_script_instruction(self)
+#		if result is GDScriptFunctionState:
+#			yield(result, "completed")
+	pass
 
 
 func init_runtime_var(identifier: String):

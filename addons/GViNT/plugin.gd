@@ -17,14 +17,14 @@ func _init():
 
 
 func _enter_tree():
-	spawn_script_manager()
+#	spawn_script_manager()
 	spawn_ui()
 	make_visible(false)
 
 
 func _exit_tree():
 	remove_ui()
-	remove_script_manager()
+#	remove_script_manager()
 
 
 func has_main_screen():

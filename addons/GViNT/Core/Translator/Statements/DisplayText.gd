@@ -53,6 +53,7 @@ func _to_string():
 	for t in params_tokens:
 		params_string += t.text
 	return template.format({
+		"statement_id": statement_id,
 		"target": target,
 		"method": method,
 		"undo_method": undo_method,

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "cutscene",
+    "mode": "CUTSCENE",
+    "display_text_target": "runtime",
+    "display_text_method": "display_text",
+    "undo_method_prefix": "undo_",
+    "shorthands": {
+    },
+  },
+  {
+    "id": "vn",
+    "mode": "VN",
+    "display_text_target": "runtime",
+    "display_text_method": "display_text",
+    "undo_method_prefix": "undo_",
+    "shorthands": {
+    },
+  }
+]
