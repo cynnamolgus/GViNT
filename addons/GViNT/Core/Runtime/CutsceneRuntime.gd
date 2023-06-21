@@ -2,7 +2,8 @@ tool
 class_name CutsceneRuntime extends GvintRuntime
 
 func _init():
-	config_id = "cutscene"
+	if Engine.editor_hint:
+		config_id = "cutscene"
 
 func init_runtime_var(identifier: String, default_value = null):
 	if not identifier in runtime_variables:
