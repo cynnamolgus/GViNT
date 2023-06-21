@@ -26,6 +26,9 @@ var tokenizer := Tokenizer.new()
 
 var unpaired_tokens := []
 
+var unpaired_braces: int = 0
+
+
 var current_statement
 var statements := []
 
@@ -35,6 +38,7 @@ var identifier_buffer := []
 var identifier_is_settable := false
 var identifier_buffer_open := true
 
+var nested_conditionals = 0
 var last_statement_was_conditional := false
 
 
@@ -99,11 +103,13 @@ func translate_tokens(tokens: Array, config: Dictionary) -> String:
 func parse_statements(tokens: Array, config: Dictionary):
 	statements = []
 	for t in tokens:
+		if (unpaired_braces == nested_conditionals) and t.type == Tokens.CLOSE_BRACE:
+			statements.append(EndConditional.new())
+			nested_conditionals -= 1
+			update_paired_tokens(t)
+			continue
 		update_paired_tokens(t)
 		update_identifier_buffer(t, config)
-		if last_statement_was_conditional and t.type == Tokens.CLOSE_BRACE:
-			statements.append(EndConditional.new())
-			continue
 		if statement_buffer and token_ends_statement(t):
 			var statement = end_statement(config)
 			statements.append(statement)
@@ -123,7 +129,7 @@ func collapse_conditionals():
 			continue
 		
 		if s is ConditionalBranch:
-			assert(conditional_stack)
+			assert(collapsed_statements.back() is ConditionalBranch)
 			
 			var cond = collapsed_statements.pop_back()
 			assert(cond is IfCondition)
@@ -135,7 +141,8 @@ func collapse_conditionals():
 		
 		if s is EndConditional:
 			assert(conditional_stack)
-			conditional_stack.back().current_branch -= 1
+			if conditional_stack.back().current_branch > 0:
+				conditional_stack.back().current_branch -= 1
 			
 			var cond = conditional_stack.pop_back()
 			collapsed_statements.push_back(cond)
@@ -151,7 +158,7 @@ func collapse_conditionals():
 
 
 func token_ends_statement(token: Token) -> bool:
-	if statement_buffer.front() in Tokens.CONDITIONALS:
+	if statement_buffer.front().type in Tokens.CONDITIONALS:
 		return (
 			token.type == Tokens.LINEBREAK 
 			and unpaired_tokens.back() == Tokens.OPEN_BRACE
@@ -159,7 +166,7 @@ func token_ends_statement(token: Token) -> bool:
 	else:
 		return (
 			token.type == Tokens.LINEBREAK 
-			and unpaired_tokens.empty()
+			and (unpaired_braces <= nested_conditionals)
 		) or token.type == Tokens.END_OF_FILE
 
 
@@ -193,6 +200,12 @@ func update_identifier_buffer(token: Token, config: Dictionary):
 
 
 func update_paired_tokens(token: Token):
+	
+	if token.type == Tokens.OPEN_BRACE:
+		unpaired_braces += 1
+	if token.type == Tokens.CLOSE_BRACE:
+		assert(unpaired_braces)
+		unpaired_braces -= 1
 	
 	if token.type in Tokens.OPENING_TOKENS:
 		unpaired_tokens.append(token.type)
@@ -247,11 +260,14 @@ func instantiate_statement_from_buffer():
 		Tokens.KEYWORD_IF:
 			instance = IfCondition.new()
 			instance.template = Templates.CONDITIONAL_STATEMENT
+			nested_conditionals += 1
 			return instance
 		Tokens.KEYWORD_ELSE:
+			nested_conditionals += 1
 			instance = ConditionalBranch.new()
 			return instance
 		Tokens.KEYWORD_ELIF:
+			nested_conditionals += 1
 			instance = ConditionalBranch.new()
 			return instance
 	last_statement_was_conditional = false

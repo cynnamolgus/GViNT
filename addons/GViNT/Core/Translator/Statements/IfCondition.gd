@@ -1,32 +1,65 @@
-extends "res://addons/GViNT/Core/Translator/Statements/Statement.gd"
+extends "res://addons/GViNT/Core/Translator/Statements/ConditionalBranch.gd"
 
 
-var condition_tokens := []
-var branch_statements = []
 var branches = [self]
 var current_branch = 0
 
 var indent_amount: int = 0
 
-func construct_from_tokens(tokens: Array):
-	pass
-
 
 func _to_string():
 	var result = Templates.CONDITIONAL_STATEMENT
-	var branch_classes = []
+	var branch_class_definitions = ""
+	var branch_class_names = []
+	var sub_conditions = ""
 	var branch_index = 0
 	for b in branches:
-		branch_classes.append([])
+		branch_class_names.append([])
 		var statement_index = 0
 		for s in b.branch_statements:
 			s.statement_id = (statement_id 
 				+ "_branch" + str(branch_index) 
 				+ "_" + str(statement_index)
 			)
+			
 			var statement_class: String = s.to_string()
 			statement_class = GvintUtils.indent_text_lines(statement_class, indent_amount)
-			branch_classes.back().append(statement_class)
+			
+			branch_class_definitions += statement_class + "\n"
+			branch_class_names.back().append(Templates.STATEMENT_PREFIX + s.statement_id)
+			
 			statement_index += 1
 		branch_index += 1
+	branch_class_definitions = branch_class_definitions.trim_suffix("\n")
+	
+	var branch_context_getters = ""
+	branch_index = 0
+	for b in branch_class_names:
+		
+		var branch_id = "branch" + str(branch_index)
+		var class_names := GvintUtils.pretty_print_array(b)
+		class_names = GvintUtils.indent_text_lines(class_names, indent_amount)
+		while class_names.begins_with("	"):
+			class_names = class_names.trim_prefix("	")
+		
+		branch_index += 1
+		
+		var context_getter = Templates.CONDITIONAL_CONTEXT_GETTER.format({
+			"branch_id": branch_id,
+			"statement_class_names": class_names
+		})
+		context_getter = GvintUtils.indent_text_lines(context_getter, indent_amount)
+		branch_context_getters += context_getter + "\n"
+	
+	
+	
+	result = result.format({
+		"statement_id": statement_id,
+		"nested_statements": branch_class_definitions,
+		"context_getters": branch_context_getters,
+		"main_condition": condition,
+		"sub_conditions": sub_conditions
+	})
+	
+	return result
 

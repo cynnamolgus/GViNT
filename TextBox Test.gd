@@ -8,11 +8,11 @@ const DEFAULT_CONFIG_FILE = "res://addons/GViNT/Core/default_script_config.json"
 var translator := Translator.new()
 
 var source_code = """
-foo = 1
-bar = 2
-do_a_thing()
-foo += 42
-foo = (randi() % 2)
+if true {
+foo = 5
+} elif foo {
+foo = 10
+}
 """
 
 func _ready():

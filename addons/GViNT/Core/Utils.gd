@@ -73,11 +73,11 @@ static func indent_text_lines(text, indent_amount):
 		indentation += "	"
 	for line in lines:
 		result += indentation + line + "\n"
-	return result
+	return result.trim_suffix("\n")
 
-static func pretty_print_array(arr: Array):
+static func pretty_print_array(arr: Array) -> String:
 	var result = "[\n"
 	for element in arr:
-		result += "	" + str(element) + ",\n"
+		result += "	" + str(element) + ",\n	"
 	result += "]"
 	return result
