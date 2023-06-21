@@ -1,15 +1,19 @@
 class_name GvintContext extends Reference
 
 var source_filename: String
-var instructions: Array
-var current_instruction: int = 0
+var statements: Array
+var current_statement: int = 0
 
 
-func next_instruction():
-	current_instruction += 1
-	return instructions[current_instruction - 1]
+func is_finished():
+	return current_statement >= statements.size()
 
 
-func previous_instruction():
-	current_instruction -= 1
-	return instructions[current_instruction]
+func next_statement():
+	current_statement += 1
+	return statements[current_statement - 1]
+
+
+func previous_statement():
+	current_statement -= 1
+	return statements[current_statement]

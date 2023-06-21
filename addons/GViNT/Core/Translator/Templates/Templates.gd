@@ -9,7 +9,7 @@ const BASE = """extends Reference
 static func create_context() -> GvintContext:
 	var context = GvintContext.new()
 	context.source_filename = "{source_filename}"
-	context.instructions = {statement_class_names}
+	context.statements = {statement_class_names}
 	return context
 """
 
@@ -34,13 +34,13 @@ const CALL_FUNCTION = """class Statement_{statement_id}:
 	static func evaluate(runtime: GvintRuntime):
 		var target = {target}
 		assert(target.has_method("{method}"))
-		assert(target.has_method("{undo_method}"))
 		var result = target.callv("{method}", [{params}])
 		if result is GDScriptFunctionState:
 			yield(result, "completed")
 	
 	static func undo(runtime: GvintRuntime):
 		var target = {target}
+		assert(target.has_method("{undo_method}"))
 		var result = target.call("{undo_method}")
 		if result is GDScriptFunctionState:
 			yield(result, "completed")
@@ -64,7 +64,7 @@ const SUB_CONDITION = """		{keyword} {condition}:
 const CONDITIONAL_CONTEXT_GETTER = """static func create_{branch_id}_context() -> GvintContext:
 	var context = GvintContext.new()
 	context.source_filename = "{source_filename}"
-	context.instructions = {statement_class_names}
+	context.statements = {statement_class_names}
 	return context
 """
 

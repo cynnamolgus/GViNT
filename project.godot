@@ -17,7 +17,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "GvintRuntime",
 "language": "GDScript",
-"path": "res://addons/GViNT/Core/Runtime.gd"
+"path": "res://addons/GViNT/Core/CutsceneRuntime.gd"
 }, {
 "base": "Reference",
 "class": "GvintVariable",
@@ -34,6 +34,10 @@ _global_script_class_icons={
 
 config/name="GViNT"
 config/icon="res://icon.png"
+
+[autoload]
+
+GvintScripts="*res://addons/GViNT/Core/ScriptDB/ScriptDB.gd"
 
 [debug]
 
