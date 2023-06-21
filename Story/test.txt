@@ -1,2 +1,4 @@
 foo = "foo"
 foo: "Hello, world!"
+foo: "Lorem ipsum"
+foo: "dolor sit amet..."

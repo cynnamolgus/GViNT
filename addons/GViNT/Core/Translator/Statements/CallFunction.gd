@@ -13,10 +13,6 @@ var undo_method: String
 
 
 
-func _init():
-	template = ScriptTemplates.CALL_FUNCTION
-
-
 func construct_from_tokens(tokens: Array):
 	assert(len(tokens) >= 3)
 	var i: int = len(tokens) - 2

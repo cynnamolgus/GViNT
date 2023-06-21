@@ -12,9 +12,6 @@ var undo_method := ""
 
 var has_params: bool = false
 
-func _init():
-	template = ScriptTemplates.CALL_FUNCTION
-
 
 func construct_from_tokens(tokens: Array):
 	if has_params:

@@ -4,7 +4,7 @@ class_name GvintRuntime extends Node
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
 export(String, FILE) var autostart_script := ""
-export(String) var config_id = "cutscene"
+export(String) var config_id = ""
 
 
 var runtime_variables := {}
@@ -55,6 +55,7 @@ func start(script_filename: String):
 	_enter_context(context_factory.create_context())
 	if not is_running:
 		_run_until_finished()
+
 
 func _run_until_finished():
 	is_running = true
@@ -114,5 +115,3 @@ func serialize_state():
 	pass
 
 
-func display_text(text: String, params: Array):
-	print(str(params) + ": " + text)

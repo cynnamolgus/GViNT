@@ -2,7 +2,7 @@ extends Reference
 
 
 
-const Templates = preload("res://addons/GViNT/Core/Translator/Templates/Templates.gd")
+const Templates = preload("res://addons/GViNT/Core/Translator/TranslationTemplates.gd")
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 const GvintConfig = preload("res://addons/GViNT/Core/Config.gd")

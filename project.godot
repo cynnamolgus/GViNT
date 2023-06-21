@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "GvintRuntime",
+"class": "CutsceneRuntime",
+"language": "GDScript",
+"path": "res://addons/GViNT/Core/Runtime/CutsceneRuntime.gd"
+}, {
 "base": "Reference",
 "class": "GvintContext",
 "language": "GDScript",
@@ -17,7 +22,7 @@ _global_script_classes=[ {
 "base": "Node",
 "class": "GvintRuntime",
 "language": "GDScript",
-"path": "res://addons/GViNT/Core/CutsceneRuntime.gd"
+"path": "res://addons/GViNT/Core/Runtime/GvintRuntime.gd"
 }, {
 "base": "Reference",
 "class": "GvintVariable",
@@ -25,6 +30,7 @@ _global_script_classes=[ {
 "path": "res://addons/GViNT/Core/Variable.gd"
 } ]
 _global_script_class_icons={
+"CutsceneRuntime": "",
 "GvintContext": "",
 "GvintRuntime": "",
 "GvintVariable": ""
