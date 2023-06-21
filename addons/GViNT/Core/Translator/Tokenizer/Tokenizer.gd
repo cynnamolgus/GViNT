@@ -143,8 +143,8 @@ func process_source():
 		tokenize_displayed_text()
 		return
 	
-	if character == Chars.SPACE:
-		skip_consecutive_spaces()
+	if character == Chars.SPACE or character == Chars.TAB:
+		skip_whitespace()
 	if character == Chars.COMMENT_MARK:
 		skip_comments()
 		character = source_code[current_character]
@@ -154,7 +154,7 @@ func process_source():
 			tokenize_single_character(character)
 		elif character == Chars.QUOTE:
 			tokenize_string_literal()
-		elif character == Chars.SPACE:
+		elif character == Chars.SPACE or character == Chars.TAB:
 			current_character += 1
 		else:
 			current_token.start(character)
@@ -167,9 +167,11 @@ func process_source():
 			current_character += 1
 
 
-func skip_consecutive_spaces():
-	while source_code[current_character + 1] == Chars.SPACE:
+func skip_whitespace():
+	while (source_code[current_character + 1] == Chars.SPACE
+	or source_code[current_character + 1] == Chars.TAB):
 		current_character += 1
+
 
 
 func skip_comments():

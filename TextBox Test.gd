@@ -9,9 +9,9 @@ var translator := Translator.new()
 
 var source_code = """
 if true {
-foo = 5
+	foo = 5
 } elif foo {
-foo = 10
+	foo = 10
 }
 """
 

@@ -3,6 +3,7 @@ extends Reference
 
 
 const SPACE = " "
+const TAB = "	"
 const LINEBREAK = "\n"
 const BACKSLASH = "\\"
 

@@ -26,7 +26,7 @@ class Statement_0:
 		return context
 	
 
-	static func evaluate(runtime: GvintRuntime):
+	static func evaluate_conditional(runtime: GvintRuntime):
 		if true:
 			return create_branch0_context()
 		
