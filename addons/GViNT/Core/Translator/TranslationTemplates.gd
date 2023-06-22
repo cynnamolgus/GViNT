@@ -18,7 +18,10 @@ const SET_WITH_UNDO = """class Statement_{statement_id}:
 	static func evaluate(runtime: GvintRuntime):
 		var target = {target}
 		assert(target is GvintVariable)
-		target.value {operator} {value}
+		var value = {value}
+		if value is GDScriptFunctionState:
+			value = yield(value, "completed")
+		target.value {operator} value
 	
 	static func undo(runtime: GvintRuntime):
 		var target = {target}
@@ -27,7 +30,10 @@ const SET_WITH_UNDO = """class Statement_{statement_id}:
 
 const SET_WITHOUT_UNDO = """class Statement_{statement_id}:
 	static func evaluate(runtime: GvintRuntime):
-		{target} {operator} {value}
+		var value = {value}
+		if value is GDScriptFunctionState:
+			value = yield(value, "completed")
+		{target} {operator} value
 """
 
 const CALL_FUNCTION = """class Statement_{statement_id}:
