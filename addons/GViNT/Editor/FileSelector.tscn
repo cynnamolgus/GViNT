@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/GViNT/Editor/FileSelector.gd" type="Script" id=1]
+
+[node name="FileSelector" type="HBoxContainer"]
+margin_right = 286.0
+margin_bottom = 20.0
+script = ExtResource( 1 )
+
+[node name="SelectFileButton" type="Button" parent="."]
+margin_right = 262.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+disabled = true
+text = "File.txt"
+clip_text = true
+align = 0
+
+[node name="CloseButton" type="Button" parent="."]
+margin_left = 266.0
+margin_right = 286.0
+margin_bottom = 20.0
+text = "X"
+
+[connection signal="pressed" from="SelectFileButton" to="." method="_on_SelectFileButton_pressed"]
+[connection signal="pressed" from="CloseButton" to="." method="_on_CloseButton_pressed"]

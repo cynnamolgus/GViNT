@@ -1,0 +1,88 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/GViNT/Editor/ScriptEditor.gd" type="Script" id=1]
+
+[node name="ScriptEditor" type="PanelContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1017.0
+margin_bottom = 593.0
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer"]
+margin_right = 300.0
+margin_bottom = 586.0
+rect_min_size = Vector2( 300, 0 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 293.0
+margin_bottom = 579.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer"]
+margin_right = 286.0
+margin_bottom = 20.0
+
+[node name="SaveFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+margin_right = 286.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Save current file"
+
+[node name="FileSelectors" type="VBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 286.0
+margin_bottom = 44.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors"]
+margin_right = 286.0
+margin_bottom = 20.0
+
+[node name="NewFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer"]
+margin_right = 286.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Open file"
+
+[node name="TextEdit" type="TextEdit" parent="HBoxContainer"]
+margin_left = 304.0
+margin_right = 1010.0
+margin_bottom = 586.0
+size_flags_horizontal = 3
+readonly = true
+highlight_current_line = true
+syntax_highlighting = true
+show_line_numbers = true
+draw_tabs = true
+fold_gutter = true
+highlight_all_occurrences = true
+wrap_enabled = true
+
+[node name="OpenFileDialog" type="FileDialog" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1017.0
+margin_bottom = 569.0
+window_title = "Open a File"
+mode = 0
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+margin_left = 404.0
+margin_top = 265.0
+margin_right = 619.0
+margin_bottom = 335.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+window_title = "Discard unsaved changes?"
+
+[connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/SaveFileButton" to="." method="_on_SaveFileButton_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer/NewFileButton" to="." method="_on_NewFileButton_pressed"]
+[connection signal="text_changed" from="HBoxContainer/TextEdit" to="." method="_on_TextEdit_text_changed"]
+[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
