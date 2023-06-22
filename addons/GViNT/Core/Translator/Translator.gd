@@ -235,7 +235,7 @@ func flush_identifier_buffer(config: GvintConfig):
 
 
 func end_statement(config: GvintConfig) -> Statement:
-	current_statement = instantiate_statement_from_buffer()
+	current_statement = instantiate_statement_from_buffer(config)
 	current_statement.construct_from_tokens(statement_buffer)
 	statement_buffer.clear()
 	
@@ -253,7 +253,7 @@ func end_statement(config: GvintConfig) -> Statement:
 	return current_statement
 
 
-func instantiate_statement_from_buffer():
+func instantiate_statement_from_buffer(config: GvintConfig):
 	assert(statement_buffer)
 	
 	var instance
@@ -295,22 +295,34 @@ func instantiate_statement_from_buffer():
 		assert(colons == 1)
 		instance = DisplayText.new()
 		instance.has_params = true
-		instance.template = Templates.CALL_FUNCTION
+		if config.mode == config.MODE_CUTSCENE:
+			instance.template = Templates.CALL_FUNCTION_WITHOUT_UNDO
+		else:
+			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
 		return instance
 	elif statement_buffer[0].type == Tokens.STRING:
 		instance = DisplayText.new()
-		instance.template = Templates.CALL_FUNCTION
+		if config.mode == config.MODE_CUTSCENE:
+			instance.template = Templates.CALL_FUNCTION_WITHOUT_UNDO
+		else:
+			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
 		
 		return DisplayText.new()
 	if assignments:
 		assert(assignments == 1)
 		instance = SetVariable.new()
-		instance.template = Templates.SET_WITHOUT_UNDO
+		if config.mode == config.MODE_CUTSCENE:
+			instance.template = Templates.SET_WITHOUT_UNDO
+		else:
+			instance.template = Templates.SET_WITH_UNDO
 		return instance
 	
 	if instance == null:
 		instance = CallFunction.new()
-		instance.template = Templates.CALL_FUNCTION
+		if config.mode == config.MODE_CUTSCENE:
+			instance.template = Templates.CALL_FUNCTION_WITHOUT_UNDO
+		else:
+			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
 	
 	assert(instance)
 	return instance

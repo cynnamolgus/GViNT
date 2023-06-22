@@ -17,6 +17,18 @@ var current_script: ScriptEditData
 
 var opened_files := {}
 
+var ctrl_pressed: bool = false
+
+func _input(event):
+	if event is InputEventKey:
+		if event.pressed and event.scancode == KEY_S:
+			if ctrl_pressed:
+				save_all_files()
+			
+		if event.scancode == KEY_CONTROL:
+			ctrl_pressed = event.pressed
+	pass
+
 func _on_OpenFileDialog_file_selected(path):
 	print("selected " + "'" + path + "'")
 	var file_name = file_picker.current_file
@@ -64,6 +76,11 @@ func open_file(path, file_name):
 	selector.script_data = script_data
 	
 	opened_files[path] = script_data
+
+func save_all_files():
+	for script_path in opened_files:
+		var script_data: ScriptEditData = opened_files[script_path]
+		script_data.save_file()
 
 func on_script_closed(script_data: ScriptEditData):
 	opened_files.erase(script_data.file_path)

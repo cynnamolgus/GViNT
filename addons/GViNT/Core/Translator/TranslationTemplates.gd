@@ -36,21 +36,29 @@ const SET_WITHOUT_UNDO = """class Statement_{statement_id}:
 		{target} {operator} value
 """
 
-const CALL_FUNCTION = """class Statement_{statement_id}:
+const CALL_FUNCTION_WITH_UNDO = """class Statement_{statement_id}:
 	static func evaluate(runtime: GvintRuntime):
 		var target = {target}
 		assert(target.has_method("{method}"))
+		assert(target.has_method("{undo_method}"))
 		var result = target.callv("{method}", [{params}])
 		if result is GDScriptFunctionState:
 			yield(result, "completed")
 	
 	static func undo(runtime: GvintRuntime):
 		var target = {target}
-		assert(target.has_method("{undo_method}"))
 		var result = target.call("{undo_method}")
 		if result is GDScriptFunctionState:
 			yield(result, "completed")
+"""
 
+const CALL_FUNCTION_WITHOUT_UNDO = """class Statement_{statement_id}:
+	static func evaluate(runtime: GvintRuntime):
+		var target = {target}
+		assert(target.has_method("{method}"))
+		var result = target.callv("{method}", [{params}])
+		if result is GDScriptFunctionState:
+			yield(result, "completed")
 """
 
 const CONDITIONAL_STATEMENT = """class Statement_{statement_id}:
