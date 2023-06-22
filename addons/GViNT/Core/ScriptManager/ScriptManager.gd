@@ -1,9 +1,10 @@
+tool
 extends Node
 
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 const GvintConfig = preload("res://addons/GViNT/Core/Config.gd")
-const ScriptMetadata = preload("res://addons/GViNT/Core/ScriptDB/ScriptMetadata.gd")
+const ScriptMetadata = preload("res://addons/GViNT/Core/ScriptManager/ScriptMetadata.gd")
 const Translator = preload("res://addons/GViNT/Core/Translator/Translator.gd")
 
 const CONFIGS_FILENAME = "res://addons/GViNT/configs.json"
@@ -23,6 +24,7 @@ var configs := {}
 func _ready():
 	_load_configs()
 	_load_script_compilation_metadata()
+	_delete_obsolete_data()
 
 
 func _load_configs():
@@ -34,9 +36,13 @@ func _load_configs():
 
 
 func load_script(source_filename: String, config_id: String = "cutscene"):
+	source_filename = _expand_source_filename(source_filename)
+	
 	var config: GvintConfig = configs[config_id]
 	if _script_needs_compiling(source_filename, config):
 		_compile_script(source_filename, config)
+	else:
+		print("Loading '" + source_filename + "' compiled for config '" + config_id + "'")
 	
 	var metadata: ScriptMetadata = compiled_scripts[source_filename]
 	
@@ -44,6 +50,12 @@ func load_script(source_filename: String, config_id: String = "cutscene"):
 	var loader = metadata.get_context_loader(config)
 	return loader
 
+func _expand_source_filename(source_filename):
+	if not source_filename.begins_with("res://"):
+		source_filename = DEFAULT_SCRIPT_DIRECTORY + source_filename
+	if not "." in source_filename:
+		source_filename += DEFAULT_SCRIPT_EXTENSION
+	return source_filename
 
 func _script_needs_compiling(script_filename: String, config: GvintConfig):
 	var config_id = config.id
@@ -66,6 +78,7 @@ func _script_needs_compiling(script_filename: String, config: GvintConfig):
 	
 
 func _compile_script(source_filename: String, config: GvintConfig):
+	print("Compiling '" + source_filename + "' for config '" + config.id + "'")
 	var d := Directory.new()
 	if not d.dir_exists(CACHE_DIRECTORY + config.id):
 		d.make_dir(CACHE_DIRECTORY + config.id)
@@ -94,6 +107,40 @@ func _compile_script(source_filename: String, config: GvintConfig):
 	
 	metadata.compiled_for_configs[config.id] = compilation_data
 	_save_script_compilation_metadata()
+
+
+func clear_cache():
+	var d := Directory.new()
+	d.open(CACHE_DIRECTORY)
+	d.list_dir_begin(true)
+	var config_directory = d.get_next()
+	while config_directory:
+		if config_directory == "scripts.json":
+			config_directory = d.get_next()
+			continue
+		GvintUtils.delete_file_or_directory(CACHE_DIRECTORY + config_directory)
+		config_directory = d.get_next()
+	compiled_scripts.clear()
+	_save_script_compilation_metadata()
+
+
+func _delete_obsolete_data():
+	var d := Directory.new()
+	var f := File.new()
+	for script_filename in compiled_scripts:
+		if not f.file_exists(script_filename):
+			_delete_compiled_script(script_filename)
+	_save_script_compilation_metadata()
+
+
+func _delete_compiled_script(script_filename: String):
+	assert(script_filename in compiled_scripts)
+	var metadata: ScriptMetadata = compiled_scripts[script_filename]
+	compiled_scripts.erase(script_filename)
+	
+	for config_id in metadata.compiled_for_configs:
+		var compiled_filename = CACHE_DIRECTORY + config_id + "/" + script_filename.md5_text() + ".gd"
+		GvintUtils.delete_file_or_directory(compiled_filename)
 
 
 func _load_script_compilation_metadata():

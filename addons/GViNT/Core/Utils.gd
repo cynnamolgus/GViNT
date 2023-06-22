@@ -61,7 +61,7 @@ static func load_json_array(filename: String) -> Array:
 	else:
 		return (parse_result.result) as Array
 
-static func delete_directory(directory: String):
+static func delete_file_or_directory(directory: String):
 	var d = Directory.new()
 	if not d.dir_exists(directory):
 		return

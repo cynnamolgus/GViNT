@@ -4,7 +4,7 @@ extends EditorPlugin
 
 
 const GvintEditorScene = preload("res://addons/GViNT/Editor/GvintEditor.tscn")
-const SCRIPT_MANAGER = "res://addons/GViNT/Core/ScriptManager.gd"
+const SCRIPT_MANAGER = "res://addons/GViNT/Core/ScriptManager/ScriptManager.gd"
 
 
 var ui_root: Control

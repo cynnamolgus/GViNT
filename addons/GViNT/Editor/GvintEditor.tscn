@@ -26,13 +26,12 @@ grow_vertical = 2
 
 [node name="InfoLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 margin_right = 960.0
-margin_bottom = 167.0
+margin_bottom = 150.0
 size_flags_vertical = 0
 text = "UNDER CONSTRUCTION
 
 TODO:
 SCRIPT EDITOR
-CONDITIONAL STATEMENTS
 REVERSABLE SCRIPT EXECUTION FLOW,
  SAVE&RELOAD STATE
 
@@ -42,9 +41,9 @@ align = 1
 
 [node name="ClearCacheButton" type="Button" parent="MarginContainer/VBoxContainer"]
 margin_left = 408.0
-margin_top = 171.0
+margin_top = 154.0
 margin_right = 552.0
-margin_bottom = 191.0
+margin_bottom = 174.0
 size_flags_horizontal = 6
 size_flags_vertical = 0
 text = "CLEAR SCRIPT CACHE"
