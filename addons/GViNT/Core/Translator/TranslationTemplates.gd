@@ -24,7 +24,7 @@ const SET_WITH_UNDO = """class Statement_{statement_id}:
 		var value = {value}
 		if value is GDScriptFunctionState:
 			value = yield(value, "completed")
-		target.variable_value {operator} value
+		target.value {operator} value
 	
 	static func undo(runtime: VNRuntime):
 		var target = {target}

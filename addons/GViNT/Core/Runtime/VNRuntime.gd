@@ -2,12 +2,6 @@ tool
 class_name VNRuntime extends "res://addons/GViNT/Core/Runtime/GvintRuntime.gd"
 
 
-
-enum ExecutionFlow {
-	FORWARDS,
-	BACKWARDS
-}
-
 const FINISHED = "FINISHED"
 
 
@@ -29,16 +23,17 @@ var execution_flow = null
 func _init():
 	if Engine.editor_hint and not config_id:
 		config_id = "cutscene"
+	init_runtime_var("number", 42)
 
+func _ready():
+	$LineEdit.number_variable = runtime_variables["number"]
 
 
 
 func start(script_filename: String):
 	var context_factory = GvintScripts.load_script(script_filename, config_id)
 	_enter_context(context_factory.create_context())
-	execution_flow = ExecutionFlow.FORWARDS
 	execute_until_yield()
-
 
 
 func execute_next_statement():
@@ -85,9 +80,11 @@ func undo_until_yield():
 		if previous_statement in yielding_statements:
 			reached_yielding_statement = true
 			previous_statement = current_context.previous_statement()
-			previous_statement.undo(self)
+			if previous_statement.new().has_method("undo"):
+				previous_statement.undo(self)
 		else:
-			previous_statement.undo(self)
+			if previous_statement.new().has_method("undo"):
+				previous_statement.undo(self)
 
 
 func on_last_yielded_statement_completed():
@@ -110,7 +107,7 @@ func init_runtime_var(identifier: String, default_value = null):
 	if not identifier in runtime_variables:
 		var runtime_var := GvintVariable.new()
 		if default_value:
-			runtime_var.variable_value = default_value
+			runtime_var.value = default_value
 		runtime_variables[identifier] = runtime_var
 	return runtime_variables[identifier]
 
@@ -118,7 +115,7 @@ func init_runtime_var(identifier: String, default_value = null):
 func _set_runtime_var_value(identifier: String, value):
 	var runtime_var = runtime_variables[identifier]
 	assert(runtime_var is GvintVariable)
-	runtime_var.variable_value = value
+	runtime_var.value = value
 
 
 func display_text(text: String, params: Array):

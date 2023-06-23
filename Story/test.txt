@@ -1,14 +1,13 @@
-num = 1337
 foo = "b"
-
-if num == 42 {
+"hello, world!"
+if number.value == 42 {
 	"num is 42"
-} elif num == 1337 {
-	"num is 1337"
-	if foo == "a" {
+} elif number.value == 1337 {
+	"number is 1337"
+	if foo.value == "a" {
 		"foo is 'a'"
 	}
-	elif foo == "b" {
+	elif foo.value == "b" {
 		"foo is 'b'"
 		"1"
 		"2"
