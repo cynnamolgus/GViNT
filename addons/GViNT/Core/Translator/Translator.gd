@@ -307,7 +307,7 @@ func instantiate_statement_from_buffer(config: GvintConfig):
 		else:
 			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
 		
-		return DisplayText.new()
+		return instance
 	if assignments:
 		assert(assignments == 1)
 		instance = SetVariable.new()

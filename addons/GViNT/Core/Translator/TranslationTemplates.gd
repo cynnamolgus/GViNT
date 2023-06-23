@@ -67,12 +67,12 @@ const CONDITIONAL_STATEMENT = """class Statement_{statement_id}:
 	static func evaluate_conditional(runtime: GvintRuntime):
 		if {main_condition}:
 			return create_branch0_context()
-		{sub_conditions}
+{sub_conditions}
 
 """
 
 const SUB_CONDITION = """		{keyword} {condition}:
-			return get_{branch_id}_context()
+			return create_{branch_id}_context()
 """
 
 const CONDITIONAL_CONTEXT_GETTER = """static func create_{branch_id}_context() -> GvintContext:

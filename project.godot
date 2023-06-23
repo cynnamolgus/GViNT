@@ -28,12 +28,18 @@ _global_script_classes=[ {
 "class": "GvintVariable",
 "language": "GDScript",
 "path": "res://addons/GViNT/Core/Variable.gd"
+}, {
+"base": "GvintRuntime",
+"class": "VNRuntime",
+"language": "GDScript",
+"path": "res://addons/GViNT/Core/Runtime/VNRuntime.gd"
 } ]
 _global_script_class_icons={
 "CutsceneRuntime": "",
 "GvintContext": "",
 "GvintRuntime": "",
-"GvintVariable": ""
+"GvintVariable": "",
+"VNRuntime": ""
 }
 
 [application]

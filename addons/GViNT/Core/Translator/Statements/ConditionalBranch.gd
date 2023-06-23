@@ -5,7 +5,7 @@ var condition: String = ""
 var branch_statements = []
 
 func construct_from_tokens(tokens: Array):
-	assert(len(tokens) >= 3)
+	assert(len(tokens) >= 2)
 	var first_token = tokens.pop_front()
 	assert(
 		first_token.type == Tokens.KEYWORD_IF

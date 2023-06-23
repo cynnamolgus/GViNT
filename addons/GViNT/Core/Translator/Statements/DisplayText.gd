@@ -49,6 +49,7 @@ func construct_from_params_and_text(tokens: Array):
 func _to_string():
 	for t in params_tokens:
 		params_string += t.text
+	assert(template)
 	return template.format({
 		"statement_id": statement_id,
 		"target": target,

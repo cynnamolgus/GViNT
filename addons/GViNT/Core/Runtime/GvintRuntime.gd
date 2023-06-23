@@ -63,7 +63,7 @@ func _run_until_finished():
 	var script_statement
 	while current_context and is_running:
 		script_statement = current_context.next_statement()
-		if script_statement.has_method("evaluate_conditional"):
+		if script_statement.new().has_method("evaluate_conditional"):
 			var conditional_context = script_statement.evaluate_conditional(self)
 			_enter_context(conditional_context)
 		else:
@@ -84,6 +84,10 @@ func _exit_context():
 		current_context = context_stack.pop_back()
 	else:
 		current_context = null
+	
+	if current_context:
+		if current_context.is_finished():
+			_exit_context()
 
 
 func stop():

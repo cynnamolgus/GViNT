@@ -1,0 +1,10 @@
+num = 1337
+if num == 42 {
+	"num is 42"
+}
+elif num == 1337 {
+	"num is 1337"
+}
+else {
+	"bruh"
+}

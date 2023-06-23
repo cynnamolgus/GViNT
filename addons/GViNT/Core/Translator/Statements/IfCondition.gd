@@ -13,6 +13,14 @@ func _to_string():
 	var branch_index = 0
 	for b in branches:
 		branch_class_names.append([])
+		
+		if b != self:
+			sub_conditions += Templates.SUB_CONDITION.format({
+				"branch_id": "branch" + str(branch_index),
+				"keyword": b.keyword,
+				"condition": b.condition
+			})
+		
 		var statement_index = 0
 		for s in b.branch_statements:
 			s.statement_id = (statement_id 
@@ -29,6 +37,7 @@ func _to_string():
 			statement_index += 1
 		branch_index += 1
 	branch_class_definitions = branch_class_definitions.trim_suffix("\n")
+	sub_conditions = sub_conditions.trim_suffix("\n")
 	
 	var branch_context_getters = ""
 	branch_index = 0
