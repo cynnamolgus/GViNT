@@ -129,28 +129,38 @@ func collapse_conditionals():
 			continue
 		
 		if s is ConditionalBranch:
-			assert(collapsed_statements.back() is ConditionalBranch)
 			
-			var cond = collapsed_statements.pop_back()
-			assert(cond is IfCondition)
-			conditional_stack.push_back(cond)
 			
-			conditional_stack.back().branches.append(s)
-			conditional_stack.back().current_branch += 1
+			var parent_conditional: IfCondition
+			if conditional_stack:
+				parent_conditional = conditional_stack.back()
+				var parent_branch = parent_conditional.branches[parent_conditional.current_branch]
+				var last_statement = parent_branch.branch_statements.back()
+				assert(last_statement is IfCondition)
+				parent_branch.branch_statements.pop_back()
+				conditional_stack.push_back(last_statement)
+				parent_conditional = last_statement
+			else:
+				parent_conditional = collapsed_statements.pop_back()
+				assert(parent_conditional)
+				conditional_stack.push_back(parent_conditional)
+			assert(parent_conditional)
+			
+			parent_conditional.branches.append(s)
+			parent_conditional.current_branch += 1
 			continue
 		
 		if s is EndConditional:
 			assert(conditional_stack)
-			if conditional_stack.back().current_branch > 0:
-				conditional_stack.back().current_branch -= 1
-			
-			var nested_conditional = conditional_stack.pop_back()
+		
+			var last_conditional = conditional_stack.pop_back()
 			if conditional_stack:
 				var parent_conditional = conditional_stack.back()
+				assert(parent_conditional is IfCondition)
 				var target_branch = parent_conditional.branches[parent_conditional.current_branch]
-				target_branch.branch_statements.push_back(nested_conditional)
+				target_branch.branch_statements.push_back(last_conditional)
 			else:
-				collapsed_statements.push_back(nested_conditional)
+				collapsed_statements.push_back(last_conditional)
 			continue
 		
 		if conditional_stack:
