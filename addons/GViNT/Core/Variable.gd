@@ -1,26 +1,26 @@
 class_name GvintVariable extends Reference
 
-signal value_changed
+signal variable_value_changed
 
-var value setget set_value
+var variable_value setget set_variable_value
 var history := []
 
 
-func set_value(new_value):
-	history.push_back(value)
-	if "value" in new_value:
-		value = new_value.value
+func set_variable_value(new_value):
+	history.push_back(variable_value)
+	if "variable_value" in new_value:
+		variable_value = new_value.variable_value
 	else:
-		value = new_value
-	emit_signal("value_changed", value)
+		variable_value = new_value
+	emit_signal("variable_value_changed", variable_value)
 
 
 func undo_last_change():
 	assert(not history.empty())
 	if not history.empty():
-		value = history.pop_back()
-	emit_signal("value_changed", value)
+		variable_value = history.pop_back()
+	emit_signal("variable_value_changed", variable_value)
 
 
 func _to_string() -> String:
-	return str(value) + "#("  + str(len(history)) + ")"
+	return str(variable_value) + "#("  + str(len(history)) + ")"

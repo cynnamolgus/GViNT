@@ -10,11 +10,10 @@ signal closed
 
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
-const FileSelector = preload("res://addons/GViNT/Editor/FileSelector.gd")
 
 
 
-var selector: FileSelector
+var selector: Control
 var close_confirm_dialog: ConfirmationDialog setget set_close_confirm_dialog
 
 var editing_active: bool = false setget set_editing_active

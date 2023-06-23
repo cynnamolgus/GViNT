@@ -16,3 +16,4 @@ func _set_runtime_var_value(identifier: String, value):
 func display_text(text: String, params: Array):
 	print(str(params) + ": " + text)
 	yield(get_tree().create_timer(1.0), "timeout")
+

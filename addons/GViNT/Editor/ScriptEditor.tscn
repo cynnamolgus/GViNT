@@ -46,10 +46,17 @@ margin_right = 286.0
 margin_bottom = 20.0
 
 [node name="NewFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer"]
+margin_right = 141.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "New file"
+
+[node name="OpenFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer"]
+margin_left = 145.0
 margin_right = 286.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
-text = "Open file"
+text = "Open existing"
 
 [node name="TextEdit" type="TextEdit" parent="HBoxContainer"]
 margin_left = 304.0
@@ -72,6 +79,14 @@ margin_right = 1017.0
 margin_bottom = 569.0
 window_title = "Open a File"
 mode = 0
+filters = PoolStringArray( "*.txt" )
+
+[node name="NewFileDialog" type="FileDialog" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1017.0
+margin_bottom = 569.0
+filters = PoolStringArray( "*.txt" )
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
 margin_left = 404.0
@@ -84,5 +99,7 @@ window_title = "Discard unsaved changes?"
 
 [connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/SaveFileButton" to="." method="_on_SaveFileButton_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer/NewFileButton" to="." method="_on_NewFileButton_pressed"]
+[connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="text_changed" from="HBoxContainer/TextEdit" to="." method="_on_TextEdit_text_changed"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
+[connection signal="file_selected" from="NewFileDialog" to="." method="_on_NewFileDialog_file_selected"]

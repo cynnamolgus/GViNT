@@ -2,5 +2,3 @@ foo = "foo"
 foo: "Hello, world!"
 foo: "Lorem ipsum"
 foo: "dolor sit amet..."
-sprite = Sprite.new()
-add_child(sprite)

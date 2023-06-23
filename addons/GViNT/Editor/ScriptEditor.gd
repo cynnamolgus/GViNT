@@ -8,6 +8,7 @@ const FileSelector = preload("res://addons/GViNT/Editor/FileSelector.gd")
 const FILE_SELECTOR_SCENE = preload("res://addons/GViNT/Editor/FileSelector.tscn")
 
 onready var file_picker: FileDialog = find_node("OpenFileDialog")
+onready var new_file_picker: FileDialog = find_node("NewFileDialog")
 onready var close_confirm_dialog: ConfirmationDialog = find_node("ConfirmationDialog")
 
 onready var file_selectors_container: VBoxContainer = find_node("FileSelectors")
@@ -33,6 +34,13 @@ func _on_OpenFileDialog_file_selected(path):
 	print("selected " + "'" + path + "'")
 	var file_name = file_picker.current_file
 	activate_script_editing(path, file_name)
+
+func _on_NewFileDialog_file_selected(path):
+	print("selected " + "'" + path + "'")
+	var file_name = new_file_picker.current_file
+	activate_script_editing(path, file_name)
+	new_file_picker.invalidate()
+	file_picker.invalidate()
 
 
 func file_exists(path: String):
@@ -99,8 +107,10 @@ func on_opened_script_selected(script_data: ScriptEditData):
 	text_edit.readonly = false
 
 func _on_NewFileButton_pressed():
-	file_picker.popup_centered_clamped()
+	new_file_picker.popup_centered_clamped()
 
+func _on_OpenFileButton_pressed():
+	file_picker.popup_centered_clamped()
 
 func _on_SaveFileButton_pressed():
 	current_script.save_file()
@@ -114,5 +124,7 @@ func serialize_state():
 
 func restore_state():
 	pass
+
+
 
 
