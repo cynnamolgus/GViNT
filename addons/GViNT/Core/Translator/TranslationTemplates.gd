@@ -18,7 +18,7 @@ const SET_WITH_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
-	static func evaluate(runtime: GvintRuntime):
+	static func evaluate(runtime: VNRuntime):
 		var target = {target}
 		assert(target is GvintVariable)
 		var value = {value}
@@ -26,8 +26,9 @@ const SET_WITH_UNDO = """class Statement_{statement_id}:
 			value = yield(value, "completed")
 		target.variable_value {operator} value
 	
-	static func undo(runtime: GvintRuntime):
+	static func undo(runtime: VNRuntime):
 		var target = {target}
+		assert(target is GvintVariable)
 		target.undo_last_change()
 """
 
@@ -35,7 +36,7 @@ const SET_WITHOUT_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
-	static func evaluate(runtime: GvintRuntime):
+	static func evaluate(runtime: CutsceneRuntime):
 		var value = {value}
 		if value is GDScriptFunctionState:
 			value = yield(value, "completed")
@@ -46,26 +47,26 @@ const CALL_FUNCTION_WITH_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
-	static func evaluate(runtime: GvintRuntime):
+	static func evaluate(runtime: VNRuntime):
 		var target = {target}
 		assert(target.has_method("{method}"))
-		assert(target.has_method("{undo_method}"))
 		var result = target.callv("{method}", [{params}])
 		if result is GDScriptFunctionState:
 			yield(result, "completed")
 	
-	static func undo(runtime: GvintRuntime):
+	static func undo(runtime: VNRuntime):
 		var target = {target}
-		var result = target.call("{undo_method}")
-		if result is GDScriptFunctionState:
-			yield(result, "completed")
+		if target.has_method("{undo_method}"):
+			var result = target.call("{undo_method}")
+			if result is GDScriptFunctionState:
+				yield(result, "completed")
 """
 
 const CALL_FUNCTION_WITHOUT_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
-	static func evaluate(runtime: GvintRuntime):
+	static func evaluate(runtime: CutsceneRuntime):
 		var target = {target}
 		assert(target.has_method("{method}"))
 		var result = target.callv("{method}", [{params}])
@@ -78,7 +79,7 @@ const CONDITIONAL_STATEMENT = """class Statement_{statement_id}:
 		return "{statement_id}"
 {nested_statements}
 {context_getters}
-	static func evaluate_conditional(runtime: GvintRuntime):
+	static func evaluate_conditional(runtime):
 		if {main_condition}:
 			return create_branch0_context()
 {sub_conditions}

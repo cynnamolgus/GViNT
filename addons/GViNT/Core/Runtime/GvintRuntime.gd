@@ -1,8 +1,8 @@
-class_name GvintRuntime extends Node
+extends Node
 
 
 signal script_execution_completed
-
+signal script_execution_interrupted
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
@@ -14,11 +14,7 @@ var runtime_variables := {}
 var context_stack := []
 var current_context: GvintContext
 
-var yielding_statements := []
-
 var is_running = false
-var currently_yielded: bool = false
-var last_yield_funcstate: GDScriptFunctionState
 
 func _get(property):
 	var calling_method = GvintUtils.check_calling_method()
@@ -57,38 +53,7 @@ func _ready():
 
 
 func start(script_filename: String):
-	var context_factory = GvintScripts.load_script(script_filename, config_id)
-	_enter_context(context_factory.create_context())
-	if not is_running:
-		_run_until_finished()
-
-
-func _run_until_finished():
-	is_running = true
-	var result
-	var script_statement
-	while current_context and is_running:
-		if current_context.is_finished():
-			_exit_context()
-			if not current_context:
-				break
-		script_statement = current_context.next_statement()
-		if script_statement.new().has_method("evaluate_conditional"):
-			var conditional_context = script_statement.evaluate_conditional(self)
-			_enter_context(conditional_context)
-		else:
-			result = script_statement.evaluate(self)
-			if result is GDScriptFunctionState:
-				last_yield_funcstate = result
-				if not script_statement in yielding_statements:
-					yielding_statements.append(script_statement)
-				currently_yielded = true
-				yield(result, "completed")
-				last_yield_funcstate = null
-				currently_yielded = false
-	if is_running:
-		emit_signal("script_execution_completed")
-	is_running = false
+	pass
 
 func _enter_context(ctx: GvintContext):
 	if current_context:
@@ -106,37 +71,18 @@ func _exit_context():
 		if current_context.is_finished():
 			_exit_context()
 
-
-func stop():
-	assert(is_running)
-	assert(currently_yielded)
-	is_running = false
-	context_stack.clear()
-	current_context = null
-
-func pause():
-	assert(is_running)
-	assert(currently_yielded)
-	is_running = false
-
-func resume():
-	assert(current_context)
-	assert(not is_running)
-	if last_yield_funcstate:
-		yield(last_yield_funcstate, "completed")
-	_run_until_finished()
-
-
 func init_runtime_var(identifier: String, default_value = null):
-	if not identifier in runtime_variables:
-		runtime_variables[identifier] = default_value
-	return runtime_variables[identifier]
+	pass
 
 func _set_runtime_var_value(identifier: String, value):
-	runtime_variables[identifier] = value
+	pass
+
 
 func serialize_state():
 	# TODO
 	pass
 
+func restore_state(save_file_path: String):
+	#TODO
+	pass
 

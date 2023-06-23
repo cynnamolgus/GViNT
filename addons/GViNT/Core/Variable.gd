@@ -15,6 +15,10 @@ func set_variable_value(new_value):
 	emit_signal("variable_value_changed", variable_value)
 
 
+func stateless_set(new_value):
+	variable_value = new_value
+
+
 func undo_last_change():
 	assert(not history.empty())
 	if not history.empty():
@@ -24,3 +28,5 @@ func undo_last_change():
 
 func _to_string() -> String:
 	return str(variable_value) + "#("  + str(len(history)) + ")"
+
+
