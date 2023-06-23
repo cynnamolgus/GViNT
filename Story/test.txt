@@ -1,11 +1,25 @@
-if 1 {
-	"1"
-}
-elif true {
-	if 2 {
+num = 1337
+foo = "b"
+
+if num == 42 {
+	"num is 42"
+} elif num == 1337 {
+	"num is 1337"
+	if foo == "a" {
+		"foo is 'a'"
+	}
+	elif foo == "b" {
+		"foo is 'b'"
+		"1"
 		"2"
+		"3"
 	}
 	else {
-		"2 else"
+		"foo is sth else"
 	}
+	"4"
 }
+else {
+	"num is sth else"
+}
+"5"
