@@ -129,8 +129,6 @@ func collapse_conditionals():
 			continue
 		
 		if s is ConditionalBranch:
-			
-			
 			var parent_conditional: IfCondition
 			if conditional_stack:
 				parent_conditional = conditional_stack.back()

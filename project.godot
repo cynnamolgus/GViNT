@@ -49,7 +49,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-GvintScripts="*res://addons/GViNT/Core/ScriptManager/ScriptManager.gd"
+GvintScripts="*res://addons/GViNT/Autoload/GvintScripts.tscn"
 
 [debug]
 

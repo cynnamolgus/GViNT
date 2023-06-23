@@ -9,8 +9,8 @@ const Translator = preload("res://addons/GViNT/Core/Translator/Translator.gd")
 
 const CONFIGS_FILENAME = "res://addons/GViNT/configs.json"
 
-const DEFAULT_SCRIPT_DIRECTORY = "res://Story/"
-const DEFAULT_SCRIPT_EXTENSION = ".txt"
+export(String, DIR) var default_script_directory: String = "res://Story"
+export var default_script_extension: String = ".txt"
 
 const CACHE_DIRECTORY = "res://addons/GViNT/ScriptCache/"
 const CACHE_INFO_FILE = "res://addons/GViNT/ScriptCache/scripts.json"
@@ -52,9 +52,9 @@ func load_script(source_filename: String, config_id: String = "cutscene"):
 
 func _expand_source_filename(source_filename):
 	if not source_filename.begins_with("res://"):
-		source_filename = DEFAULT_SCRIPT_DIRECTORY + source_filename
+		source_filename = default_script_directory + source_filename
 	if not "." in source_filename:
-		source_filename += DEFAULT_SCRIPT_EXTENSION
+		source_filename += default_script_extension
 	return source_filename
 
 func _script_needs_compiling(script_filename: String, config: GvintConfig):

@@ -4,7 +4,7 @@ extends EditorPlugin
 
 
 const GvintEditorScene = preload("res://addons/GViNT/Editor/GvintEditor.tscn")
-const SCRIPT_MANAGER = "res://addons/GViNT/Core/ScriptManager/ScriptManager.gd"
+const SCRIPT_MANAGER = "res://addons/GViNT/Autoload/GvintScripts.tscn"
 
 
 var ui_root: Control
@@ -17,14 +17,14 @@ func _init():
 
 
 func _enter_tree():
-#	spawn_script_manager()
+	spawn_script_manager()
 	spawn_ui()
 	make_visible(false)
 
 
 func _exit_tree():
 	remove_ui()
-#	remove_script_manager()
+	remove_script_manager()
 
 
 func has_main_screen():

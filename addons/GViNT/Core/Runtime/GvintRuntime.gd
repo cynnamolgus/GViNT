@@ -1,6 +1,9 @@
 class_name GvintRuntime extends Node
 
 
+signal script_execution_completed
+
+
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
 export(String, FILE) var autostart_script := ""
@@ -11,8 +14,11 @@ var runtime_variables := {}
 var context_stack := []
 var current_context: GvintContext
 
-var is_running = false
+var yielding_statements := []
 
+var is_running = false
+var currently_yielded: bool = false
+var last_yield_funcstate: GDScriptFunctionState
 
 func _get(property):
 	var calling_method = GvintUtils.check_calling_method()
@@ -62,6 +68,10 @@ func _run_until_finished():
 	var result
 	var script_statement
 	while current_context and is_running:
+		if current_context.is_finished():
+			_exit_context()
+			if not current_context:
+				break
 		script_statement = current_context.next_statement()
 		if script_statement.new().has_method("evaluate_conditional"):
 			var conditional_context = script_statement.evaluate_conditional(self)
@@ -69,9 +79,16 @@ func _run_until_finished():
 		else:
 			result = script_statement.evaluate(self)
 			if result is GDScriptFunctionState:
+				last_yield_funcstate = result
+				if not script_statement in yielding_statements:
+					yielding_statements.append(script_statement)
+				currently_yielded = true
 				yield(result, "completed")
-		if current_context.is_finished():
-			_exit_context()
+				last_yield_funcstate = null
+				currently_yielded = false
+	if is_running:
+		emit_signal("script_execution_completed")
+	is_running = false
 
 func _enter_context(ctx: GvintContext):
 	if current_context:
@@ -92,17 +109,21 @@ func _exit_context():
 
 func stop():
 	assert(is_running)
+	assert(currently_yielded)
 	is_running = false
 	context_stack.clear()
 	current_context = null
 
 func pause():
 	assert(is_running)
+	assert(currently_yielded)
 	is_running = false
 
 func resume():
 	assert(current_context)
 	assert(not is_running)
+	if last_yield_funcstate:
+		yield(last_yield_funcstate, "completed")
 	_run_until_finished()
 
 
