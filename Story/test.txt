@@ -8,7 +8,6 @@ if number.value == 42 {
 		"foo is 'a'"
 	}
 	elif foo.value == "b" {
-		"foo is 'b'"
 		"1"
 		"2"
 		"3"

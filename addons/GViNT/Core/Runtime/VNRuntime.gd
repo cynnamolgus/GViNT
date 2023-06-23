@@ -23,7 +23,7 @@ var execution_flow = null
 func _init():
 	if Engine.editor_hint and not config_id:
 		config_id = "cutscene"
-	init_runtime_var("number", 42)
+	init_runtime_var("number", 1337)
 
 func _ready():
 	$LineEdit.number_variable = runtime_variables["number"]
@@ -68,23 +68,56 @@ func execute_until_yield():
 			break
 
 func undo_until_yield():
+	if yielding_statements.size() < 2:
+		return
 	var reached_yielding_statement = false
-	while current_context and not reached_yielding_statement:
-		if current_context.current_statement == 0:
-			_exit_context()
-			if not current_context:
-				break
-		var previous_statement = current_context.previous_statement()
-		if previous_statement.has_method("evaluate_conditional"):
-			continue
+	
+	if current_context.last_executed_statement.new().has_method("undo"):
+		current_context.last_executed_statement.undo(self)
+	
+	if current_context.current_statement_index == 0:
+		_exit_context()
+		if current_context.previous_statement() in yielding_statements:
+			reached_yielding_statement = true
+			current_context.current_statement_index -= 1
+			assert(current_context.current_statement_index >= -1)
+			return
+	
+	var previous_statement = current_context.previous_statement()
+	if previous_statement in yielding_statements:
+		reached_yielding_statement = true
+		current_context.current_statement_index -= 1
+		assert(current_context.current_statement_index >= -1)
+		return
+	
+	if previous_statement.new().has_method("evaluate_conditional"):
+		_enter_context(previous_statement.evaluate_conditional(self))
+		current_context.current_statement_index = current_context.statements.size() - 2
+		if current_context.next_statement() in yielding_statements:
+			reached_yielding_statement = true
+		current_context.current_statement_index -= 1
+	
+	
+	assert(current_context.current_statement_index >= 1 or reached_yielding_statement)
+	while not reached_yielding_statement:
+		previous_statement = current_context.previous_statement()
+		
 		if previous_statement in yielding_statements:
 			reached_yielding_statement = true
-			previous_statement = current_context.previous_statement()
-			if previous_statement.new().has_method("undo"):
-				previous_statement.undo(self)
-		else:
-			if previous_statement.new().has_method("undo"):
-				previous_statement.undo(self)
+			current_context.current_statement_index -= 1
+			break
+		
+		if previous_statement.new().has_method("evaluate_conditional"):
+			_enter_context(previous_statement.evaluate_conditional(self))
+			current_context.current_statement_index = current_context.statements.size() - 2
+			if current_context.current_statement() in yielding_statements:
+				reached_yielding_statement = true
+				break
+		
+		if current_context.current_statement_index == 0:
+			_exit_context()
+			if current_context.previous_statement() in yielding_statements:
+				reached_yielding_statement = true
 
 
 func on_last_yielded_statement_completed():
