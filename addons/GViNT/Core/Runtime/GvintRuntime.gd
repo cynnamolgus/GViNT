@@ -8,6 +8,8 @@ const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
 export(String, FILE) var autostart_script := ""
 export(String) var config_id = ""
+export(String, DIR) var default_script_directory: String = "res://Story"
+export var default_script_extension: String = ".txt"
 
 
 var runtime_variables := {}
@@ -54,6 +56,14 @@ func _ready():
 
 func start(script_filename: String):
 	pass
+
+func _expand_source_filename(source_filename):
+	if not source_filename.begins_with("res://"):
+		source_filename = default_script_directory + source_filename
+	if not "." in source_filename:
+		source_filename += default_script_extension
+	return source_filename
+
 
 func _enter_context(ctx: GvintContext):
 	if current_context:

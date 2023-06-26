@@ -17,12 +17,12 @@ var yielding_statements := []
 
 var last_yielded_funcstate: GDScriptFunctionState
 
-var execution_flow = null
 
 
 func _init():
-	if Engine.editor_hint and not config_id:
-		config_id = "cutscene"
+	if Engine.editor_hint:
+		if not config_id:
+			config_id = "cutscene"
 	init_runtime_var("number", 1337)
 
 func _ready():
@@ -31,9 +31,12 @@ func _ready():
 
 
 func start(script_filename: String):
+	script_filename = _expand_source_filename(script_filename)
 	var context_factory = GvintScripts.load_script(script_filename, config_id)
+	var is_running = current_context != null
 	_enter_context(context_factory.create_context())
-	execute_until_yield()
+	if not is_running:
+		execute_until_yield()
 
 
 func execute_next_statement():
@@ -57,6 +60,20 @@ func execute_next_statement():
 			return result
 	return null
 
+
+func step_backwards():
+	if not current_context:
+		return
+	if current_context.current_statement_index == 0 and not context_stack:
+		return
+	var undo_successful = undo_until_yield()
+	if undo_successful:
+		assert(last_yielded_funcstate != null)
+		last_yielded_funcstate.disconnect("completed", self, "on_last_yielded_statement_completed")
+		last_yielded_funcstate = null
+		execute_until_yield()
+
+
 func execute_until_yield():
 	var result
 	while true:
@@ -67,28 +84,34 @@ func execute_until_yield():
 		if result is GDScriptFunctionState:
 			break
 
+
 func undo_until_yield():
-	if yielding_statements.size() < 2:
-		return
 	var reached_yielding_statement = false
 	
-	if current_context.last_executed_statement.new().has_method("undo"):
-		current_context.last_executed_statement.undo(self)
+	if yielding_statements.size() < 2:
+		return reached_yielding_statement
+	
+	if current_context.last_executed_statement == yielding_statements.front():
+		return reached_yielding_statement
+	
+	var undo_stack = [current_context.last_executed_statement]
 	
 	if current_context.current_statement_index == 0:
 		_exit_context()
 		if current_context.previous_statement() in yielding_statements:
+			undo_stack.push_back(current_context.current_statement())
 			reached_yielding_statement = true
 			current_context.current_statement_index -= 1
 			assert(current_context.current_statement_index >= -1)
-			return
+			return reached_yielding_statement
 	
 	var previous_statement = current_context.previous_statement()
 	if previous_statement in yielding_statements:
+		undo_stack.push_back(current_context.current_statement())
 		reached_yielding_statement = true
 		current_context.current_statement_index -= 1
 		assert(current_context.current_statement_index >= -1)
-		return
+		return reached_yielding_statement
 	
 	if previous_statement.new().has_method("evaluate_conditional"):
 		_enter_context(previous_statement.evaluate_conditional(self))
@@ -98,9 +121,21 @@ func undo_until_yield():
 		current_context.current_statement_index -= 1
 	
 	
-	assert(current_context.current_statement_index >= 1 or reached_yielding_statement)
+	assert(
+		current_context.current_statement_index >= 1 
+		or reached_yielding_statement
+		or not context_stack
+	)
+	
+	if current_context.current_statement_index < 1 and not context_stack:
+		current_context.last_executed_statement.evaluate(self)
+		assert(not reached_yielding_statement)
+		return reached_yielding_statement
+	
+	
 	while not reached_yielding_statement:
 		previous_statement = current_context.previous_statement()
+		undo_stack.push_back(current_context.current_statement())
 		
 		if previous_statement in yielding_statements:
 			reached_yielding_statement = true
@@ -118,6 +153,13 @@ func undo_until_yield():
 			_exit_context()
 			if current_context.previous_statement() in yielding_statements:
 				reached_yielding_statement = true
+	
+	if reached_yielding_statement:
+		for statement in undo_stack:
+			if statement.new().has_method("undo"):
+				statement.undo(self)
+	
+	return reached_yielding_statement
 
 
 func on_last_yielded_statement_completed():
@@ -126,14 +168,6 @@ func on_last_yielded_statement_completed():
 	if current_context:
 		execute_until_yield()
 
-func step_backwards():
-	if not current_context:
-		return
-	if last_yielded_funcstate:
-		last_yielded_funcstate.disconnect("completed", self, "on_last_yielded_statement_completed")
-		last_yielded_funcstate = null
-	undo_until_yield()
-	execute_until_yield()
 
 
 func init_runtime_var(identifier: String, default_value = null):

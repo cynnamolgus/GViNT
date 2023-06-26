@@ -9,9 +9,6 @@ const Translator = preload("res://addons/GViNT/Core/Translator/Translator.gd")
 
 const CONFIGS_FILENAME = "res://addons/GViNT/configs.json"
 
-export(String, DIR) var default_script_directory: String = "res://Story"
-export var default_script_extension: String = ".txt"
-
 const CACHE_DIRECTORY = "res://addons/GViNT/ScriptCache/"
 const CACHE_INFO_FILE = "res://addons/GViNT/ScriptCache/scripts.json"
 
@@ -36,7 +33,6 @@ func _load_configs():
 
 
 func load_script(source_filename: String, config_id: String = "cutscene"):
-	source_filename = _expand_source_filename(source_filename)
 	
 	var config: GvintConfig = configs[config_id]
 	if _script_needs_compiling(source_filename, config):
@@ -50,12 +46,6 @@ func load_script(source_filename: String, config_id: String = "cutscene"):
 	var loader = metadata.get_context_loader(config)
 	return loader
 
-func _expand_source_filename(source_filename):
-	if not source_filename.begins_with("res://"):
-		source_filename = default_script_directory + source_filename
-	if not "." in source_filename:
-		source_filename += default_script_extension
-	return source_filename
 
 func _script_needs_compiling(script_filename: String, config: GvintConfig):
 	var config_id = config.id
@@ -75,7 +65,7 @@ func _script_needs_compiling(script_filename: String, config: GvintConfig):
 	var last_compiled = metadata.compiled_for_configs[config.id].timestamp
 	if modify_time > last_compiled:
 		return true
-	
+
 
 func _compile_script(source_filename: String, config: GvintConfig):
 	print("Compiling '" + source_filename + "' for config '" + config.id + "'")
