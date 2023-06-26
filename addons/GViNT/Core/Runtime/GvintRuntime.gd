@@ -59,7 +59,7 @@ func start(script_filename: String):
 
 func _expand_source_filename(source_filename):
 	if not source_filename.begins_with("res://"):
-		source_filename = default_script_directory + source_filename
+		source_filename = default_script_directory  + "/" + source_filename
 	if not "." in source_filename:
 		source_filename += default_script_extension
 	return source_filename
@@ -78,7 +78,7 @@ func _exit_context():
 		current_context = null
 	
 	if current_context:
-		if current_context.is_finished():
+		while current_context.is_finished():
 			_exit_context()
 
 func init_runtime_var(identifier: String, default_value = null):

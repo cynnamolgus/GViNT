@@ -9,15 +9,13 @@ if number.value == 42 {
 	}
 	elif foo.value == "b" {
 		"1"
-		"2"
-		"3"
 	}
 	else {
 		"foo is sth else"
 	}
-	"4"
+	"2"
 }
 else {
 	"num is sth else"
 }
-"5"
+"3"

@@ -18,7 +18,7 @@ config_id = "cutscene"
 
 [node name="VNRuntime" type="Node" parent="."]
 script = ExtResource( 4 )
-autostart_script = "res://Story/test.txt"
+autostart_script = "res://Story/start.txt"
 config_id = "vn"
 
 [node name="LineEdit" type="LineEdit" parent="VNRuntime"]
