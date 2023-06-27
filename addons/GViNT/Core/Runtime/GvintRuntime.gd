@@ -76,10 +76,6 @@ func _exit_context():
 		current_context = context_stack.pop_back()
 	else:
 		current_context = null
-	
-	if current_context:
-		while current_context.is_finished():
-			_exit_context()
 
 func init_runtime_var(identifier: String, default_value = null):
 	pass

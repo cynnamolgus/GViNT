@@ -47,7 +47,7 @@ func start(script_filename: String):
 
 
 func execute_next_statement():
-	if current_context.is_finished():
+	while current_context.is_finished():
 		_exit_context()
 		if not current_context:
 			return FINISHED
@@ -126,6 +126,15 @@ func undo_until_yield():
 		if current_context.next_statement() in yielding_statements:
 			reached_yielding_statement = true
 	
+	if previous_statement in script_starting_statements_stack:
+		for statement in undo_stack:
+			if statement.new().has_method("undo"):
+				statement.undo(self)
+		current_context.current_statement_index = current_context.statements.size() - 2
+		if current_context.next_statement() in yielding_statements:
+			reached_yielding_statement = true
+		undo_stack = []
+	
 	if current_context.current_statement_index < 1 and not context_stack:
 		if undo_stack.size() > 1:
 			assert(undo_stack.size() == 2)
@@ -137,7 +146,6 @@ func undo_until_yield():
 	while not reached_yielding_statement:
 		if current_context.current_statement_index == 0:
 			_exit_context()
-			current_context.current_statement_index -= 1
 			if current_context.previous_statement() in yielding_statements:
 				undo_stack.push_back(current_context.current_statement())
 				reached_yielding_statement = true

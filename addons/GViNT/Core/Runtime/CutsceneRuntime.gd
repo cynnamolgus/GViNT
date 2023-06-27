@@ -24,7 +24,7 @@ func _run_until_finished():
 			result = script_statement.evaluate(self)
 			if result is GDScriptFunctionState:
 				yield(result, "completed")
-		if current_context.is_finished():
+		while current_context.is_finished():
 			_exit_context()
 	if is_running:
 		emit_signal("script_execution_completed")
