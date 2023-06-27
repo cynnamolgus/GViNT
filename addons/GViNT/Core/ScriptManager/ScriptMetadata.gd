@@ -36,8 +36,9 @@ func load_from_json_object(data: Dictionary):
 
 func get_context_loader(config: GvintConfig):
 	assert(is_compiled_for_config(config))
-	var loader = load(compiled_for_configs[config.id].compiled_filename)
-	return loader
+	if not context_loader:
+		context_loader = load(compiled_for_configs[config.id].compiled_filename)
+	return context_loader
 
 
 func is_compiled_for_config(config: GvintConfig):

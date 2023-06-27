@@ -43,7 +43,8 @@ func start(script_filename: String):
 	if not is_running:
 		execute_until_yield()
 	else:
-		context_spawning_statements_stack.push_back(invoking_statement)
+		if not invoking_statement in context_spawning_statements_stack:
+			context_spawning_statements_stack.push_back(invoking_statement)
 
 
 func execute_next_statement():
@@ -165,7 +166,9 @@ func display_text(text: String, params: Array):
 
 func _enter_context(ctx: GvintContext):
 	if current_context:
-		context_spawning_statements_stack.push_back(current_context.current_statement())
+		var current_statement = current_context.current_statement()
+		if not current_statement in context_spawning_statements_stack:
+			context_spawning_statements_stack.push_back(current_statement)
 	._enter_context(ctx)
 
 func _exit_context():
