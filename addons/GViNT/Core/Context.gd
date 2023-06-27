@@ -19,6 +19,7 @@ func is_finished():
 
 func next_statement():
 	current_statement_index += 1
+	assert(current_statement_index >= 0)
 	var statement = statements[current_statement_index]
 	last_statement_id = statement.get_id()
 	last_executed_statement = statement
@@ -29,5 +30,6 @@ func current_statement():
 
 func previous_statement():
 	current_statement_index -= 1
+	assert(current_statement_index >= 0)
 	var statement = statements[current_statement_index]
 	return statement

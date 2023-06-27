@@ -13,7 +13,7 @@ class DisplayedTextData:
 	var params: Array
 
 
-var script_starting_statements_stack := []
+var context_spawning_statements_stack := []
 var yielding_statements := []
 
 var last_yielded_funcstate: GDScriptFunctionState
@@ -43,7 +43,7 @@ func start(script_filename: String):
 	if not is_running:
 		execute_until_yield()
 	else:
-		script_starting_statements_stack.push_back(invoking_statement)
+		context_spawning_statements_stack.push_back(invoking_statement)
 
 
 func execute_next_statement():
@@ -96,84 +96,42 @@ func undo_until_yield():
 	var reached_yielding_statement = false
 	
 	if yielding_statements.size() < 2:
-		return reached_yielding_statement
-	
+		return false
 	if current_context.last_executed_statement == yielding_statements.front():
-		return reached_yielding_statement
+		return false
 	
-	var undo_stack = [current_context.last_executed_statement]
-	
-	if current_context.current_statement_index == 0:
-		_exit_context()
-		if current_context.previous_statement() in yielding_statements:
-			undo_stack.push_back(current_context.current_statement())
-			reached_yielding_statement = true
+	var previous_statement = current_context.current_statement()
+	var entered_new_context = undo_statement(previous_statement)
+	if entered_new_context:
+		previous_statement = current_context.current_statement()
+	else:
+		if current_context.current_statement_index == 0:
+			_exit_context()
 			current_context.current_statement_index -= 1
-			assert(current_context.current_statement_index >= -1)
-			return reached_yielding_statement
+			previous_statement = current_context.current_statement()
+		else:
+			previous_statement = current_context.previous_statement()
 	
-	var previous_statement = current_context.previous_statement()
-	undo_stack.push_back(current_context.current_statement())
-	if previous_statement in yielding_statements:
-		reached_yielding_statement = true
-		current_context.current_statement_index -= 1
-		assert(current_context.current_statement_index >= -1)
-		return reached_yielding_statement
-	
-	if previous_statement.new().has_method("evaluate_conditional"):
-		_enter_context(previous_statement.evaluate_conditional(self))
-		current_context.current_statement_index = current_context.statements.size() - 2
-		if current_context.next_statement() in yielding_statements:
-			reached_yielding_statement = true
-	
-	if previous_statement in script_starting_statements_stack:
-		for statement in undo_stack:
-			if statement.new().has_method("undo"):
-				statement.undo(self)
-		current_context.current_statement_index = current_context.statements.size() - 2
-		if current_context.next_statement() in yielding_statements:
-			reached_yielding_statement = true
-		undo_stack = []
-	
-	if current_context.current_statement_index < 1 and not context_stack:
-		if undo_stack.size() > 1:
-			assert(undo_stack.size() == 2)
-			current_context.next_statement()
-		assert(not reached_yielding_statement)
-		return reached_yielding_statement
-	
-	
-	while not reached_yielding_statement:
+	while true:
+		entered_new_context = undo_statement(previous_statement)
+		
+		if entered_new_context:
+			previous_statement = current_context.current_statement()
+		
+		if previous_statement in yielding_statements:
+			current_context.current_statement_index -= 1
+			return true
+		
 		if current_context.current_statement_index == 0:
 			_exit_context()
 			if current_context.previous_statement() in yielding_statements:
-				undo_stack.push_back(current_context.current_statement())
-				reached_yielding_statement = true
-				break
-			continue
-		
-		previous_statement = current_context.previous_statement()
-		undo_stack.push_back(current_context.current_statement())
-		
-		if previous_statement in yielding_statements:
-			reached_yielding_statement = true
-			break
-		
-		if previous_statement.new().has_method("evaluate_conditional"):
-			_enter_context(previous_statement.evaluate_conditional(self))
-			current_context.current_statement_index = current_context.statements.size() - 2
-			if current_context.current_statement() in yielding_statements:
-				reached_yielding_statement = true
-				break
+				current_context.current_statement_index -= 1
+				return true
+		else:
+			previous_statement = current_context.previous_statement()
 		
 	
-	if reached_yielding_statement:
-		current_context.current_statement_index -= 1
-		for statement in undo_stack:
-			if statement.new().has_method("undo"):
-				statement.undo(self)
-	
-	return reached_yielding_statement
+	pass
 
 
 func on_last_yielded_statement_completed():
@@ -181,7 +139,6 @@ func on_last_yielded_statement_completed():
 	last_yielded_funcstate = null
 	if current_context:
 		execute_until_yield()
-
 
 
 func init_runtime_var(identifier: String, default_value = null):
@@ -206,9 +163,29 @@ func display_text(text: String, params: Array):
 	yield(get_node(text_box_nodepath), "advance_text")
 
 
-func undo_start():
-	var starting_statement = script_starting_statements_stack.pop_back()
-	starting_statement.evaluate(self)
-	current_context.current_statement_index = current_context.statements.size() - 2
+func _enter_context(ctx: GvintContext):
+	if current_context:
+		context_spawning_statements_stack.push_back(current_context.current_statement())
+	._enter_context(ctx)
 
+func _exit_context():
+	._exit_context()
+
+
+func undo_statement(statement):
+	var entered_new_context = false
+	if statement.new().has_method("undo"):
+		statement.undo(self)
+	if context_spawning_statements_stack:
+		if statement in context_spawning_statements_stack:
+			context_spawning_statements_stack.erase(statement)
+			entered_new_context = true
+			if statement.new().has_method("evaluate_conditional"):
+				_enter_context(statement.evaluate_conditional(self))
+			else:
+				statement.evaluate(self)
+			context_spawning_statements_stack.pop_back()
+			current_context.current_statement_index = current_context.statements.size() - 1
+			assert(current_context.current_statement_index >= -1)
+	return entered_new_context
 

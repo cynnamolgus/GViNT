@@ -1,5 +1,5 @@
 foo = "foo"
 foo: "Hello, world!"
-start("test")
+start("iftest")
 foo: "Lorem ipsum"
 foo: "dolor sit amet..."
