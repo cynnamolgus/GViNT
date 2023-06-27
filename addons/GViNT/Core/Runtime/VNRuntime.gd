@@ -13,7 +13,7 @@ class DisplayedTextData:
 	var params: Array
 
 
-var context_spawning_statements_stack := []
+var context_spawning_statements := []
 var yielding_statements := []
 
 var last_yielded_funcstate: GDScriptFunctionState
@@ -43,8 +43,8 @@ func start(script_filename: String):
 	if not is_running:
 		execute_until_yield()
 	else:
-		if not invoking_statement in context_spawning_statements_stack:
-			context_spawning_statements_stack.push_back(invoking_statement)
+		if not invoking_statement in context_spawning_statements:
+			context_spawning_statements.push_back(invoking_statement)
 
 
 func execute_next_statement():
@@ -167,8 +167,8 @@ func display_text(text: String, params: Array):
 func _enter_context(ctx: GvintContext):
 	if current_context:
 		var current_statement = current_context.current_statement()
-		if not current_statement in context_spawning_statements_stack:
-			context_spawning_statements_stack.push_back(current_statement)
+		if not current_statement in context_spawning_statements:
+			context_spawning_statements.push_back(current_statement)
 	._enter_context(ctx)
 
 func _exit_context():
@@ -179,15 +179,13 @@ func undo_statement(statement):
 	var entered_new_context = false
 	if statement.new().has_method("undo"):
 		statement.undo(self)
-	if context_spawning_statements_stack:
-		if statement in context_spawning_statements_stack:
-			context_spawning_statements_stack.erase(statement)
+	if context_spawning_statements:
+		if statement in context_spawning_statements:
 			entered_new_context = true
 			if statement.new().has_method("evaluate_conditional"):
 				_enter_context(statement.evaluate_conditional(self))
 			else:
 				statement.evaluate(self)
-			context_spawning_statements_stack.pop_back()
 			current_context.current_statement_index = current_context.statements.size() - 1
 			assert(current_context.current_statement_index >= -1)
 	return entered_new_context
