@@ -118,6 +118,7 @@ func undo_until_yield():
 		
 		if entered_new_context:
 			previous_statement = current_context.current_statement()
+			continue
 		
 		if previous_statement in yielding_statements:
 			current_context.current_statement_index -= 1
@@ -130,9 +131,6 @@ func undo_until_yield():
 				return true
 		else:
 			previous_statement = current_context.previous_statement()
-		
-	
-	pass
 
 
 func on_last_yielded_statement_completed():
@@ -170,9 +168,6 @@ func _enter_context(ctx: GvintContext):
 		if not current_statement in context_spawning_statements:
 			context_spawning_statements.push_back(current_statement)
 	._enter_context(ctx)
-
-func _exit_context():
-	._exit_context()
 
 
 func undo_statement(statement):
