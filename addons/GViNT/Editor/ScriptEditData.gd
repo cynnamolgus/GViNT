@@ -14,7 +14,7 @@ const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
 
 var selector: Control
-var close_confirm_dialog: ConfirmationDialog setget set_close_confirm_dialog
+var close_confirm_dialog: ConfirmationDialog
 
 var editing_active: bool = false setget set_editing_active
 
@@ -32,10 +32,6 @@ func set_editing_active(new_value):
 		emit_signal("editing_activated", self)
 	else:
 		emit_signal("editing_deactivated", self)
-
-func set_close_confirm_dialog(new_value):
-	close_confirm_dialog = new_value
-	close_confirm_dialog.connect("confirmed", self, "confirm_close")
 
 func set_text(new_value):
 	if text != new_value:
@@ -59,8 +55,14 @@ func close():
 	if not modified_since_last_save:
 		confirm_close()
 	else:
+		close_confirm_dialog.get_cancel().connect("pressed", self, "on_confirm_dialog_cancel")
+		close_confirm_dialog.connect("confirmed", self, "confirm_close")
 		close_confirm_dialog.popup_centered_minsize()
 
 func confirm_close():
 	selector.queue_free()
 	emit_signal("closed", self)
+
+func on_confirm_dialog_cancel():
+	close_confirm_dialog.get_cancel().disconnect("pressed", self, "on_confirm_dialog_cancel")
+	close_confirm_dialog.disconnect("confirmed", self, "confirm_close")
