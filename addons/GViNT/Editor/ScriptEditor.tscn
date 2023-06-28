@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://addons/GViNT/Editor/ScriptEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/GViNT/Editor/FileContextMenu.gd" type="Script" id=2]
+[ext_resource path="res://addons/GViNT/Editor/ScriptEdit.gd" type="Script" id=3]
 
 [node name="ScriptEditor" type="PanelContainer"]
 anchor_right = 1.0
@@ -26,20 +28,10 @@ margin_top = 7.0
 margin_right = 293.0
 margin_bottom = 579.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer"]
-margin_right = 286.0
-margin_bottom = 20.0
-
-[node name="SaveFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
-margin_right = 286.0
-margin_bottom = 20.0
-size_flags_horizontal = 3
-text = "Save current file"
-
 [node name="FileSelectors" type="VBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer"]
-margin_top = 24.0
 margin_right = 286.0
-margin_bottom = 44.0
+margin_bottom = 572.0
+size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors"]
 margin_right = 286.0
@@ -58,6 +50,12 @@ margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "Open existing"
 
+[node name="ItemList" type="ItemList" parent="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors"]
+margin_top = 24.0
+margin_right = 286.0
+margin_bottom = 572.0
+size_flags_vertical = 3
+
 [node name="TextEdit" type="TextEdit" parent="HBoxContainer"]
 margin_left = 304.0
 margin_right = 1010.0
@@ -71,6 +69,7 @@ draw_tabs = true
 fold_gutter = true
 highlight_all_occurrences = true
 wrap_enabled = true
+script = ExtResource( 3 )
 
 [node name="OpenFileDialog" type="FileDialog" parent="."]
 margin_left = 7.0
@@ -97,7 +96,16 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 window_title = "Discard unsaved changes?"
 
-[connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/SaveFileButton" to="." method="_on_SaveFileButton_pressed"]
+[node name="FileContextMenu" type="PopupMenu" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 100.0
+margin_bottom = 153.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+items = [ "Save", null, 0, false, false, 0, 0, null, "", false, "Rename", null, 0, false, false, 1, 0, null, "", false, "", null, 0, false, false, 2, 0, null, "", true, "Move up", null, 0, false, false, 3, 0, null, "", false, "Move down", null, 0, false, false, 4, 0, null, "", false, "", null, 0, false, false, 5, 0, null, "", true, "Delete", null, 0, false, false, 6, 0, null, "", false ]
+script = ExtResource( 2 )
+
 [connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer/NewFileButton" to="." method="_on_NewFileButton_pressed"]
 [connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/FileSelectors/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="text_changed" from="HBoxContainer/TextEdit" to="." method="_on_TextEdit_text_changed"]

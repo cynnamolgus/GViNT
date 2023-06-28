@@ -50,7 +50,7 @@ func _set(property, value):
 
 
 func _ready():
-	if autostart_script:
+	if autostart_script and not Engine.editor_hint:
 		start(autostart_script)
 
 

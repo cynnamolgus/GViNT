@@ -55,6 +55,7 @@ func get_plugin_icon():
 func spawn_ui():
 	ui_root = GvintEditorScene.instance()
 	interface.get_editor_viewport().add_child(ui_root)
+	ui_root.plugin = self
 
 func remove_ui():
 	if is_instance_valid(ui_root):

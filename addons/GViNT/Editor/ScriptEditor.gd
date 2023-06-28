@@ -7,18 +7,28 @@ const FileSelector = preload("res://addons/GViNT/Editor/FileSelector.gd")
 
 const FILE_SELECTOR_SCENE = preload("res://addons/GViNT/Editor/FileSelector.tscn")
 
+
 onready var file_picker: FileDialog = find_node("OpenFileDialog")
 onready var new_file_picker: FileDialog = find_node("NewFileDialog")
 onready var close_confirm_dialog: ConfirmationDialog = find_node("ConfirmationDialog")
 
 onready var file_selectors_container: VBoxContainer = find_node("FileSelectors")
-onready var text_edit: TextEdit = find_node("TextEdit")
+onready var script_text_edit: TextEdit = find_node("TextEdit")
+
+
+var plugin: EditorPlugin setget set_plugin
 
 var current_script: ScriptEditData
 
 var opened_files := {}
 
 var ctrl_pressed: bool = false
+
+
+func set_plugin(new_value):
+	plugin = new_value
+	script_text_edit.plugin = plugin
+
 
 func _input(event):
 	if event is InputEventKey:
@@ -31,12 +41,10 @@ func _input(event):
 	pass
 
 func _on_OpenFileDialog_file_selected(path):
-	print("selected " + "'" + path + "'")
 	var file_name = file_picker.current_file
 	activate_script_editing(path, file_name)
 
 func _on_NewFileDialog_file_selected(path):
-	print("selected " + "'" + path + "'")
 	var file_name = new_file_picker.current_file
 	activate_script_editing(path, file_name)
 	new_file_picker.invalidate()
@@ -59,7 +67,7 @@ func activate_script_editing(path: String, file_name: String):
 	
 	current_script = opened_files[path]
 	current_script.editing_active = true
-	text_edit.readonly = false
+	script_text_edit.readonly = false
 
 
 func open_file(path, file_name):
@@ -93,18 +101,18 @@ func save_all_files():
 func on_script_closed(script_data: ScriptEditData):
 	opened_files.erase(script_data.file_path)
 	if script_data == current_script:
-		text_edit.text = ""
-		text_edit.readonly = true
+		script_text_edit.text = ""
+		script_text_edit.readonly = true
 
 func on_script_editing_activated(script_data: ScriptEditData):
-	text_edit.text = script_data.text
-	text_edit.scroll_vertical = script_data.scroll
+	script_text_edit.text = script_data.text
+	script_text_edit.scroll_vertical = script_data.scroll
 
 func on_opened_script_selected(script_data: ScriptEditData):
 	current_script.editing_active = false
 	current_script = script_data
 	current_script.editing_active = true
-	text_edit.readonly = false
+	script_text_edit.readonly = false
 
 func _on_NewFileButton_pressed():
 	new_file_picker.popup_centered_clamped()
@@ -112,12 +120,9 @@ func _on_NewFileButton_pressed():
 func _on_OpenFileButton_pressed():
 	file_picker.popup_centered_clamped()
 
-func _on_SaveFileButton_pressed():
-	current_script.save_file()
-
 
 func _on_TextEdit_text_changed():
-	current_script.text = text_edit.text
+	current_script.text = script_text_edit.text
 
 func serialize_state():
 	pass
