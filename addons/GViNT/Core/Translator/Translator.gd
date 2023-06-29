@@ -30,6 +30,8 @@ var unpaired_tokens := []
 var unpaired_braces: int = 0
 
 
+var source_filename: String
+
 var current_statement
 var statements := []
 
@@ -43,15 +45,6 @@ var nested_conditionals = 0
 var last_statement_was_conditional := false
 
 
-func read_file(file: String) -> String:
-	var content: String
-	var f := File.new()
-	f.open(file, File.READ)
-	content = f.get_as_text()
-	f.close()
-	return content
-
-
 func clear():
 	tokenizer.clear()
 	current_statement = null
@@ -59,16 +52,19 @@ func clear():
 	identifier_buffer.clear()
 	identifier_is_settable = false
 	identifier_buffer_open = true
+	source_filename = ""
 
 
 func translate_file(file: String, config: GvintConfig) -> String:
-	var source_code := read_file(file)
+	clear()
+	var source_code := GvintUtils.read_file(file)
+	source_filename = file
 	var gdscript_code := translate_source_code(source_code, config)
+	source_filename = ""
 	return gdscript_code
 
 
 func translate_source_code(source_code: String, config: GvintConfig) -> String:
-	clear()
 	var tokenize_result := tokenizer.tokenize_text(source_code)
 	
 	var gdscript_code := translate_tokens(tokenize_result.tokens, config)
@@ -95,7 +91,8 @@ func translate_tokens(tokens: Array, config: GvintConfig) -> String:
 	
 	var result = Templates.BASE.format({
 		"statement_class_definitions": statement_class_definitions,
-		"statement_class_names": statement_class_names
+		"statement_class_names": statement_class_names,
+		"source_filename": source_filename
 	})
 	
 	return result

@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=2]
-
-[ext_resource path="res://addons/GViNT/Core/ScriptManager/ScriptManager.gd" type="Script" id=1]
-
-[node name="GvintScripts" type="Node"]
-script = ExtResource( 1 )

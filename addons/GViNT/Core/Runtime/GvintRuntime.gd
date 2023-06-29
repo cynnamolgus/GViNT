@@ -1,7 +1,7 @@
 extends Node
 
 
-signal script_execution_completed
+signal script_execution_finished
 signal script_execution_interrupted
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
@@ -13,10 +13,9 @@ export var default_script_extension: String = ".txt"
 
 
 var runtime_variables := {}
-var context_stack := []
-var current_context: GvintContext
+var _context_stack := []
+var _current_context: GvintContext
 
-var is_running = false
 
 func _get(property):
 	var calling_method = GvintUtils.check_calling_method()
@@ -57,6 +56,9 @@ func _ready():
 func start(script_filename: String):
 	pass
 
+func stop():
+	pass
+
 func _expand_source_filename(source_filename):
 	if not source_filename.begins_with("res://"):
 		source_filename = default_script_directory  + "/" + source_filename
@@ -66,16 +68,16 @@ func _expand_source_filename(source_filename):
 
 
 func _enter_context(ctx: GvintContext):
-	if current_context:
-		context_stack.push_back(current_context)
-	current_context = ctx
+	if _current_context:
+		_context_stack.push_back(_current_context)
+	_current_context = ctx
 
 func _exit_context():
-	assert(current_context)
-	if context_stack:
-		current_context = context_stack.pop_back()
+	assert(_current_context)
+	if _context_stack:
+		_current_context = _context_stack.pop_back()
 	else:
-		current_context = null
+		_current_context = null
 
 func init_runtime_var(identifier: String, default_value = null):
 	pass
