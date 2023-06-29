@@ -1,3 +1,4 @@
+tool
 extends Reference
 
 static func read_file(file: String) -> String:
@@ -63,8 +64,6 @@ static func load_json_array(filename: String) -> Array:
 
 static func delete_file_or_directory(directory: String):
 	var d = Directory.new()
-	if not d.dir_exists(directory):
-		return
 	var error = d.remove(directory)
 	if error:
 		error = OS.move_to_trash(ProjectSettings.globalize_path(directory))
