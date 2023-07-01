@@ -6,9 +6,7 @@ var _is_running = false
 
 
 func _init():
-	if Engine.editor_hint:
-		if not config_id:
-			config_id = "cutscene"
+	_config_id = "cutscene"
 
 
 func init_runtime_var(identifier: String, default_value = null):
@@ -22,9 +20,9 @@ func _set_runtime_var_value(identifier: String, value):
 
 
 func start(script_filename: String):
-	assert(config_id)
-	assert(config_id in GvintScripts.configs)
-	var context_factory = GvintScripts.load_script(script_filename, config_id)
+	assert(_config_id)
+	assert(_config_id in GvintScripts.configs)
+	var context_factory = GvintScripts.load_script(script_filename, _config_id)
 	_enter_context(context_factory.create_context())
 	if not _is_running:
 		_run_until_finished()

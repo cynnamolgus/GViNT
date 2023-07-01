@@ -4,6 +4,7 @@ extends "res://addons/GViNT/Core/Translator/Statements/ConditionalBranch.gd"
 var branches = [self]
 var current_branch = 0
 
+var source_filename: String
 
 func _to_string():
 	var result = Templates.CONDITIONAL_STATEMENT
@@ -23,7 +24,7 @@ func _to_string():
 		
 		var statement_index = 0
 		for s in b.branch_statements:
-			s.statement_id = (statement_id 
+			s.statement_id = (statement_id
 				+ "_branch" + str(branch_index) 
 				+ "_" + str(statement_index)
 			)
@@ -53,7 +54,8 @@ func _to_string():
 		
 		var context_getter = Templates.CONDITIONAL_CONTEXT_GETTER.format({
 			"branch_id": branch_id,
-			"statement_class_names": class_names
+			"statement_class_names": class_names,
+			"source_filename": source_filename
 		})
 		context_getter = GvintUtils.indent_text_lines(context_getter, 1)
 		branch_context_getters += context_getter + "\n"

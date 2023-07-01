@@ -73,8 +73,6 @@ func tokenize_text(text: String) -> TokenizeResult:
 	while current_character < source_length:
 		process_source()
 		assert(current_character > previous)
-		if current_character <= previous:
-			Engine.get_main_loop().quit()
 	
 	add_eof_token()
 	

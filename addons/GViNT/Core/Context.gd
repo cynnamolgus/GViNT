@@ -1,9 +1,5 @@
 class_name GvintContext extends Reference
 
-enum Directions {
-	FORWARDS,
-	BACKWARDS
-}
 
 var source_filename: String
 var statements: Array
@@ -33,3 +29,12 @@ func previous_statement():
 	assert(current_statement_index >= 0)
 	var statement = statements[current_statement_index]
 	return statement
+
+
+func to_json_object():
+	var result = {
+		"source_filename": source_filename,
+		"last_statement_id": last_statement_id
+	}
+	return result
+

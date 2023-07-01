@@ -12,7 +12,6 @@ mouse_filter = 1
 [node name="VNRuntime" type="Node" parent="."]
 script = ExtResource( 4 )
 autostart_script = "res://Story/start.txt"
-config_id = "vn"
 
 [node name="LineEdit" type="LineEdit" parent="VNRuntime"]
 margin_right = 58.0
@@ -28,17 +27,25 @@ margin_left = -32.0
 margin_top = -22.0
 margin_right = 32.0
 margin_bottom = 22.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Button" type="Button" parent="VBoxContainer"]
-margin_right = 64.0
+margin_right = 75.0
 margin_bottom = 20.0
 text = "advance"
 
 [node name="UndoButton" type="Button" parent="VBoxContainer"]
 margin_top = 24.0
-margin_right = 64.0
+margin_right = 75.0
 margin_bottom = 44.0
-text = "Undo"
+text = "undo"
+
+[node name="QuicksaveButton" type="Button" parent="VBoxContainer"]
+margin_top = 48.0
+margin_right = 75.0
+margin_bottom = 68.0
+text = "quicksave"
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 anchor_left = 0.1
@@ -94,3 +101,4 @@ script = ExtResource( 3 )
 [connection signal="text_changed" from="VNRuntime/LineEdit" to="VNRuntime/LineEdit" method="_on_LineEdit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/Button" to="PanelContainer/MarginContainer/RichTextLabel" method="advance"]
 [connection signal="pressed" from="VBoxContainer/UndoButton" to="VNRuntime" method="step_backwards"]
+[connection signal="pressed" from="VBoxContainer/QuicksaveButton" to="VNRuntime" method="save_state" binds= [ "res://savestate.json" ]]

@@ -7,10 +7,10 @@ signal script_execution_interrupted
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 
 export(String, FILE) var autostart_script := ""
-export(String) var config_id = ""
 export(String, DIR) var default_script_directory: String = "res://Story"
 export var default_script_extension: String = ".txt"
 
+var _config_id = ""
 
 var runtime_variables := {}
 var _context_stack := []

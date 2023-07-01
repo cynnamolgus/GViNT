@@ -17,49 +17,55 @@ margin_top = 7.0
 margin_right = 1017.0
 margin_bottom = 593.0
 
-[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer"]
+[node name="HSplitContainer" type="HSplitContainer" parent="HBoxContainer"]
+margin_right = 1010.0
+margin_bottom = 586.0
+size_flags_horizontal = 3
+split_offset = 100
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/HSplitContainer"]
 margin_right = 300.0
 margin_bottom = 586.0
-rect_min_size = Vector2( 300, 0 )
+rect_min_size = Vector2( 200, 0 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HSplitContainer/PanelContainer"]
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 293.0
 margin_bottom = 579.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer"]
 margin_right = 286.0
 margin_bottom = 20.0
 
-[node name="NewFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="NewFileButton" type="Button" parent="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/HBoxContainer"]
 margin_right = 141.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "New file"
 
-[node name="OpenFileButton" type="Button" parent="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="OpenFileButton" type="Button" parent="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/HBoxContainer"]
 margin_left = 145.0
 margin_right = 286.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "Open existing"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/PanelContainer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer"]
 margin_top = 24.0
 margin_right = 286.0
 margin_bottom = 572.0
 size_flags_vertical = 3
 
-[node name="FileList" type="ItemList" parent="HBoxContainer/PanelContainer/VBoxContainer/ScrollContainer"]
+[node name="FileList" type="ItemList" parent="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/ScrollContainer"]
 margin_right = 286.0
 margin_bottom = 548.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 allow_rmb_select = true
 
-[node name="TextEdit" type="TextEdit" parent="HBoxContainer"]
-margin_left = 304.0
+[node name="TextEdit" type="TextEdit" parent="HBoxContainer/HSplitContainer"]
+margin_left = 312.0
 margin_right = 1010.0
 margin_bottom = 586.0
 size_flags_horizontal = 3
@@ -116,12 +122,12 @@ size_flags_vertical = 0
 items = [ "Save", null, 0, false, false, 0, 0, null, "", false, "Rename", null, 0, false, false, 1, 0, null, "", false, "", null, 0, false, false, 2, 0, null, "", true, "Move up", null, 0, false, false, 3, 0, null, "", false, "Move down", null, 0, false, false, 4, 0, null, "", false, "", null, 0, false, false, 5, 0, null, "", true, "Close", null, 0, false, false, 6, 0, null, "", false ]
 script = ExtResource( 2 )
 
-[connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/NewFileButton" to="." method="_on_NewFileButton_pressed"]
-[connection signal="pressed" from="HBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
-[connection signal="item_activated" from="HBoxContainer/PanelContainer/VBoxContainer/ScrollContainer/FileList" to="." method="_on_FileList_item_activated"]
-[connection signal="item_rmb_selected" from="HBoxContainer/PanelContainer/VBoxContainer/ScrollContainer/FileList" to="." method="_on_FileList_item_rmb_selected"]
-[connection signal="item_selected" from="HBoxContainer/PanelContainer/VBoxContainer/ScrollContainer/FileList" to="." method="_on_FileList_item_selected"]
-[connection signal="text_changed" from="HBoxContainer/TextEdit" to="." method="_on_TextEdit_text_changed"]
+[connection signal="pressed" from="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/HBoxContainer/NewFileButton" to="." method="_on_NewFileButton_pressed"]
+[connection signal="pressed" from="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
+[connection signal="item_activated" from="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/ScrollContainer/FileList" to="." method="_on_FileList_item_activated"]
+[connection signal="item_rmb_selected" from="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/ScrollContainer/FileList" to="." method="_on_FileList_item_rmb_selected"]
+[connection signal="item_selected" from="HBoxContainer/HSplitContainer/PanelContainer/VBoxContainer/ScrollContainer/FileList" to="." method="_on_FileList_item_selected"]
+[connection signal="text_changed" from="HBoxContainer/HSplitContainer/TextEdit" to="." method="_on_TextEdit_text_changed"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
 [connection signal="file_selected" from="NewFileDialog" to="." method="_on_NewFileDialog_file_selected"]
 [connection signal="file_selected" from="RenameFileDialog" to="FileContextMenu" method="_on_RenameFileDialog_file_selected"]

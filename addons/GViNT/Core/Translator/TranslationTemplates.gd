@@ -92,7 +92,7 @@ const SUB_CONDITION = """		{keyword} {condition}:
 
 const CONDITIONAL_CONTEXT_GETTER = """static func create_{branch_id}_context() -> GvintContext:
 	var context = GvintContext.new()
-	context.source_filename = ""
+	context.source_filename = "{source_filename}"
 	context.statements = {statement_class_names}
 	return context
 """

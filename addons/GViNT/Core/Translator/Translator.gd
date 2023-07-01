@@ -46,6 +46,7 @@ var last_statement_was_conditional := false
 
 
 func clear():
+	assert(tokenizer)
 	tokenizer.clear()
 	current_statement = null
 	statement_buffer.clear()
@@ -65,6 +66,7 @@ func translate_file(file: String, config: GvintConfig) -> String:
 
 
 func translate_source_code(source_code: String, config: GvintConfig) -> String:
+	assert(tokenizer)
 	var tokenize_result := tokenizer.tokenize_text(source_code)
 	
 	var gdscript_code := translate_tokens(tokenize_result.tokens, config)
@@ -268,6 +270,7 @@ func instantiate_statement_from_buffer(config: GvintConfig):
 	match first_token.type:
 		Tokens.KEYWORD_IF:
 			instance = IfCondition.new()
+			instance.source_filename = source_filename
 			instance.template = Templates.CONDITIONAL_STATEMENT
 			nested_conditionals += 1
 			return instance
