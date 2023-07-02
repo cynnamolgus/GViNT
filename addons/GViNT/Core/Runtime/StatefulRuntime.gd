@@ -1,20 +1,18 @@
 tool
-class_name VNRuntime extends "res://addons/GViNT/Core/Runtime/GvintRuntime.gd"
+class_name GvintRuntimeStateful extends GvintRuntimeStateless
 
 
-const FINISHED = "FINISHED"
 
 var _context_spawning_statements := {}
 var _yielding_statements := {}
 
-var _last_yielded_funcstate: GDScriptFunctionState
 
 
 func _init():
-	_config_id = "vn"
+	_config_id = "stateful"
 
 
-func create_runtime_var(identifier: String, default_value = null):
+func create_runtime_variable(identifier: String, default_value = null):
 	if not identifier in runtime_variables:
 		var runtime_var := GvintVariable.new()
 		if default_value:
@@ -27,31 +25,6 @@ func _set_runtime_var_value(identifier: String, value):
 	var runtime_var = runtime_variables[identifier]
 	assert(runtime_var is GvintVariable)
 	runtime_var.value = value
-
-
-func start(script_filename: String):
-	assert(_config_id)
-	assert(_config_id in GvintScripts.configs)
-	
-	var is_running = _current_context != null
-	
-	script_filename = _expand_source_filename(script_filename)
-	var context_factory = GvintScripts.load_script(script_filename, _config_id)
-	_enter_context(context_factory.create_context())
-	if not is_running:
-		runtime_variables.clear()
-		_init_runtime_vars()
-		_on_script_execution_starting()
-		emit_signal("script_execution_starting", self)
-		execute_until_yield_or_finished()
-
-func stop():
-	if _last_yielded_funcstate:
-		_last_yielded_funcstate.disconnect("completed", self, "_on_last_yielded_statement_completed")
-		_last_yielded_funcstate = null
-		_context_stack.clear()
-		_current_context = null
-		emit_signal("script_execution_interrupted")
 
 
 func step_backwards():
@@ -72,40 +45,6 @@ func _enter_context(ctx: GvintContext):
 		_mark_current_statement_as_context_spawning()
 	._enter_context(ctx)
 
-
-
-
-func _execute_next_statement():
-	while _current_context.is_finished():
-		_exit_context()
-		if not _current_context:
-			return FINISHED
-	
-	var script_statement = _current_context.next_statement()
-	var result
-	if script_statement.new().has_method("evaluate_conditional"):
-		var conditional_context = script_statement.evaluate_conditional(self)
-		_enter_context(conditional_context)
-	else:
-		result = script_statement.evaluate(self)
-		if result is GDScriptFunctionState:
-			_mark_current_statement_as_yielding()
-			_last_yielded_funcstate = result
-			_last_yielded_funcstate.connect("completed", self, "_on_last_yielded_statement_completed")
-			return result
-	return null
-
-
-func execute_until_yield_or_finished():
-	var result
-	while true:
-		if result is String:
-			if result == FINISHED:
-				emit_signal("script_execution_finished")
-				break
-		result = _execute_next_statement()
-		if result is GDScriptFunctionState:
-			break
 
 
 func _undo_until_yield():
@@ -181,12 +120,8 @@ func _undo_current_statement():
 	return entered_new_context
 
 
-
-func _on_last_yielded_statement_completed():
-	_last_yielded_funcstate.disconnect("completed", self, "_on_last_yielded_statement_completed")
-	_last_yielded_funcstate = null
-	if _current_context:
-		execute_until_yield_or_finished()
+func _on_current_statement_yielded():
+	_mark_current_statement_as_yielding()
 
 
 func _is_current_statement_yielding():
@@ -196,12 +131,14 @@ func _is_current_statement_yielding():
 	var current_statement_id = _current_context.current_statement().get_id()
 	return current_statement_id in statements
 
+
 func _is_current_statement_first_yielding_statement():
 	if _current_context.source_filename != _yielding_statements.keys().front():
 		return false
 	var statements = _yielding_statements[_current_context.source_filename]
 	var current_statement_id = _current_context.current_statement().get_id()
 	return current_statement_id == statements.front()
+
 
 func _mark_current_statement_as_yielding():
 	if not _current_context.source_filename in _yielding_statements:
@@ -219,12 +156,14 @@ func _is_current_statement_context_spawning():
 	var current_statement_id = _current_context.current_statement().get_id()
 	return current_statement_id in statements
 
+
 func _mark_statement_as_context_spawning(source_filename: String, statement_id: String):
 	if not source_filename in _context_spawning_statements:
 		_context_spawning_statements[source_filename] = []
 	var statements = _context_spawning_statements[source_filename]
 	if not statement_id in statements:
 		statements.append(statement_id)
+
 
 func _mark_current_statement_as_context_spawning():
 	if not _current_context.source_filename in _context_spawning_statements:
@@ -314,6 +253,6 @@ func _restore_context_stack(data: Array):
 func _save_state() -> Dictionary:
 	return {}
 
-func _load_state(saved_data: Dictionary):
+func _load_state(savestate: Dictionary):
 	pass
 

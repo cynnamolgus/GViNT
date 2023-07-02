@@ -32,7 +32,7 @@ func _load_configs():
 		configs[config_data.id] = config
 
 
-func load_script(source_filename: String, config_id: String = "cutscene"):
+func load_script(source_filename: String, config_id: String):
 	
 	var config: GvintConfig = configs[config_id]
 	if _script_needs_compiling(source_filename, config):

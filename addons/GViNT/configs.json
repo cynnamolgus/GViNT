@@ -1,7 +1,7 @@
 [
   {
-    "id": "cutscene",
-    "mode": "CUTSCENE",
+    "id": "stateless",
+    "mode": "STATELESS",
     "display_text_target": "runtime",
     "display_text_method": "display_text",
     "undo_method_prefix": "undo_",
@@ -9,8 +9,8 @@
     },
   },
   {
-    "id": "vn",
-    "mode": "VN",
+    "id": "stateful",
+    "mode": "STATEFUL",
     "display_text_target": "runtime",
     "display_text_method": "display_text",
     "undo_method_prefix": "undo_",

@@ -62,8 +62,8 @@ func load_file(path):
 func save_file():
 	assert(file_path)
 	GvintUtils.save_file(file_path, text)
-	GvintScripts.compile_script(file_path, GvintScripts.configs["vn"])
-	GvintScripts.compile_script(file_path, GvintScripts.configs["cutscene"])
+	GvintScripts.compile_script(file_path, GvintScripts.configs["stateful"])
+	GvintScripts.compile_script(file_path, GvintScripts.configs["stateless"])
 	modified_since_last_save = false
 	emit_signal("saved", self)
 

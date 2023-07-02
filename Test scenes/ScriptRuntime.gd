@@ -1,10 +1,10 @@
-extends VNRuntime
+extends GvintRuntimeStateful
 
 var text_box_nodepath = "../PanelContainer/MarginContainer/RichTextLabel"
 var name_label_nodepath = "../PanelContainer/NameLabelContainer/NameLabel"
 
-func _ready():
-	create_runtime_var("number", 1337)
+func _init_runtime_variables():
+	create_runtime_variable("number", 1337)
 	$LineEdit.number_variable = runtime_variables["number"]
 
 

@@ -1,4 +1,5 @@
 foo = "b"
+number = 1337
 "hello, world!"
 if number.value == 42 {
 	"num is 42"

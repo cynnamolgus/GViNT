@@ -9,11 +9,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
 
-[node name="VNRuntime" type="Node" parent="."]
+[node name="GvintRuntimeStateful" type="Node" parent="."]
 script = ExtResource( 4 )
 autostart_script = "res://Story/start.txt"
 
-[node name="LineEdit" type="LineEdit" parent="VNRuntime"]
+[node name="LineEdit" type="LineEdit" parent="GvintRuntimeStateful"]
 margin_right = 58.0
 margin_bottom = 24.0
 script = ExtResource( 2 )
@@ -104,8 +104,8 @@ margin_bottom = 104.0
 bbcode_enabled = true
 script = ExtResource( 3 )
 
-[connection signal="text_changed" from="VNRuntime/LineEdit" to="VNRuntime/LineEdit" method="_on_LineEdit_text_changed"]
+[connection signal="text_changed" from="GvintRuntimeStateful/LineEdit" to="GvintRuntimeStateful/LineEdit" method="_on_LineEdit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/Button" to="PanelContainer/MarginContainer/RichTextLabel" method="advance"]
-[connection signal="pressed" from="VBoxContainer/UndoButton" to="VNRuntime" method="step_backwards"]
-[connection signal="pressed" from="VBoxContainer/QuicksaveButton" to="VNRuntime" method="_on_QuicksaveButton_pressed"]
-[connection signal="pressed" from="VBoxContainer/QuickloadButton" to="VNRuntime" method="_on_QuickloadButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/UndoButton" to="GvintRuntimeStateful" method="step_backwards"]
+[connection signal="pressed" from="VBoxContainer/QuicksaveButton" to="GvintRuntimeStateful" method="_on_QuicksaveButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuickloadButton" to="GvintRuntimeStateful" method="_on_QuickloadButton_pressed"]

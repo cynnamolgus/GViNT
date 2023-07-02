@@ -1,10 +1,10 @@
 extends Reference
 
-const MODE_VN = "VN"
-const MODE_CUTSCENE = "CUTSCENE"
+const MODE_STATELESS = "STATELESS"
+const MODE_STATEFUL = "STATEFUL"
 
 var id := "default"
-var mode = MODE_CUTSCENE
+var mode = MODE_STATELESS
 
 var display_text_target = "runtime"
 var display_text_method = "display_text"

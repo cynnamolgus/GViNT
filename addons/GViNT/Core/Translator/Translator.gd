@@ -303,14 +303,14 @@ func instantiate_statement_from_buffer(config: GvintConfig):
 		assert(colons == 1)
 		instance = DisplayText.new()
 		instance.has_params = true
-		if config.mode == config.MODE_CUTSCENE:
+		if config.mode == config.MODE_STATELESS:
 			instance.template = Templates.CALL_FUNCTION_WITHOUT_UNDO
 		else:
 			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
 		return instance
 	elif statement_buffer[0].type == Tokens.STRING:
 		instance = DisplayText.new()
-		if config.mode == config.MODE_CUTSCENE:
+		if config.mode == config.MODE_STATELESS:
 			instance.template = Templates.CALL_FUNCTION_WITHOUT_UNDO
 		else:
 			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
@@ -319,7 +319,7 @@ func instantiate_statement_from_buffer(config: GvintConfig):
 	if assignments:
 		assert(assignments == 1)
 		instance = SetVariable.new()
-		if config.mode == config.MODE_CUTSCENE:
+		if config.mode == config.MODE_STATELESS:
 			instance.template = Templates.SET_WITHOUT_UNDO
 		else:
 			instance.template = Templates.SET_WITH_UNDO
@@ -327,7 +327,7 @@ func instantiate_statement_from_buffer(config: GvintConfig):
 	
 	if instance == null:
 		instance = CallFunction.new()
-		if config.mode == config.MODE_CUTSCENE:
+		if config.mode == config.MODE_STATELESS:
 			instance.template = Templates.CALL_FUNCTION_WITHOUT_UNDO
 		else:
 			instance.template = Templates.CALL_FUNCTION_WITH_UNDO
