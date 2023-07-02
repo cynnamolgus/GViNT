@@ -37,8 +37,8 @@ func load_script(source_filename: String, config_id: String = "cutscene"):
 	var config: GvintConfig = configs[config_id]
 	if _script_needs_compiling(source_filename, config):
 		compile_script(source_filename, config)
-	else:
-		print("Loading '" + source_filename + "' compiled for config '" + config_id + "'")
+#	else:
+#		print("Loading '" + source_filename + "' compiled for config '" + config_id + "'")
 	
 	var metadata: ScriptMetadata = compiled_scripts[source_filename]
 	
@@ -68,7 +68,7 @@ func _script_needs_compiling(script_filename: String, config: GvintConfig):
 
 
 func compile_script(source_filename: String, config: GvintConfig):
-	print("Compiling '" + source_filename + "' for config '" + config.id + "'")
+#	print("Compiling '" + source_filename + "' for config '" + config.id + "'")
 	var d := Directory.new()
 	if not d.dir_exists(CACHE_DIRECTORY + config.id):
 		d.make_dir(CACHE_DIRECTORY + config.id)

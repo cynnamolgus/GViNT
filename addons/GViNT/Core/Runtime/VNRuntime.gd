@@ -14,7 +14,7 @@ func _init():
 	_config_id = "vn"
 
 
-func init_runtime_var(identifier: String, default_value = null):
+func create_runtime_var(identifier: String, default_value = null):
 	if not identifier in runtime_variables:
 		var runtime_var := GvintVariable.new()
 		if default_value:
@@ -32,19 +32,18 @@ func _set_runtime_var_value(identifier: String, value):
 func start(script_filename: String):
 	assert(_config_id)
 	assert(_config_id in GvintScripts.configs)
+	
 	var is_running = _current_context != null
-	var invoking_statement
-	if is_running:
-		invoking_statement = _current_context.current_statement()
 	
 	script_filename = _expand_source_filename(script_filename)
 	var context_factory = GvintScripts.load_script(script_filename, _config_id)
 	_enter_context(context_factory.create_context())
 	if not is_running:
-		_execute_until_yield_or_finished()
-#	else:
-#		if not invoking_statement in _context_spawning_statements:
-#			_context_spawning_statements.push_back(invoking_statement)
+		runtime_variables.clear()
+		_init_runtime_vars()
+		_on_script_execution_starting()
+		emit_signal("script_execution_starting", self)
+		execute_until_yield_or_finished()
 
 func stop():
 	if _last_yielded_funcstate:
@@ -62,17 +61,18 @@ func step_backwards():
 		return
 	var undo_successful = _undo_until_yield()
 	if undo_successful:
-		assert(_last_yielded_funcstate != null)
-		_last_yielded_funcstate.disconnect("completed", self, "_on_last_yielded_statement_completed")
-		_last_yielded_funcstate = null
-		_execute_until_yield_or_finished()
+		if _last_yielded_funcstate:
+			_last_yielded_funcstate.disconnect("completed", self, "_on_last_yielded_statement_completed")
+			_last_yielded_funcstate = null
+		execute_until_yield_or_finished()
 
 
 func _enter_context(ctx: GvintContext):
 	if _current_context:
-		var current_statement = _current_context.current_statement()
 		_mark_current_statement_as_context_spawning()
 	._enter_context(ctx)
+
+
 
 
 func _execute_next_statement():
@@ -96,7 +96,7 @@ func _execute_next_statement():
 	return null
 
 
-func _execute_until_yield_or_finished():
+func execute_until_yield_or_finished():
 	var result
 	while true:
 		if result is String:
@@ -186,7 +186,7 @@ func _on_last_yielded_statement_completed():
 	_last_yielded_funcstate.disconnect("completed", self, "_on_last_yielded_statement_completed")
 	_last_yielded_funcstate = null
 	if _current_context:
-		_execute_until_yield_or_finished()
+		execute_until_yield_or_finished()
 
 
 func _is_current_statement_yielding():
@@ -219,6 +219,13 @@ func _is_current_statement_context_spawning():
 	var current_statement_id = _current_context.current_statement().get_id()
 	return current_statement_id in statements
 
+func _mark_statement_as_context_spawning(source_filename: String, statement_id: String):
+	if not source_filename in _context_spawning_statements:
+		_context_spawning_statements[source_filename] = []
+	var statements = _context_spawning_statements[source_filename]
+	if not statement_id in statements:
+		statements.append(statement_id)
+
 func _mark_current_statement_as_context_spawning():
 	if not _current_context.source_filename in _context_spawning_statements:
 		_context_spawning_statements[_current_context.source_filename] = []
@@ -230,8 +237,7 @@ func _mark_current_statement_as_context_spawning():
 
 
 func save_state(savefile_path: String):
-	var state_data = {}
-	_save_state(state_data)
+	var state_data = _save_state()
 	
 	var context_stack = []
 	for ctx in _context_stack:
@@ -240,20 +246,73 @@ func save_state(savefile_path: String):
 	
 	var result = {
 		"context_stack": context_stack,
-		"state_data": state_data,
 		"yielding_statements": _yielding_statements,
-		"context_spawning_statements": _context_spawning_statements
+		"context_spawning_statements": _context_spawning_statements,
+		"state_data": state_data,
 	}
 	
-	GvintUtils.save_file(savefile_path, JSON.print(result))
+	GvintUtils.save_file(savefile_path, JSON.print(result, "  "))
 
 
 func load_state(savefile_path: String):
-	pass
+	stop()
+	var json_data = GvintUtils.load_json_dict(savefile_path)
+	assert(json_data)
+	_validate_savestate_data(json_data)
+	_yielding_statements = json_data.yielding_statements
+	_context_spawning_statements = json_data.context_spawning_statements
+	_restore_context_stack(json_data.context_stack)
+	_load_state(json_data.state_data)
 
 
-func _save_state(json_data_out: Dictionary):
+func _validate_savestate_data(data: Dictionary):
+	
 	pass
+
+func _restore_context_stack(data: Array):
+	assert(_context_stack.empty())
+	assert(_current_context == null)
+	assert(data.size() >= 1)
+	data.invert()
+	
+	var context_data = data.pop_back()
+	var last_statement_id: String
+	
+	
+	var split_id = context_data.last_statement_id.split("_")
+	
+	var script_context_factory = GvintScripts.load_script(context_data.source_filename, _config_id)
+	var context: GvintContext = script_context_factory.create_context()
+	
+	context.current_statement_index = int(split_id[-1])
+	
+	var previous_context_last_statement = context.current_statement()
+	var previous_context_source_filename = context.source_filename
+	
+	_context_stack.push_back(context)
+	
+	context_data = data.pop_back()
+	while context_data:
+		split_id = context_data.last_statement_id.split("_")
+		
+		if context_data.source_filename == previous_context_source_filename:
+			context = previous_context_last_statement.call("create_" + split_id[-2] + "_context")
+		else:
+			context = GvintScripts.load_script(context_data.source_filename, _config_id).create_context()
+		
+		context.current_statement_index = int(split_id[-1])
+		
+		previous_context_last_statement = context.current_statement()
+		previous_context_source_filename = context.source_filename
+		
+		context_data = data.pop_back()
+	
+	assert(_context_stack.size() >= 1)
+	_current_context = _context_stack.pop_back()
+
+
+func _save_state() -> Dictionary:
+	return {}
 
 func _load_state(saved_data: Dictionary):
 	pass

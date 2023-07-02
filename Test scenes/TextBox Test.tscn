@@ -47,6 +47,12 @@ margin_right = 75.0
 margin_bottom = 68.0
 text = "quicksave"
 
+[node name="QuickloadButton" type="Button" parent="VBoxContainer"]
+margin_top = 72.0
+margin_right = 75.0
+margin_bottom = 92.0
+text = "quickload"
+
 [node name="PanelContainer" type="PanelContainer" parent="."]
 anchor_left = 0.1
 anchor_top = 1.0
@@ -101,4 +107,5 @@ script = ExtResource( 3 )
 [connection signal="text_changed" from="VNRuntime/LineEdit" to="VNRuntime/LineEdit" method="_on_LineEdit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/Button" to="PanelContainer/MarginContainer/RichTextLabel" method="advance"]
 [connection signal="pressed" from="VBoxContainer/UndoButton" to="VNRuntime" method="step_backwards"]
-[connection signal="pressed" from="VBoxContainer/QuicksaveButton" to="VNRuntime" method="save_state" binds= [ "res://savestate.json" ]]
+[connection signal="pressed" from="VBoxContainer/QuicksaveButton" to="VNRuntime" method="_on_QuicksaveButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuickloadButton" to="VNRuntime" method="_on_QuickloadButton_pressed"]

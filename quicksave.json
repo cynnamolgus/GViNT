@@ -1,0 +1,46 @@
+{
+  "context_stack": [
+    {
+      "source_filename": "res://Story/start.txt",
+      "last_statement_id": "2"
+    },
+    {
+      "source_filename": "res://Story/test.txt",
+      "last_statement_id": "1"
+    },
+    {
+      "source_filename": "res://Story/iftest.txt",
+      "last_statement_id": "2"
+    },
+    {
+      "source_filename": "res://Story/iftest.txt",
+      "last_statement_id": "2_branch1_0"
+    }
+  ],
+  "yielding_statements": {
+    "res://Story/start.txt": [
+      "1"
+    ],
+    "res://Story/test.txt": [
+      "0"
+    ],
+    "res://Story/iftest.txt": [
+      "1",
+      "2_branch1_0"
+    ]
+  },
+  "context_spawning_statements": {
+    "res://Story/start.txt": [
+      "2"
+    ],
+    "res://Story/test.txt": [
+      "1"
+    ],
+    "res://Story/iftest.txt": [
+      "2"
+    ]
+  },
+  "state_data": {
+
+  }
+}

@@ -1,6 +1,7 @@
 extends Node
 
 
+signal script_execution_starting
 signal script_execution_finished
 signal script_execution_interrupted
 
@@ -28,7 +29,7 @@ func _get(property):
 		if property in runtime_variables:
 			return runtime_variables[property]
 		else:
-			return init_runtime_var(property)
+			return create_runtime_var(property)
 
 func _set(property, value):
 	var calling_method = GvintUtils.check_calling_method()
@@ -40,7 +41,7 @@ func _set(property, value):
 	
 	if called_by_runtime_action:
 		if not property in runtime_variables:
-			init_runtime_var(property)
+			create_runtime_var(property)
 	
 	if property in runtime_variables:
 		_set_runtime_var_value(property, value)
@@ -79,12 +80,17 @@ func _exit_context():
 	else:
 		_current_context = null
 
-func init_runtime_var(identifier: String, default_value = null):
+func create_runtime_var(identifier: String, default_value = null):
 	pass
 
 func _set_runtime_var_value(identifier: String, value):
 	pass
 
+func _on_script_execution_starting():
+	pass
+
+func _init_runtime_vars():
+	pass
 
 func serialize_state():
 	# TODO

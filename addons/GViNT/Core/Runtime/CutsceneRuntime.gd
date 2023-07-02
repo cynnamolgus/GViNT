@@ -9,7 +9,7 @@ func _init():
 	_config_id = "cutscene"
 
 
-func init_runtime_var(identifier: String, default_value = null):
+func create_runtime_var(identifier: String, default_value = null):
 	if not identifier in runtime_variables:
 		runtime_variables[identifier] = default_value
 	return runtime_variables[identifier]
@@ -25,6 +25,10 @@ func start(script_filename: String):
 	var context_factory = GvintScripts.load_script(script_filename, _config_id)
 	_enter_context(context_factory.create_context())
 	if not _is_running:
+		runtime_variables.clear()
+		_init_runtime_vars()
+		_on_script_execution_starting()
+		emit_signal("script_execution_starting", self)
 		_run_until_finished()
 
 
