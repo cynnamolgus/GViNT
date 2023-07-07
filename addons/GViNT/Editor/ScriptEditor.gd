@@ -3,9 +3,6 @@ extends PanelContainer
 
 const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 const ScriptEditData = preload("res://addons/GViNT/Editor/ScriptEditData.gd")
-const FileSelector = preload("res://addons/GViNT/Editor/FileSelector.gd")
-
-const FILE_SELECTOR_SCENE = preload("res://addons/GViNT/Editor/FileSelector.tscn")
 
 
 onready var open_file_dialog: FileDialog = find_node("OpenFileDialog")

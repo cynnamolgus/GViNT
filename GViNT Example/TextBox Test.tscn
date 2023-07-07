@@ -1,0 +1,104 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://GViNT Example/ScriptRuntime.gd" type="Script" id=2]
+[ext_resource path="res://GViNT Example/TextBox.gd" type="Script" id=3]
+
+[node name="TextBox Test" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 1
+
+[node name="GvintRuntimeStateful" type="Node" parent="."]
+script = ExtResource( 2 )
+autostart_script = "res://Story/start.txt"
+text_box_nodepath = NodePath("../TextBox/MarginContainer/RichTextLabel")
+name_label_nodepath = NodePath("../TextBox/NameLabelContainer/NameLabel")
+
+[node name="SideMenu" type="VBoxContainer" parent="."]
+anchor_left = 0.99
+anchor_top = 0.939
+anchor_right = 0.99
+anchor_bottom = 0.939
+margin_left = -75.0
+margin_top = -92.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="SideMenu"]
+margin_right = 75.0
+margin_bottom = 20.0
+text = "advance"
+
+[node name="UndoButton" type="Button" parent="SideMenu"]
+margin_top = 24.0
+margin_right = 75.0
+margin_bottom = 44.0
+text = "undo"
+
+[node name="QuicksaveButton" type="Button" parent="SideMenu"]
+margin_top = 48.0
+margin_right = 75.0
+margin_bottom = 68.0
+text = "quicksave"
+
+[node name="QuickloadButton" type="Button" parent="SideMenu"]
+margin_top = 72.0
+margin_right = 75.0
+margin_bottom = 92.0
+text = "quickload"
+
+[node name="TextBox" type="PanelContainer" parent="."]
+anchor_left = 0.1
+anchor_top = 1.0
+anchor_right = 0.9
+anchor_bottom = 1.0
+margin_top = -166.0
+margin_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+rect_min_size = Vector2( 600, 150 )
+mouse_filter = 1
+
+[node name="NameLabelContainer" type="MarginContainer" parent="TextBox"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 53.0
+margin_bottom = 29.0
+mouse_filter = 1
+size_flags_horizontal = 0
+size_flags_vertical = 0
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+
+[node name="NameLabel" type="Label" parent="TextBox/NameLabelContainer"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 46.0
+margin_bottom = 22.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Name"
+
+[node name="MarginContainer" type="MarginContainer" parent="TextBox"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 812.2
+margin_bottom = 143.0
+mouse_filter = 1
+custom_constants/margin_right = 32
+custom_constants/margin_top = 32
+custom_constants/margin_left = 32
+custom_constants/margin_bottom = 32
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TextBox/MarginContainer"]
+margin_left = 32.0
+margin_top = 32.0
+margin_right = 773.0
+margin_bottom = 104.0
+bbcode_enabled = true
+script = ExtResource( 3 )
+
+[connection signal="pressed" from="SideMenu/Button" to="TextBox/MarginContainer/RichTextLabel" method="advance"]
+[connection signal="pressed" from="SideMenu/UndoButton" to="GvintRuntimeStateful" method="step_backwards"]
+[connection signal="pressed" from="SideMenu/QuicksaveButton" to="GvintRuntimeStateful" method="_on_QuicksaveButton_pressed"]
+[connection signal="pressed" from="SideMenu/QuickloadButton" to="GvintRuntimeStateful" method="_on_QuickloadButton_pressed"]

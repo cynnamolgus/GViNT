@@ -1,11 +1,13 @@
 extends GvintRuntimeStateful
 
-var text_box_nodepath = "../PanelContainer/MarginContainer/RichTextLabel"
-var name_label_nodepath = "../PanelContainer/NameLabelContainer/NameLabel"
+
+export(NodePath) var text_box_nodepath
+export(NodePath) var name_label_nodepath
+
+
 
 func _init_runtime_variables():
 	create_runtime_variable("number", 1337)
-	$LineEdit.number_variable = runtime_variables["number"]
 
 
 func display_text(text: String, params: Array):
@@ -16,12 +18,25 @@ func display_text(text: String, params: Array):
 
 
 func _on_QuicksaveButton_pressed():
-#	save_state("res://quicksave.json")
-	pass # Replace with function body.
+	save_state("res://quicksave.json")
+
 
 func _on_QuickloadButton_pressed():
 	load_state("res://quicksave.json")
+	prevent_undo()
 	yield(get_node(text_box_nodepath), "advance_text")
 	execute_until_yield_or_finished()
+
+
+func _save_state() -> Dictionary:
+	return {
+		"name": get_node(name_label_nodepath).text,
+		"text": get_node(text_box_nodepath).text,
+	}
+
+
+func _load_state(savestate: Dictionary):
+	get_node(name_label_nodepath).text = savestate.name
+	get_node(text_box_nodepath).text = savestate.text
 
 

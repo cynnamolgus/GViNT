@@ -14,7 +14,11 @@ func set_variable_value(new_value):
 		if "value" in new_value:
 			value = new_value.value
 	
-	assert(value is Resource or not (value is Object), "Invalid value type - GvintVariable can only store primitives and resources in order to be serializable")
+	assert(
+		(value is Resource 
+		or not (value is Object))
+		and not (value is Array or value is Dictionary), 
+		"Invalid value type - GvintVariable can only store primitives and resources in order to be serializable")
 	if value is Resource:
 		assert(value.resource_path, "Invalid GvintVariable value: resource does not have resource_path set, which is needed for serialization")
 	
@@ -65,7 +69,7 @@ func serialize_state() -> Array:
 	return result
 
 
-func load_savestate(savestate_data: Array):
+func load_state(savestate_data: Array):
 	history.clear()
 	
 	var current_value_data = savestate_data.pop_back()

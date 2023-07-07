@@ -10,13 +10,43 @@
     },
     {
       "source_filename": "res://Story/iftest.txt",
-      "last_statement_id": "2"
+      "last_statement_id": "3"
     },
     {
       "source_filename": "res://Story/iftest.txt",
-      "last_statement_id": "2_branch1_0"
+      "last_statement_id": "3_branch1_0"
     }
   ],
+  "runtime_variables": {
+    "number": [
+      {
+        "type": "primitive",
+        "value": null
+      },
+      {
+        "type": "primitive",
+        "value": 1337
+      },
+      {
+        "type": "primitive",
+        "value": 1337
+      }
+    ],
+    "foo": [
+      {
+        "type": "primitive",
+        "value": null
+      },
+      {
+        "type": "primitive",
+        "value": "foo"
+      },
+      {
+        "type": "primitive",
+        "value": "b"
+      }
+    ]
+  },
   "yielding_statements": {
     "res://Story/start.txt": [
       "1"
@@ -25,8 +55,8 @@
       "0"
     ],
     "res://Story/iftest.txt": [
-      "1",
-      "2_branch1_0"
+      "2",
+      "3_branch1_0"
     ]
   },
   "context_spawning_statements": {
@@ -37,10 +67,15 @@
       "1"
     ],
     "res://Story/iftest.txt": [
-      "2"
+      "3"
     ]
   },
+  "undo_limit": {
+    "source_filename": "res://Story/start.txt",
+    "statement_id": "1"
+  },
   "state_data": {
-
+    "name": "",
+    "text": "number is 1337"
   }
 }

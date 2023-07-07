@@ -35,7 +35,3 @@ func setup_syntax_highlighting(editor_settings: EditorSettings):
 	add_color_override("background_color", editor_settings.get_setting("text_editor/highlighting/background_color"))
 	add_color_override("current_line_color", editor_settings.get_setting("text_editor/highlighting/current_line_color"))
 
-
-func _ready():
-	
-	pass
