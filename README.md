@@ -1,7 +1,7 @@
 # GViNT - Godot Visual Novel Tools
 A Godot Engine toolkit for story-focused content scripting. 
 
-Implements a minimalistic declarative scripting language that's directly translated into GDScript for seamless integration with arbitrary Godot systems. It emphasizes flexibility and customizability, and can be extensively configured to suit the specific needs of a project.
+Implements a minimalistic declarative scripting language that's directly translated into GDScript for seamless integration with arbitrary Godot systems. It emphasizes flexibility and customizability, and can be configured to suit the specific needs of a project.
 
 ## How it works
 The core purpose of GViNT is to bring simplified scripting for cutscenes and dialogue into the Godot engine, with full undo/redo and save/reload support. The way it accomplishes this is by translating source scripts of GDScript-style statements stripped down of any GDScript context into proper GDScript files containing the translated source statements. Corresponding GvintRuntime nodes execute said translated GDScript files and can be extended from to form an interface between the stripped-down source scripts and arbitrary game systems. Script statements get translated to operations on the runtime node, for instance a display text statement will result in calling the `display_text` method on the runtime node, and a `do_a_thing()` call function statement will call the runtime's `do_a_thing` method (if present, otherwise it will result in an error at runtime). The same goes for setting and accessing variables - `foo` becomes `runtime.foo` etc. All variables and methods declared on the runtime node are available in script, which makes for a very powerful and flexible system.
