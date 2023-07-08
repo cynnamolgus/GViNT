@@ -55,8 +55,6 @@ func _enter_context(ctx: GvintContext):
 func _undo_until_yield():
 	var reached_yielding_statement = false
 	
-	if _yielding_statements.size() < 2:
-		return false
 	if _undo_limit_reached():
 		return false
 	
@@ -230,6 +228,7 @@ func load_state(savefile_path: String):
 	_undo_limit_source_filename = json_data.undo_limit.source_filename
 	_undo_limit_statement_id = json_data.undo_limit.statement_id
 	_load_state(json_data.state_data)
+	_on_script_execution_starting()
 	emit_signal("savestate_loaded", json_data.state_data)
 
 
@@ -283,7 +282,6 @@ func _restore_context_stack(data: Array):
 
 func _restore_runtime_variables(savestate_data: Dictionary):
 	runtime_variables.clear()
-	_init_runtime_variables()
 	for identifier in savestate_data:
 		runtime_variables[identifier] = GvintVariable.new()
 		runtime_variables[identifier].load_state(savestate_data[identifier])

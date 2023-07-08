@@ -3,79 +3,36 @@
     {
       "source_filename": "res://Story/start.txt",
       "last_statement_id": "2"
-    },
-    {
-      "source_filename": "res://Story/test.txt",
-      "last_statement_id": "1"
-    },
-    {
-      "source_filename": "res://Story/iftest.txt",
-      "last_statement_id": "3"
-    },
-    {
-      "source_filename": "res://Story/iftest.txt",
-      "last_statement_id": "3_branch1_0"
     }
   ],
   "runtime_variables": {
-    "number": [
+    "portrait": [
       {
         "type": "primitive",
         "value": null
       },
       {
-        "type": "primitive",
-        "value": 1337
-      },
-      {
-        "type": "primitive",
-        "value": 1337
-      }
-    ],
-    "foo": [
-      {
-        "type": "primitive",
-        "value": null
-      },
-      {
-        "type": "primitive",
-        "value": "foo"
-      },
-      {
-        "type": "primitive",
-        "value": "b"
+        "type": "resource",
+        "value": "res://GViNT Example/foo.png"
       }
     ]
   },
   "yielding_statements": {
     "res://Story/start.txt": [
-      "1"
-    ],
-    "res://Story/test.txt": [
-      "0"
-    ],
-    "res://Story/iftest.txt": [
-      "2",
-      "3_branch1_0"
+      "0",
+      "2"
     ]
   },
   "context_spawning_statements": {
-    "res://Story/start.txt": [
-      "2"
-    ],
-    "res://Story/test.txt": [
-      "1"
-    ],
-    "res://Story/iftest.txt": [
-      "3"
-    ]
+
   },
   "undo_limit": {
     "source_filename": "res://Story/start.txt",
-    "statement_id": "1"
+    "statement_id": "0"
   },
   "state_data": {
-    "name": "",
-    "text": "number is 1337"
+    "name": "Foo",
+    "text": "Lorem ipsum",
+    "portrait": "res://GViNT Example/foo.png"
   }
 }

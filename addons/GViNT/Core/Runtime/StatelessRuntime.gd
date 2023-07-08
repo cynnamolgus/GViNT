@@ -84,7 +84,6 @@ func start(script_filename: String):
 	_enter_context(context_factory.create_context())
 	if not is_running:
 		runtime_variables.clear()
-		_init_runtime_variables()
 		_on_script_execution_starting()
 		emit_signal("script_execution_starting", self)
 		execute_until_yield_or_finished()
@@ -98,6 +97,7 @@ func stop():
 	if _current_context:
 		_context_stack.clear()
 		_current_context = null
+		_on_script_execution_interrupted()
 		emit_signal("script_execution_interrupted")
 
 
@@ -127,6 +127,7 @@ func execute_until_yield_or_finished():
 	while true:
 		if result is String:
 			if result == FINISHED:
+				_on_script_execution_finished()
 				emit_signal("script_execution_finished")
 				break
 		result = _execute_next_statement()
@@ -165,11 +166,19 @@ func _on_last_yielded_statement_completed():
 
 
 
-func _init_runtime_variables():
+func _on_script_execution_starting():
 	pass
 
-func _on_script_execution_starting():
+func _on_script_execution_finished():
+	pass
+
+func _on_script_execution_interrupted():
 	pass
 
 func _on_current_statement_yielded():
 	pass
+
+func display_text(text: String, params: Array):
+	print(str(params) + ": " + text)
+	yield(get_tree().create_timer(1.0), "timeout")
+

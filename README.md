@@ -85,6 +85,9 @@ The plugin comes with a basic script editor. It is recommended to use it, as it 
 ### GvintRuntimeStateless
 Basic script runtime that can execute scripts.
 
+#### runtime_variables: Dictionary
+Dictionary containing all of the runtime variables mapped by identifier. Cleared every time script execution begins.
+
 #### start(script_filename: String)
 Executes the script based on the provided filename. If the filename does not start with "res://", a configurable prefix ("res://Story/" by default) is added. If the filename does not contain an extension, a configurable suffix (".txt" by default) is added. Can be called from inside a script in order to nest script execution. Once the nested script is completed, the execution of the calling script will resume.
 
@@ -94,8 +97,17 @@ Ends script execution.
 #### create_runtime_variable(identifier: String, value = null)
 Creates a runtime variable based on the provided data. Equivalent to `runtime_variables[identifier] = value`.
 
-#### _init_runtime_variables()
-Virtual methoid called just before the script execution starts. Meant to be used for initializing runtime variables.
+#### _on_script_execution_starting()
+Virtual method called just before the script execution starts, either due to a `start` or `load_state` call.
+
+#### _on_script_execution_finished()
+Virtual method called when script execution finishes without interruption.
+
+#### _on_script_execution_interrupted()
+Virtual method called when script execution is interrupted with `stop()`.
+
+#### _on_current_statement_yielded():
+Virtual method called every time script execution yields.
 
 ### GvintRuntimeStateful
 Extends GvintRuntimeStateless to support full undo/redo as well as save/reload.
@@ -105,6 +117,9 @@ Creates and initializes a new `GvintVariable` object based on the provided data.
 
 #### step_backwards()
 Executes the script in reverse until a yielding statement is reached.
+
+#### prevent_undo()
+Marks the current point in script execution as the limit of how far the script can be undone.
 
 #### save_state(savefile_path: String)
 Saves the runtime's state to the provided filename.

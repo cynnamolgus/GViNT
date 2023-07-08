@@ -1,5 +1,10 @@
-foo = "foo"
-foo: "Hello, world!"
-start("test")
+"Hello, world!"
+player_choice = prompt_choice({
+"A": "foo",
+"B": "bar"
+})
+if player_choice.value == "A" {
+	"chose foo"
+} 
 foo: "Lorem ipsum"
 foo: "dolor sit amet..."
