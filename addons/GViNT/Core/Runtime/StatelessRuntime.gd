@@ -146,7 +146,8 @@ func _execute_next_statement():
 	var result
 	if script_statement.new().has_method("evaluate_conditional"):
 		var conditional_context = script_statement.evaluate_conditional(self)
-		_enter_context(conditional_context)
+		if conditional_context:
+			_enter_context(conditional_context)
 	else:
 		result = script_statement.evaluate(self)
 		if result is GDScriptFunctionState:
