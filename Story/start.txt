@@ -1,10 +1,17 @@
+foo.alias = "???"
+bar.alias = "???"
+
 "Hello, world!"
 player_choice = prompt_choice({
 "A": "foo",
 "B": "bar"
 })
+
 if player_choice.value == "A" {
-	"chose foo"
+	start("foo")
 } 
-foo: "Lorem ipsum"
-foo: "dolor sit amet..."
+if player_choice.value == "B" {
+	start("bar")
+} 
+
+"END"

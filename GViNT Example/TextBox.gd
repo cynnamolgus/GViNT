@@ -10,7 +10,7 @@ onready var queued_label = $HBoxContainer/MarginContainer/RichTextLabel
 
 func display_text(text: String, character: Character = null):
 	if character:
-		name_label.text = character.alias
+		name_label.text = character.alias.value
 		portrait.texture = character.portrait
 		portrait_container.show()
 	else:

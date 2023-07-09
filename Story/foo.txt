@@ -1,0 +1,4 @@
+foo: "Lorem ipsum"
+foo.alias = "Foo"
+foo: "dolor sit amet,"
+foo: consectetur adipiscing elit.

@@ -1,0 +1,4 @@
+bar: "Lorem ipsum"
+bar.alias = "Bar"
+bar: "dolor sit amet,"
+bar: consectetur adipiscing elit.
