@@ -18,6 +18,9 @@ const SET_WITH_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
+	static func get_type():
+		return "SetVariable"
+	
 	static func evaluate(runtime: GvintRuntimeStateful):
 		var target = {target}
 		assert(target is GvintVariable)
@@ -36,6 +39,9 @@ const SET_WITHOUT_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
+	static func get_type():
+		return "SetVariable"
+	
 	static func evaluate(runtime: GvintRuntimeStateless):
 		var value = {value}
 		if value is GDScriptFunctionState:
@@ -46,6 +52,9 @@ const SET_WITHOUT_UNDO = """class Statement_{statement_id}:
 const CALL_FUNCTION_WITH_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
+	
+	static func get_type():
+		return "CallFunction"
 	
 	static func evaluate(runtime: GvintRuntimeStateful):
 		var target = {target}
@@ -66,6 +75,9 @@ const CALL_FUNCTION_WITHOUT_UNDO = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
 	
+	static func get_type():
+		return "CallFunction"
+	
 	static func evaluate(runtime: GvintRuntimeStateless):
 		var target = {target}
 		assert(target.has_method("{method}"))
@@ -77,6 +89,10 @@ const CALL_FUNCTION_WITHOUT_UNDO = """class Statement_{statement_id}:
 const CONDITIONAL_STATEMENT = """class Statement_{statement_id}:
 	static func get_id():
 		return "{statement_id}"
+	
+	static func get_type():
+		return "IfCondition"
+	
 {nested_statements}
 {context_getters}
 	static func evaluate_conditional(runtime):

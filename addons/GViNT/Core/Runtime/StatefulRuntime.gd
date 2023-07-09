@@ -59,7 +59,9 @@ func _undo_until_yield():
 		return false
 	
 	var previous_statement = _current_context.current_statement()
-	var entered_new_context = _undo_current_statement()
+	var entered_new_context = false
+	if previous_statement.get_type() != "SetVariable":
+		entered_new_context = _undo_current_statement()
 	if entered_new_context:
 		previous_statement = _current_context.current_statement()
 	else:
@@ -90,35 +92,22 @@ func _undo_until_yield():
 		else:
 			previous_statement = _current_context.previous_statement()
 
-
-func _undo_statement(statement):
-	var entered_new_context = false
-	if statement.new().has_method("undo"):
-		statement.undo(self)
-	if _context_spawning_statements:
-		if statement in _context_spawning_statements:
-			entered_new_context = true
-			if statement.new().has_method("evaluate_conditional"):
-				_enter_context(statement.evaluate_conditional(self))
-			else:
-				statement.evaluate(self)
-			_current_context.current_statement_index = _current_context.statements.size() - 1
-			assert(_current_context.current_statement_index >= -1)
-	return entered_new_context
-
-
 func _undo_current_statement():
 	var entered_new_context = false
 	var statement = _current_context.current_statement()
 	if statement.new().has_method("undo"):
 		statement.undo(self)
 	if _is_current_statement_context_spawning():
-		entered_new_context = true
 		if statement.new().has_method("evaluate_conditional"):
-			_enter_context(statement.evaluate_conditional(self))
+			var conditional_context = statement.evaluate_conditional(self)
+			if conditional_context:
+				entered_new_context = true
+				_enter_context(conditional_context)
+				_current_context.current_statement_index = _current_context.statements.size() - 1
 		else:
+			entered_new_context = true
 			statement.evaluate(self)
-		_current_context.current_statement_index = _current_context.statements.size() - 1
+			_current_context.current_statement_index = _current_context.statements.size() - 1
 		assert(_current_context.current_statement_index >= -1)
 	return entered_new_context
 

@@ -60,9 +60,11 @@ func _on_choice_button_pressed(choice: String):
 
 func display_text(text: String, params: Array):
 	print(str(params) + ": " + text)
+	
 	var character = (params[0] as Character) if params else null
 	text_box.display_text(text, character)
 	yield(text_box.queued_label, "advance_text")
+
 
 func prompt_choice(choices: Dictionary):
 	for choice_value in choices:
@@ -71,20 +73,14 @@ func prompt_choice(choices: Dictionary):
 		button.connect("pressed", self, "_on_choice_button_pressed", [choice_value])
 		choice_menu.add_child(button)
 	text_box.hide()
-	side_menu.get_node("AdvanceButton").hide()
+	side_menu.hide()
 	
 	var choice = yield(self, "player_choice_taken")
 	
 	text_box.show()
-	side_menu.get_node("AdvanceButton").show()
+	side_menu.show()
 	
 	for child_index in choice_menu.get_child_count():
 		choice_menu.get_child(child_index).queue_free()
 	return choice
 
-func undo_prompt_choice():
-	for child_index in choice_menu.get_child_count():
-		choice_menu.get_child(child_index).queue_free()
-	
-	text_box.show()
-	side_menu.get_node("AdvanceButton").show()
