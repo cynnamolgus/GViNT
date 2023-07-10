@@ -45,6 +45,12 @@ func prevent_undo():
 	_undo_limit_source_filename = _current_context.source_filename
 	_undo_limit_statement_id = _current_context.current_statement().get_id()
 
+func start(script_filename: String):
+	if not _current_context:
+		_yielding_statements.clear()
+		_context_spawning_statements.clear()
+	.start(script_filename)
+
 func _enter_context(ctx: GvintContext):
 	if _current_context:
 		_mark_current_statement_as_context_spawning()
@@ -55,7 +61,7 @@ func _enter_context(ctx: GvintContext):
 func _undo_until_yield():
 	var reached_yielding_statement = false
 	
-	if _undo_limit_reached():
+	if undo_limit_reached():
 		return false
 	
 	var previous_statement = _current_context.current_statement()
@@ -66,9 +72,9 @@ func _undo_until_yield():
 		previous_statement = _current_context.current_statement()
 	else:
 		if _current_context.current_statement_index == 0:
-			_exit_context()
-			_current_context.current_statement_index -= 1
-			previous_statement = _current_context.current_statement()
+			while _current_context.current_statement_index <= 0:
+				_exit_context()
+				_current_context.current_statement_index -= 1
 		else:
 			previous_statement = _current_context.previous_statement()
 	
@@ -84,15 +90,19 @@ func _undo_until_yield():
 			return true
 		
 		if _current_context.current_statement_index == 0:
-			_exit_context()
-			_current_context.previous_statement()
-			if _is_current_statement_yielding():
+			while _current_context.current_statement_index <= 0:
+				_exit_context()
 				_current_context.current_statement_index -= 1
-				return true
+				if _current_context.current_statement_index == -1:
+					continue
+				if _is_current_statement_yielding():
+					_current_context.current_statement_index -= 1
+					return true
 		else:
 			previous_statement = _current_context.previous_statement()
 
 func _undo_current_statement():
+	assert(_current_context.current_statement_index > -1)
 	var entered_new_context = false
 	var statement = _current_context.current_statement()
 	if statement.new().has_method("undo"):
@@ -124,7 +134,7 @@ func _is_current_statement_yielding():
 	return current_statement_id in statements
 
 
-func _undo_limit_reached():
+func undo_limit_reached():
 	if _current_context.source_filename != _undo_limit_source_filename:
 		return false
 	var statements = _yielding_statements[_current_context.source_filename]
@@ -210,6 +220,7 @@ func load_state(savefile_path: String):
 	stop()
 	var json_data = GvintUtils.load_json_dict(savefile_path)
 	_validate_savestate_data(json_data)
+	_on_script_execution_starting()
 	_restore_context_stack(json_data.context_stack)
 	_restore_runtime_variables(json_data.runtime_variables)
 	_yielding_statements = json_data.yielding_statements
@@ -217,7 +228,6 @@ func load_state(savefile_path: String):
 	_undo_limit_source_filename = json_data.undo_limit.source_filename
 	_undo_limit_statement_id = json_data.undo_limit.statement_id
 	_load_state(json_data.state_data)
-	_on_script_execution_starting()
 	emit_signal("savestate_loaded", json_data.state_data)
 
 
@@ -258,6 +268,7 @@ func _restore_context_stack(data: Array):
 			context = GvintScripts.load_script(context_data.source_filename, _config_id).create_context()
 		
 		context.current_statement_index = int(split_id[-1])
+		context.last_statement_id = context_data.last_statement_id
 		_context_stack.push_back(context)
 		
 		previous_context_last_statement = context.current_statement()

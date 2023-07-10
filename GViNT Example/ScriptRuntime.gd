@@ -24,8 +24,12 @@ func _on_QuicksaveButton_pressed():
 func _on_QuickloadButton_pressed():
 	load_state("res://GViNT Example/quicksave.json")
 	prevent_undo()
-	var input = yield(self, "script_step_input_received")
-	if input == "advance":
+	if not undo_limit_reached():
+		var input = yield(self, "script_step_input_received")
+		if input == "advance":
+			execute_until_yield_or_finished()
+	else:
+		yield(text_box.queued_label, "advance_text")
 		execute_until_yield_or_finished()
 
 

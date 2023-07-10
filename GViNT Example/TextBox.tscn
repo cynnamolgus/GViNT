@@ -37,7 +37,6 @@ margin_bottom = 146.0
 [node name="Label" type="Label" parent="HBoxContainer/PortraitContainer/VBoxContainer"]
 margin_right = 96.0
 margin_bottom = 14.0
-text = "Name"
 
 [node name="TextureRect" type="TextureRect" parent="HBoxContainer/PortraitContainer/VBoxContainer"]
 margin_top = 18.0

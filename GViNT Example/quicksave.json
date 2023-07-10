@@ -2,53 +2,28 @@
   "context_stack": [
     {
       "source_filename": "res://Story/start.txt",
-      "last_statement_id": "4"
-    },
-    {
-      "source_filename": "res://Story/start.txt",
-      "last_statement_id": "4_branch0_0"
-    },
-    {
-      "source_filename": "res://Story/foo.txt",
       "last_statement_id": "2"
     }
   ],
   "runtime_variables": {
-    "player_choice": [
-      {
-        "type": "primitive",
-        "value": null
-      },
-      {
-        "type": "primitive",
-        "value": "A"
-      }
-    ]
+
   },
   "yielding_statements": {
     "res://Story/start.txt": [
-      "2",
-      "3"
-    ],
-    "res://Story/foo.txt": [
-      "0",
       "2"
     ]
   },
   "context_spawning_statements": {
-    "res://Story/start.txt": [
-      "4",
-      "4_branch0_0"
-    ]
+
   },
   "undo_limit": {
     "source_filename": "res://Story/start.txt",
     "statement_id": "2"
   },
   "state_data": {
-    "name": "Foo",
-    "text": "dolor sit amet,",
-    "portrait": "res://GViNT Example/foo.png",
+    "name": "",
+    "text": "Hello, world!",
+    "portrait": "res://icon.png",
     "foo_alias": [
       {
         "type": "primitive",
@@ -57,10 +32,6 @@
       {
         "type": "primitive",
         "value": "???"
-      },
-      {
-        "type": "primitive",
-        "value": "Foo"
       }
     ],
     "bar_alias": [

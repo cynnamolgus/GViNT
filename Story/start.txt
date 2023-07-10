@@ -2,6 +2,7 @@ foo.alias = "???"
 bar.alias = "???"
 
 "Hello, world!"
+
 player_choice = prompt_choice({
 "A": "foo",
 "B": "bar"
@@ -9,9 +10,9 @@ player_choice = prompt_choice({
 
 if player_choice.value == "A" {
 	start("foo")
-} 
+}
 if player_choice.value == "B" {
 	start("bar")
-} 
+}
 
 "END"

@@ -6,6 +6,11 @@ Implements a minimalistic declarative scripting language that's directly transla
 ## How it works
 The core purpose of GViNT is to bring simplified scripting for cutscenes and dialogue into the Godot engine, with full undo/redo and save/reload support. The way it accomplishes this is by translating source scripts of GDScript-style statements stripped down of any GDScript context into proper GDScript files containing the translated source statements. Corresponding GvintRuntime nodes execute said translated GDScript files and can be extended from to form an interface between the stripped-down source scripts and arbitrary game systems. Script statements get translated to operations on the runtime node, for instance a display text statement will result in calling the `display_text` method on the runtime node, and a `do_a_thing()` call function statement will call the runtime's `do_a_thing` method (if present, otherwise it will result in an error at runtime). The same goes for setting and accessing variables - `foo` becomes `runtime.foo` etc. All variables and methods declared on the runtime node are available in script, which makes for a very powerful and flexible system.
 
+
+## Note
+This is an early release of the toolkit and it has not yet been thoroughly tested. As such, there are bound to be some bugs still lurking in the system and the API may be subject to changes in further updates.
+
+
 ## Syntax
 
 ### Set variable statement
@@ -94,6 +99,9 @@ Executes the script based on the provided filename. If the filename does not sta
 #### stop()
 Ends script execution.
 
+#### execute_until_yield_or_finished()
+Resumes script execution. In most cases, it is called automatically to resume after a yield. In GvintRuntimeStateful, it is used to resume execution after a state load.
+
 #### create_runtime_variable(identifier: String, value = null)
 Creates a runtime variable based on the provided data. Equivalent to `runtime_variables[identifier] = value`.
 
@@ -106,8 +114,6 @@ Virtual method called when script execution finishes without interruption.
 #### _on_script_execution_interrupted()
 Virtual method called when script execution is interrupted with `stop()`.
 
-#### _on_current_statement_yielded():
-Virtual method called every time script execution yields.
 
 ### GvintRuntimeStateful
 Extends GvintRuntimeStateless to support full undo/redo as well as save/reload.
@@ -121,6 +127,9 @@ Executes the script in reverse until a yielding statement is reached.
 #### prevent_undo()
 Marks the current point in script execution as the limit of how far the script can be undone.
 
+#### undo_limit_reached() -> bool
+Returns true if the current script statement is the undo limit, false otherwise.
+
 #### save_state(savefile_path: String)
 Saves the runtime's state to the provided filename.
 
@@ -132,6 +141,7 @@ Virtual method called while saving the state, must return a JSON-compatible `Dic
 
 #### _load_state(savestate: Dictionary)
 Virtual method called while reloading the state, must restore the runtime's state based on data provided by `_save_state()`.
+
 
 ### GvintVariable
 Wrapper object around GDScript variables meant to help undo/redo and serialization in stateful mode.
@@ -148,8 +158,9 @@ Returns a JSON-compatible array containing the variable's value history.
 #### load_state(savestate: Array)
 Restores the state of the object based on data provided by `serialilze_state()`
 
+
 ## Future plans:
 
-Godot 4.x port
+Template VN project/thorough testing and bugfixing
 
-Template VN project
+Godot 4.x port

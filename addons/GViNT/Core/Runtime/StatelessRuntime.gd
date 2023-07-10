@@ -151,7 +151,6 @@ func _execute_next_statement():
 	else:
 		result = script_statement.evaluate(self)
 		if result is GDScriptFunctionState:
-			_on_current_statement_yielded()
 			_last_yielded_funcstate = result
 			_last_yielded_funcstate.connect("completed", self, "_on_last_yielded_statement_completed")
 			return result
@@ -174,9 +173,6 @@ func _on_script_execution_finished():
 	pass
 
 func _on_script_execution_interrupted():
-	pass
-
-func _on_current_statement_yielded():
 	pass
 
 func display_text(text: String, params: Array):
