@@ -36,7 +36,7 @@ In stateful mode, a corresponding `undo_<method name>` method will - if defined 
 ### Display text statement
 `<string literal>` OR `<parameter list>: <string literal>`
 
-Calls the runtime's `display_text` method with two arguments - the text to be displayed, and an array containing the parameters. When using parameters, the wrapping quotes around the string literal can be omitted - the coma is sufficient to mark the following characters as being a string literal.
+Calls the runtime's `display_text` method with two arguments - the text to be displayed, and an array containing the parameters. When using parameters, the wrapping quotes around the string literal can be omitted - the colon is sufficient to mark the following characters as being a string literal.
 
 For example:
 ```
