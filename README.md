@@ -79,7 +79,7 @@ During the translation process, non-global identifiers get prefixed with "runtim
 ## GvintVariable
 In stateless mode, a variable can have any arbitrary value possible in GDScript. However, in stateful mode, it must be possible to undo set variable statements and to serialize the state of runtime variables. These limitations are enforced in stateful mode by wrapping runtime variables in `GvintVariable` objects, which automatically store the history of the variable's value and enforce type limitations. A `GvintVariable` can only store primitive datatypes and `Resource` types.
 
-Due to translator limitations, it is sometimes necessary to distinguish between the value of a `GvintVariable` and the `GvintVariable` object itself. Set variable statements function as expected - `foo = 42` will create a `GvintVariable` and write 42 to its value. However, `if foo == 42` will compare the literal value 42 to the `GvintVariable` **wrapper object**. In order to read the value of a `GvintVariable` object, the `value` property must be accessed, for example `if foo.value == 42`.
+Due to translator limitations, it is sometimes necessary to distinguish between the value of a `GvintVariable` and the `GvintVariable` object itself in stateful mode. Set variable statements function as expected - `foo = 42` will create a `GvintVariable` and write 42 to its value. However, `if foo == 42` will compare the literal value 42 to the `GvintVariable` **wrapper object**. In order to read the value of a `GvintVariable` object, the `value` property must be accessed, for example `if foo.value == 42`.
 
 
 ## Editor
@@ -137,7 +137,7 @@ Saves the runtime's state to the provided filename.
 Loads runtime state data from the file at `savefile_path` and restores the state.
 
 #### _save_state() -> Dictionary
-Virtual method called while saving the state, must return a JSON-compatible `Dictionary` containing data that's supposed to be preserved in the savestate.
+Virtual method called while saving the state, must return a JSON-compatible `Dictionary` containing data that will then be preserved in the savestate.
 
 #### _load_state(savestate: Dictionary)
 Virtual method called while reloading the state, must restore the runtime's state based on data provided by `_save_state()`.
@@ -145,6 +145,15 @@ Virtual method called while reloading the state, must restore the runtime's stat
 
 ### GvintVariable
 Wrapper object around GDScript variables meant to help undo/redo and serialization in stateful mode.
+
+#### variable_value_changed (Signal)
+Emitted when the value of the variable is changed, either via set or an `undo_last_change` call.
+
+#### value
+The property containing the current value of the variable. Implements a setter that automatically stores the current value in its history when the value is changed.
+
+#### history
+An array containing all of the variable's previous values.
 
 #### undo_last_change()
 Restores the previous value of the variable.
