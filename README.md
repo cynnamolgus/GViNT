@@ -21,7 +21,7 @@ For example:
 ```
 foo = 42
 foo.get_bar().some_property = randi()
-foo = SomeSingleton.get_value()
+foo += SomeSingleton.get_value()
 ```
 
 ### Call function statement
@@ -29,7 +29,10 @@ foo = SomeSingleton.get_value()
 
 for example:
 
-`do_a_thing("a", "b")`
+```
+do_a_thing("a", "b")
+SomeSingleton.foobar()
+```
 
 In stateful mode, a corresponding `undo_<method name>` method will - if defined on the method call target - be called when undoing the statement.
 
@@ -69,7 +72,7 @@ else {
 ```
 
 ## Coroutines
-GViNT makes use of GDScript coroutines using yield in order to control when the next statement is executed. If the callback of a call function (or display text) statement yields, or the value expression of a set variable statement returns a `GDScriptFunctionState` object, the runtime node will wait until the resulting coroutine is completed before executing the next statement. For example, the `display_text` method would yield on a signal to advance the dialogue, which would cause the runtime node to yield and resume execution once the signal is emitted. Non-yielding statements get processed immediately.
+GViNT makes use of GDScript coroutines using yield in order to control when the next statement is executed. If the callback of a call function (or display text) statement yields, or the value expression of a set variable statement returns a `GDScriptFunctionState` object, the runtime node will wait until the resulting coroutine is completed before executing the next statement. For example, the `display_text` method would yield on a signal to advance the dialogue, which would cause the runtime node to yield and resume execution once the signal is emitted. A `prompt_choice` method could display buttons and yield on a signal emitted when the player makes a choice, then return the chosen value, which would cause the corresponding set variable statement to pause until the choice is made and only perform the assignment once the value is returned by the coroutine. Non-yielding statements get processed immediately. 
 
 
 ## Variable naming convention
