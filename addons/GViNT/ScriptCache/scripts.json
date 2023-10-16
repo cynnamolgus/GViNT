@@ -4,7 +4,11 @@
     "compiled_for_configs": {
       "stateful": {
         "compiled_filename": "res://addons/GViNT/ScriptCache/stateful/f2f2749a2c816ec27c24b7f6437d34f0.gd",
-        "timestamp": 1694175450
+        "timestamp": 1696072398
+      },
+      "stateless": {
+        "compiled_filename": "res://addons/GViNT/ScriptCache/stateless/f2f2749a2c816ec27c24b7f6437d34f0.gd",
+        "timestamp": 1696072398
       }
     }
   },
@@ -13,7 +17,11 @@
     "compiled_for_configs": {
       "stateful": {
         "compiled_filename": "res://addons/GViNT/ScriptCache/stateful/53252970472cc94fce0e5ee34b4a9795.gd",
-        "timestamp": 1694175452
+        "timestamp": 1696072398
+      },
+      "stateless": {
+        "compiled_filename": "res://addons/GViNT/ScriptCache/stateless/53252970472cc94fce0e5ee34b4a9795.gd",
+        "timestamp": 1696072399
       }
     }
   },
@@ -22,7 +30,11 @@
     "compiled_for_configs": {
       "stateful": {
         "compiled_filename": "res://addons/GViNT/ScriptCache/stateful/1caac84a0a4ade8098593d000dd3c17c.gd",
-        "timestamp": 1694175455
+        "timestamp": 1696072399
+      },
+      "stateless": {
+        "compiled_filename": "res://addons/GViNT/ScriptCache/stateless/1caac84a0a4ade8098593d000dd3c17c.gd",
+        "timestamp": 1696072399
       }
     }
   }

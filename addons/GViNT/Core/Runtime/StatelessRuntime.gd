@@ -12,7 +12,6 @@ const GvintUtils = preload("res://addons/GViNT/Core/Utils.gd")
 const FINISHED = "FINISHED"
 
 
-export(String, FILE) var autostart_script := ""
 export(String, DIR) var default_script_directory: String = "res://Story"
 export var default_script_extension: String = ".txt"
 
@@ -67,22 +66,20 @@ func _set_runtime_var_value(identifier: String, value):
 	runtime_variables[identifier] = value
 
 
-
-func _ready():
-	if autostart_script and not Engine.editor_hint:
-		start(autostart_script)
+func is_running():
+	return _current_context != null
 
 
 func start(script_filename: String):
 	assert(_config_id)
 	assert(_config_id in GvintScripts.configs)
 	
-	var is_running = _current_context != null
+	var was_running = is_running()
 	
 	script_filename = _expand_source_filename(script_filename)
 	var context_factory = GvintScripts.load_script(script_filename, _config_id)
 	_enter_context(context_factory.create_context())
-	if not is_running:
+	if not was_running:
 		runtime_variables.clear()
 		_on_script_execution_starting()
 		emit_signal("script_execution_starting", self)

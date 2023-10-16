@@ -41,6 +41,10 @@ _global_script_class_icons={
 config/name="GViNT"
 config/icon="res://icon.png"
 
+[audio]
+
+default_bus_layout=""
+
 [autoload]
 
 GvintScripts="*res://addons/GViNT/Core/ScriptManager/ScriptManager.gd"
