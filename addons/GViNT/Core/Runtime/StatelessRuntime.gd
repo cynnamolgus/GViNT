@@ -26,12 +26,8 @@ var _last_yielded_funcstate: GDScriptFunctionState
 
 func _get(property):
 	var calling_method = GvintUtils.check_calling_method()
-	var called_by_runtime_action = (
-		calling_method == "evaluate"
-		or calling_method == "evaluate_conditional"
-		or calling_method == "undo"
-	)
-	if called_by_runtime_action:
+	
+	if _is_runtime_method(calling_method):
 		if property in runtime_variables:
 			return runtime_variables[property]
 		else:
@@ -40,13 +36,8 @@ func _get(property):
 
 func _set(property, value):
 	var calling_method = GvintUtils.check_calling_method()
-	var called_by_runtime_action = (
-		calling_method == "evaluate"
-		or calling_method == "evaluate_conditional"
-		or calling_method == "undo"
-	)
 	
-	if called_by_runtime_action:
+	if _is_runtime_method(calling_method):
 		if not property in runtime_variables:
 			create_runtime_variable(property)
 	
@@ -54,6 +45,14 @@ func _set(property, value):
 		_set_runtime_var_value(property, value)
 		return true
 	return false
+
+
+func _is_runtime_method(method_name):
+	return (
+		method_name == "evaluate"
+		or method_name == "evaluate_conditional"
+		or method_name == "undo"
+	)
 
 
 func create_runtime_variable(identifier: String, default_value = null):
@@ -95,7 +94,9 @@ func stop():
 		_context_stack.clear()
 		_current_context = null
 		_on_script_execution_interrupted()
+		_on_script_execution_finished()
 		emit_signal("script_execution_interrupted")
+		emit_signal("script_execution_finished")
 
 
 func _expand_source_filename(source_filename):
@@ -110,6 +111,7 @@ func _enter_context(ctx: GvintContext):
 	if _current_context:
 		_context_stack.push_back(_current_context)
 	_current_context = ctx
+
 
 func _exit_context():
 	assert(_current_context)
@@ -139,20 +141,23 @@ func _execute_next_statement():
 		if not _current_context:
 			return FINISHED
 	
-	var script_statement = _current_context.next_statement()
-	var result
-	if script_statement.new().has_method("evaluate_conditional"):
-		var conditional_context = script_statement.evaluate_conditional(self)
+	var next_statement = _current_context.next_statement()
+	var statement_result = null
+	if _is_conditional_statement(next_statement):
+		var conditional_context = next_statement.evaluate_conditional(self)
 		if conditional_context:
 			_enter_context(conditional_context)
 	else:
-		result = script_statement.evaluate(self)
-		if result is GDScriptFunctionState:
+		statement_result = next_statement.evaluate(self)
+		if statement_result is GDScriptFunctionState:
 			_on_current_statement_yielded()
-			_last_yielded_funcstate = result
+			_last_yielded_funcstate = statement_result
 			_last_yielded_funcstate.connect("completed", self, "_on_last_yielded_statement_completed")
-			return result
-	return null
+	return statement_result
+
+
+func _is_conditional_statement(statement):
+	return statement.new().has_method("evaluate_conditional")
 
 
 func _on_last_yielded_statement_completed():
@@ -174,7 +179,7 @@ func _on_script_execution_finished():
 func _on_script_execution_interrupted():
 	pass
 
+
 func display_text(text: String, params: Array):
 	print(str(params) + ": " + text)
 	yield(get_tree().create_timer(1.0), "timeout")
-
