@@ -96,6 +96,9 @@ Basic script runtime that can execute scripts.
 #### runtime_variables: Dictionary
 Dictionary containing all of the runtime variables mapped by identifier. Cleared every time script execution begins.
 
+#### is_running()
+Returns true if the runtime is currently executing a script, false otherwise.
+
 #### start(script_filename: String)
 Executes the script based on the provided filename. If the filename does not start with "res://", a configurable prefix ("res://Story/" by default) is added. If the filename does not contain an extension, a configurable suffix (".txt" by default) is added. Can be called from inside a script in order to nest script execution. Once the nested script is completed, the execution of the calling script will resume.
 
