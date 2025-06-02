@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://bt8i58p4qooyi"]
+
+[ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/code_edit_container.gd" id="2_raef6"]
+[ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/status_bar.gd" id="4_nk7tq"]
+
+[node name="ScriptEditor" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="ItemList" type="ItemList" parent="HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+item_count = 2
+item_0/text = "TODO:"
+item_1/text = " file selection"
+
+[node name="CodeEditContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2_raef6")
+
+[node name="CodeEdit" type="CodeEdit" parent="HBoxContainer/CodeEditContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="StatusBar" type="HBoxContainer" parent="HBoxContainer/CodeEditContainer"]
+layout_mode = 2
+script = ExtResource("4_nk7tq")
+
+[node name="FilenameLabel" type="Label" parent="HBoxContainer/CodeEditContainer/StatusBar"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "<No file open>"
+
+[node name="CaretLabel" type="Label" parent="HBoxContainer/CodeEditContainer/StatusBar"]
+layout_mode = 2
+text = "Line -1, Position -1"
+horizontal_alignment = 2
+
+[connection signal="caret_changed" from="HBoxContainer/CodeEditContainer/CodeEdit" to="HBoxContainer/CodeEditContainer" method="_on_code_edit_caret_changed"]
