@@ -1,3 +1,2 @@
-# prevent GitHub's automatic language detection on story scripts
-*.story linguist-vendored
-/Story/ linguist-vendored
+# Normalize EOL for all files that Git considers text files.
+* text=auto eol=lf
