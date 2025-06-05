@@ -13,8 +13,6 @@ var current_file: EditorGvintFileData = null:
 
 
 func set_current_file(value: EditorGvintFileData) -> void:
-	if current_file:
-		current_file.flush_changes_queue()
 	current_file = value
 	current_file_changed.emit(current_file)
 
@@ -58,7 +56,7 @@ func open_file_and_set_current(file_path: String) -> void:
 	_add_open_file(opened_file)
 
 
-func save_current_file():
+func save_current_file() -> void:
 	assert(current_file)
 	if current_file.file_path:
 		current_file.save()
@@ -66,7 +64,7 @@ func save_current_file():
 		$SaveAsFileDialog.show()
 
 
-func save_and_close_current_file():
+func save_and_close_current_file() -> void:
 	assert(current_file)
 	if current_file.file_path:
 		current_file.save()
@@ -84,7 +82,7 @@ func save_and_close_current_file():
 	close_current_file()
 
 
-func save_current_file_as(file_path: String):
+func save_current_file_as(file_path: String) -> void:
 	assert(current_file)
 	if not current_file.file_path:
 		
@@ -102,14 +100,14 @@ func save_current_file_as(file_path: String):
 		current_file.has_unsaved_changes = false
 
 
-func prompt_save_or_close_current_file():
+func prompt_save_or_close_current_file() -> void:
 	if current_file.has_unsaved_changes:
 		$SaveChangesDialog.show()
 	else:
 		close_current_file()
 
 
-func close_current_file():
+func close_current_file() -> void:
 	var closed_file_index := _close_file(current_file)
 	
 	if open_files.size() == 0:
@@ -119,7 +117,7 @@ func close_current_file():
 		set_file_at_index_as_selected(closed_file_index - 1)
 
 
-func _add_open_file(file: EditorGvintFileData):
+func _add_open_file(file: EditorGvintFileData) -> void:
 	file.manager_index = open_files.size()
 	open_files.append(file)
 	file_opened.emit(file)
@@ -135,20 +133,3 @@ func _close_file(file: EditorGvintFileData) -> int:
 	file_index_closed.emit(file_index)
 	file.free()
 	return file_index
-
-
-func _on_code_edit_line_modified(line: int, line_text: String) -> void:
-	current_file.queue_set_line(line, line_text)
-
-
-func _on_code_edit_lines_inserted(at_position: int, lines: Array) -> void:
-	current_file.queue_insert_lines(at_position, lines)
-
-
-func _on_code_edit_lines_removed(after_index: int, line_count: int) -> void:
-	current_file.queue_remove_lines(after_index, line_count)
-
-
-func _on_parse_delay_timer_timeout() -> void:
-	if current_file:
-		current_file.flush_changes_queue()

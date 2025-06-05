@@ -2,14 +2,14 @@
 class_name EditorGvintFileList extends ItemList
 
 
-func toggle_visible():
+func toggle_visible() -> void:
 	if visible:
 		hide()
 	else:
 		show()
 
 
-func update_displayed_filename(file: EditorGvintFileData):
+func update_displayed_filename(file: EditorGvintFileData) -> void:
 	set_item_text(
 			file.manager_index, 
 			file.filename \

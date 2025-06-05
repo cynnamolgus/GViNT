@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://bt8i58p4qooyi"]
+[gd_scene load_steps=8 format=3 uid="uid://bt8i58p4qooyi"]
 
 [ext_resource type="Script" uid="uid://ffuojyalwst4" path="res://addons/GViNT/Editor/toolbar.gd" id="2_4aj84"]
 [ext_resource type="Script" uid="uid://c3wjgextgbwx" path="res://addons/GViNT/Editor/FileList/file_list.gd" id="2_fjcf5"]
@@ -6,7 +6,6 @@
 [ext_resource type="Script" uid="uid://bqfpcvwwekf6c" path="res://addons/GViNT/Editor/FileList/file_manager.gd" id="3_ft3qa"]
 [ext_resource type="Script" uid="uid://p7fy2615tlrq" path="res://addons/GViNT/Editor/FileList/save_changes_dialog.gd" id="3_luk6g"]
 [ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="3_yv202"]
-[ext_resource type="Script" uid="uid://dlvb3cu1q7igw" path="res://addons/GViNT/Editor/ScriptEditor/code_edit.gd" id="4_fjcf5"]
 [ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="4_ft3qa"]
 
 [node name="GvintEditor" type="PanelContainer"]
@@ -101,10 +100,6 @@ editable = false
 gutters_draw_line_numbers = true
 auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
-script = ExtResource("4_fjcf5")
-
-[node name="ParseDelayTimer" type="Timer" parent="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit"]
-one_shot = true
 
 [node name="StatusBar" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
 layout_mode = 2
@@ -113,24 +108,32 @@ script = ExtResource("4_ft3qa")
 [node name="FilenameLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "<No file open>"
+text = "Editing: <No file open>"
+
+[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
+layout_mode = 2
 
 [node name="StatusLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Parser idle"
 
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
+layout_mode = 2
+
 [node name="CaretLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
 layout_mode = 2
-text = "0: -1"
+tooltip_text = "Line: Column"
+mouse_filter = 0
+text = "-1: -1"
 horizontal_alignment = 2
 
-[connection signal="all_files_closed" from="FileManager" to="VBoxContainer/Toolbar" method="_on_file_manager_all_files_closed"]
+[connection signal="current_file_changed" from="FileManager" to="VBoxContainer/Toolbar" method="_on_file_manager_current_file_changed"]
 [connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_current_file_changed"]
-[connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" method="load_file_data"]
+[connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_file_manager_current_file_changed"]
 [connection signal="file_index_closed" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_index_closed"]
-[connection signal="file_opened" from="FileManager" to="VBoxContainer/Toolbar" method="_on_file_manager_file_opened"]
 [connection signal="file_opened" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_opened"]
+[connection signal="file_opened" from="FileManager" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_file_manager_file_opened"]
 [connection signal="custom_action" from="FileManager/SaveChangesDialog" to="FileManager/SaveChangesDialog" method="_on_custom_action"]
 [connection signal="force_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="close_current_file"]
 [connection signal="save_and_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="save_and_close_current_file"]
@@ -145,10 +148,3 @@ horizontal_alignment = 2
 [connection signal="pressed" from="VBoxContainer/Toolbar/CloseFileButton" to="FileManager" method="prompt_save_or_close_current_file"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/ToggleFileListButton" to="VBoxContainer/HSplitContainer/FileList" method="toggle_visible"]
 [connection signal="item_selected" from="VBoxContainer/HSplitContainer/FileList" to="FileManager" method="set_file_at_index_as_selected"]
-[connection signal="caret_changed" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_code_edit_caret_changed"]
-[connection signal="line_modified" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="FileManager" method="_on_code_edit_line_modified"]
-[connection signal="lines_edited_from" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" method="_on_lines_edited"]
-[connection signal="lines_inserted" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="FileManager" method="_on_code_edit_lines_inserted"]
-[connection signal="lines_removed" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="FileManager" method="_on_code_edit_lines_removed"]
-[connection signal="text_set" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" method="_on_text_set"]
-[connection signal="timeout" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit/ParseDelayTimer" to="FileManager" method="_on_parse_delay_timer_timeout"]

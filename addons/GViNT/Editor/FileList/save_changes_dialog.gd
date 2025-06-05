@@ -6,7 +6,7 @@ signal save_and_close_requested
 signal force_close_requested
 
 
-func _ready():
+func _ready() -> void:
 	add_button("Close without saving", false, "force_close_requested")
 	add_button("Save & close", false, "save_and_close_requested")
 

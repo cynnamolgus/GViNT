@@ -21,20 +21,39 @@ var filename: String = "Untitled":
 	set(value):
 		filename = value
 		filename_changed.emit()
-
 var has_unsaved_changes: bool = false:
 	set(value):
 		has_unsaved_changes = value
 		modified_status_changed.emit()
+var code_edit: EditorGvintCodeEdit
 
 var _changes_queue := []
 
 
-func get_content():
+static func load_file(file_path: String) -> EditorGvintFileData:
+	var file := EditorGvintFileData.new()
+	
+	file.filename = file_path.split("/")[-1]
+	file.file_path = file_path
+	file.content_lines = FileAccess.get_file_as_string(file_path).split("\n")
+	
+	return file
+
+
+func _init() -> void:
+	code_edit = EditorGvintCodeEdit.new()
+	code_edit.file = self
+
+
+func free() -> void:
+	code_edit.queue_free()
+	super.free()
+
+func get_content() -> String:
 	return "\n".join(content_lines)
 
 
-func queue_set_line(index: int, text: String):
+func queue_set_line(index: int, text: String) -> void:
 	has_unsaved_changes = true
 	if not _changes_queue:
 		_changes_queue.append([Operations.SET_LINE, index, text])
@@ -50,17 +69,17 @@ func queue_set_line(index: int, text: String):
 			_changes_queue.append([Operations.SET_LINE, index, text])
 
 
-func queue_insert_lines(at_index: int, lines: Array):
+func queue_insert_lines(at_index: int, lines: Array) -> void:
 	has_unsaved_changes = true
 	_changes_queue.append([Operations.INSERT_LINES, at_index, lines])
 
 
-func queue_remove_lines(after_index: int, line_count: int):
+func queue_remove_lines(after_index: int, line_count: int) -> void:
 	has_unsaved_changes = true
 	_changes_queue.append([Operations.REMOVE_LINES, after_index, line_count])
 
 
-func flush_changes_queue():
+func flush_changes_queue() -> void:
 	for operation in _changes_queue:
 		match operation[0]:
 			Operations.SET_LINE:
@@ -74,13 +93,13 @@ func flush_changes_queue():
 	_changes_queue.clear()
 
 
-func set_line(index: int, text: String):
+func set_line(index: int, text: String) -> void:
 	assert(index < content_lines.size())
 	content_lines[index] = text
 	content_changed.emit()
 
 
-func insert_lines(at_index: int, lines: Array):
+func insert_lines(at_index: int, lines: Array) -> void:
 	assert(at_index <= content_lines.size())
 	assert(lines)
 	var i = 0
@@ -90,13 +109,14 @@ func insert_lines(at_index: int, lines: Array):
 	content_changed.emit()
 
 
-func remove_lines(after_index: int, line_count: int):
+func remove_lines(after_index: int, line_count: int) -> void:
 	assert( (after_index + line_count) <= content_lines.size() )
 	assert(line_count != 0)
 	for i in range(line_count):
 		content_lines.remove_at(after_index + 1)
 
 
-func save():
+func save() -> void:
+	flush_changes_queue()
 	EditorGvintUtils.write_file(file_path, get_content())
 	has_unsaved_changes = false
