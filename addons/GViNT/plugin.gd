@@ -1,17 +1,12 @@
 @tool
 extends EditorPlugin
 
-const GvintScriptEditor = preload("res://addons/GViNT/Editor/script_editor.tscn")
 
-@onready var main_screen = EditorInterface.get_editor_main_screen()
+const EDITOR_SCENE = preload("res://addons/GViNT/Editor/gvint_editor.tscn")
+
 var script_editor
 
-
-func _has_main_screen():
-	return true
-
-func _get_plugin_name():
-	return "GViNT"
+@onready var main_screen = EditorInterface.get_editor_main_screen()
 
 
 func _ready():
@@ -22,13 +17,19 @@ func _exit_tree() -> void:
 	print("GViNT exit tree")
 	_unload_script_editor()
 
+func _get_plugin_name():
+	return "GViNT"
+
+func _has_main_screen():
+	return true
+
 func _make_visible(visible):
 	if script_editor:
 		script_editor.visible = visible
 
 
 func _setup_script_editor():
-	script_editor = GvintScriptEditor.instantiate()
+	script_editor = EDITOR_SCENE.instantiate()
 	main_screen.add_child(script_editor)
 	_make_visible(false)
 

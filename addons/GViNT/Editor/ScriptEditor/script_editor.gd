@@ -1,8 +1,8 @@
 @tool
 extends VBoxContainer
 
-@onready var code_edit = $CodeEdit
-@onready var status_bar := $StatusBar
+@onready var code_edit: CodeEdit = $CodeEdit
+@onready var status_bar: EditorGvintStatusBar = $StatusBar
 
 
 func _on_code_edit_caret_changed() -> void:

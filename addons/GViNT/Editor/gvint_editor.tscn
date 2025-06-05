@@ -1,0 +1,154 @@
+[gd_scene load_steps=9 format=3 uid="uid://bt8i58p4qooyi"]
+
+[ext_resource type="Script" uid="uid://ffuojyalwst4" path="res://addons/GViNT/Editor/toolbar.gd" id="2_4aj84"]
+[ext_resource type="Script" uid="uid://c3wjgextgbwx" path="res://addons/GViNT/Editor/FileList/file_list.gd" id="2_fjcf5"]
+[ext_resource type="Script" uid="uid://ba1myqylil0sc" path="res://addons/GViNT/Editor/FileList/save_as_and_close_file_dialog.gd" id="3_4aj84"]
+[ext_resource type="Script" uid="uid://bqfpcvwwekf6c" path="res://addons/GViNT/Editor/FileList/file_manager.gd" id="3_ft3qa"]
+[ext_resource type="Script" uid="uid://p7fy2615tlrq" path="res://addons/GViNT/Editor/FileList/save_changes_dialog.gd" id="3_luk6g"]
+[ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="3_yv202"]
+[ext_resource type="Script" uid="uid://dlvb3cu1q7igw" path="res://addons/GViNT/Editor/ScriptEditor/code_edit.gd" id="4_fjcf5"]
+[ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="4_ft3qa"]
+
+[node name="GvintEditor" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+
+[node name="FileManager" type="Node" parent="."]
+script = ExtResource("3_ft3qa")
+
+[node name="SaveChangesDialog" type="AcceptDialog" parent="FileManager"]
+initial_position = 4
+size = Vector2i(372, 100)
+ok_button_text = "Cancel"
+dialog_text = "Current file has unsaved changes."
+script = ExtResource("3_luk6g")
+
+[node name="SaveAsFileDialog" type="FileDialog" parent="FileManager"]
+initial_position = 4
+
+[node name="SaveAsAndCloseFileDialog" type="FileDialog" parent="FileManager"]
+auto_translate_mode = 1
+initial_position = 4
+script = ExtResource("3_4aj84")
+
+[node name="OpenFileDialog" type="FileDialog" parent="FileManager"]
+title = "Open a File"
+initial_position = 4
+ok_button_text = "Open"
+file_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Toolbar" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_4aj84")
+
+[node name="NewFileButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+text = "New file"
+
+[node name="OpenFileButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+text = "Open file"
+
+[node name="SaveButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+disabled = true
+text = "Save current file"
+
+[node name="SaveAsButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+disabled = true
+text = "Save as"
+
+[node name="CloseFileButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+disabled = true
+text = "Close current file"
+
+[node name="ToggleFileListButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+text = "Toggle file list"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 300
+drag_area_margin_begin = 200
+
+[node name="FileList" type="ItemList" parent="VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+allow_search = false
+script = ExtResource("2_fjcf5")
+
+[node name="ScriptEditor" type="VBoxContainer" parent="VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("3_yv202")
+
+[node name="CodeEdit" type="CodeEdit" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Create or open a file to edit..."
+editable = false
+gutters_draw_line_numbers = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
+script = ExtResource("4_fjcf5")
+
+[node name="ParseDelayTimer" type="Timer" parent="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit"]
+one_shot = true
+
+[node name="StatusBar" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
+layout_mode = 2
+script = ExtResource("4_ft3qa")
+
+[node name="FilenameLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "<No file open>"
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Parser idle"
+
+[node name="CaretLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
+layout_mode = 2
+text = "0: -1"
+horizontal_alignment = 2
+
+[connection signal="all_files_closed" from="FileManager" to="VBoxContainer/Toolbar" method="_on_file_manager_all_files_closed"]
+[connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_current_file_changed"]
+[connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" method="load_file_data"]
+[connection signal="file_index_closed" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_index_closed"]
+[connection signal="file_opened" from="FileManager" to="VBoxContainer/Toolbar" method="_on_file_manager_file_opened"]
+[connection signal="file_opened" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_opened"]
+[connection signal="custom_action" from="FileManager/SaveChangesDialog" to="FileManager/SaveChangesDialog" method="_on_custom_action"]
+[connection signal="force_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="close_current_file"]
+[connection signal="save_and_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="save_and_close_current_file"]
+[connection signal="file_selected" from="FileManager/SaveAsFileDialog" to="FileManager" method="save_current_file_as"]
+[connection signal="file_selected" from="FileManager/SaveAsAndCloseFileDialog" to="FileManager/SaveAsAndCloseFileDialog" method="_on_file_selected"]
+[connection signal="visibility_changed" from="FileManager/SaveAsAndCloseFileDialog" to="FileManager/SaveAsAndCloseFileDialog" method="_on_visibility_changed"]
+[connection signal="file_selected" from="FileManager/OpenFileDialog" to="FileManager" method="open_file_and_set_current"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/NewFileButton" to="FileManager" method="create_new_file_and_set_current"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/OpenFileButton" to="FileManager/OpenFileDialog" method="show"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/SaveButton" to="FileManager" method="save_current_file"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/SaveAsButton" to="FileManager/SaveAsFileDialog" method="show"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/CloseFileButton" to="FileManager" method="prompt_save_or_close_current_file"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/ToggleFileListButton" to="VBoxContainer/HSplitContainer/FileList" method="toggle_visible"]
+[connection signal="item_selected" from="VBoxContainer/HSplitContainer/FileList" to="FileManager" method="set_file_at_index_as_selected"]
+[connection signal="caret_changed" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_code_edit_caret_changed"]
+[connection signal="line_modified" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="FileManager" method="_on_code_edit_line_modified"]
+[connection signal="lines_edited_from" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" method="_on_lines_edited"]
+[connection signal="lines_inserted" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="FileManager" method="_on_code_edit_lines_inserted"]
+[connection signal="lines_removed" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="FileManager" method="_on_code_edit_lines_removed"]
+[connection signal="text_set" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit" method="_on_text_set"]
+[connection signal="timeout" from="VBoxContainer/HSplitContainer/ScriptEditor/CodeEdit/ParseDelayTimer" to="FileManager" method="_on_parse_delay_timer_timeout"]
