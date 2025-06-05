@@ -28,10 +28,12 @@ script = ExtResource("3_luk6g")
 
 [node name="SaveAsFileDialog" type="FileDialog" parent="FileManager"]
 initial_position = 4
+filters = PackedStringArray("*.gvint;GViNT script;text/plain")
 
 [node name="SaveAsAndCloseFileDialog" type="FileDialog" parent="FileManager"]
 auto_translate_mode = 1
 initial_position = 4
+filters = PackedStringArray("*.gvint;GViNT script;text/plain")
 script = ExtResource("3_4aj84")
 
 [node name="OpenFileDialog" type="FileDialog" parent="FileManager"]

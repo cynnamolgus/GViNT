@@ -10,11 +10,9 @@ var script_editor
 
 
 func _ready() -> void:
-	print("Hello GViNT!")
 	_setup_script_editor()
 
 func _exit_tree() -> void:
-	print("GViNT exit tree")
 	_unload_script_editor()
 
 func _get_plugin_name() -> String:

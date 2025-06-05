@@ -17,6 +17,7 @@ enum Operations {
 var manager_index: int
 var content_lines := PackedStringArray([""])
 var file_path: String = ""
+var modified_time: int
 var filename: String = "Untitled":
 	set(value):
 		filename = value
@@ -36,6 +37,7 @@ static func load_file(file_path: String) -> EditorGvintFileData:
 	file.filename = file_path.split("/")[-1]
 	file.file_path = file_path
 	file.content_lines = FileAccess.get_file_as_string(file_path).split("\n")
+	file.modified_time = FileAccess.get_modified_time(file_path)
 	
 	return file
 
@@ -119,4 +121,5 @@ func remove_lines(after_index: int, line_count: int) -> void:
 func save() -> void:
 	flush_changes_queue()
 	EditorGvintUtils.write_file(file_path, get_content())
+	modified_time = Time.get_unix_time_from_system()
 	has_unsaved_changes = false

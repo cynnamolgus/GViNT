@@ -12,6 +12,11 @@ var current_file: EditorGvintFileData = null:
 	set = set_current_file
 
 
+func _init() -> void:
+	EditorInterface.get_resource_filesystem().\
+		filesystem_changed.connect(_on_editor_filesystem_changed)
+
+
 func set_current_file(value: EditorGvintFileData) -> void:
 	current_file = value
 	current_file_changed.emit(current_file)
@@ -133,3 +138,16 @@ func _close_file(file: EditorGvintFileData) -> int:
 	file_index_closed.emit(file_index)
 	file.free()
 	return file_index
+
+
+func _on_editor_filesystem_changed() -> void:
+	for file in open_files:
+		var file_path = file.file_path
+		if not file_path:
+			continue
+		if not FileAccess.file_exists(file_path):
+			file.file_path = ""
+			file.filename = "Untitled"
+			file.has_unsaved_changes = true
+		elif FileAccess.get_modified_time(file_path) > file.modified_time:
+			file.has_unsaved_changes = true
