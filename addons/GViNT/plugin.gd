@@ -4,7 +4,7 @@ extends EditorPlugin
 
 const EDITOR_SCENE = preload("res://addons/GViNT/Editor/gvint_editor.tscn")
 
-var script_editor
+var script_editor: EditorGvintEditor
 
 @onready var main_screen = EditorInterface.get_editor_main_screen()
 
@@ -21,6 +21,14 @@ func _get_plugin_name() -> String:
 func _has_main_screen() -> bool:
 	return true
 
+
+func _handles(object: Object) -> bool:
+	if object is GvintScriptReference:
+		script_editor.open_script(object)
+		return true
+	return false
+
+
 func _make_visible(visible) -> void:
 	if script_editor:
 		script_editor.visible = visible
@@ -31,6 +39,7 @@ func _setup_script_editor() -> void:
 	script_editor.plugin = self
 	main_screen.add_child(script_editor)
 	_make_visible(false)
+
 
 func _unload_script_editor() -> void:
 	script_editor.queue_free()
