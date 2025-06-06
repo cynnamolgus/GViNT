@@ -2,10 +2,10 @@
 class_name EditorGvintStatusBar extends HBoxContainer
 
 
-var filename := "<No file open>":
+var file_path := "<No file open>":
 	set(value):
-		filename = value
-		$FilenameLabel.text = "Editing: " + filename
+		file_path = value
+		$FilePathLabel.text = file_path
 
 var caret_line: int = -1:
 	set(value):
@@ -17,7 +17,6 @@ var caret_position: int = -1:
 		caret_position = value
 		update_caret_label()
 
-@onready var filename_label := $FilenameLabel
 @onready var caret_label := $CaretLabel
 
 

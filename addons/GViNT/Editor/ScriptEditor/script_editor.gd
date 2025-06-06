@@ -15,13 +15,13 @@ func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
 	if file:
 		current_file = file
 		current_code_edit = current_file.code_edit
-		status_bar.filename = current_file.filename
+		status_bar.file_path = current_file.file_path if current_file.file_path else current_file.filename
 		status_bar.caret_line = current_code_edit.get_caret_line()
 		status_bar.caret_position = current_code_edit.get_caret_column()
 	else:
 		current_file = null
 		current_code_edit = $CodeEdit
-		status_bar.filename = "<No file open>"
+		status_bar.file_path = "<No file open>"
 		status_bar.caret_line = -1
 		status_bar.caret_position = -1
 	current_code_edit.show()
@@ -39,7 +39,7 @@ func _setup_code_edit(code_edit: EditorGvintCodeEdit) -> void:
 
 
 func _on_file_filename_changed() -> void:
-	status_bar.filename = current_file.filename
+	status_bar.file_path = current_file.file_path if current_file.file_path else current_file.filename
 
 
 func _on_code_edit_caret_changed() -> void:
