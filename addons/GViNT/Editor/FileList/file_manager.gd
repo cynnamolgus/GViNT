@@ -5,6 +5,7 @@ extends Node
 signal file_opened(file: EditorGvintFileData)
 signal file_closing(file: EditorGvintFileData)
 signal file_index_closed(index: int)
+signal file_index_moved(from: int, to: int)
 signal current_file_changed(file: EditorGvintFileData)
 signal all_files_closed
 
@@ -153,6 +154,33 @@ func close_current_file() -> void:
 		all_files_closed.emit()
 	else:
 		set_file_at_index_as_selected(closed_file_index - 1)
+
+
+func move_current_file_up() -> void:
+	if current_file.manager_index == 0:
+		return
+	var swapped_from = current_file.manager_index
+	var swapped_to = swapped_from - 1
+	_swap_files(swapped_from, swapped_to)
+	file_index_moved.emit(swapped_from, swapped_to)
+
+
+func move_current_file_down() -> void:
+	if current_file.manager_index == (open_files.size() - 1):
+		return
+	var swapped_from = current_file.manager_index
+	var swapped_to = swapped_from + 1
+	_swap_files(swapped_from, swapped_to)
+	file_index_moved.emit(swapped_from, swapped_to)
+
+
+func _swap_files(index_a: int, index_b: int) -> void:
+	var file_a = open_files[index_a]
+	var file_b = open_files[index_b]
+	file_a.manager_index = index_b
+	file_b.manager_index = index_a
+	open_files[index_a] = file_b
+	open_files[index_b] = file_a
 
 
 func _add_open_file(file: EditorGvintFileData) -> void:

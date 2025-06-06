@@ -32,3 +32,15 @@ func _on_file_manager_file_index_closed(index: int) -> void:
 	remove_item(index)
 	if index == 0 and item_count > 0:
 		select(0)
+
+
+func _on_item_clicked(index: int, at_position: Vector2, mouse_button_index: int) -> void:
+	if mouse_button_index == MOUSE_BUTTON_RIGHT:
+		select(index)
+		item_selected.emit(index)
+		$FileContextMenu.position = DisplayServer.mouse_get_position()
+		$FileContextMenu.show()
+
+
+func _on_file_manager_file_index_moved(from: int, to: int) -> void:
+	move_item(from, to)
