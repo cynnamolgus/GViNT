@@ -28,6 +28,7 @@ func _make_visible(visible) -> void:
 
 func _setup_script_editor() -> void:
 	script_editor = EDITOR_SCENE.instantiate()
+	script_editor.plugin = self
 	main_screen.add_child(script_editor)
 	_make_visible(false)
 

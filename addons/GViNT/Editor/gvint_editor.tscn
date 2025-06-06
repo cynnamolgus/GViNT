@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bt8i58p4qooyi"]
+[gd_scene load_steps=9 format=3 uid="uid://bt8i58p4qooyi"]
 
+[ext_resource type="Script" uid="uid://daxbb2fye4e50" path="res://addons/GViNT/Editor/gvint_editor.gd" id="1_4aj84"]
 [ext_resource type="Script" uid="uid://ffuojyalwst4" path="res://addons/GViNT/Editor/toolbar.gd" id="2_4aj84"]
 [ext_resource type="Script" uid="uid://c3wjgextgbwx" path="res://addons/GViNT/Editor/FileList/file_list.gd" id="2_fjcf5"]
 [ext_resource type="Script" uid="uid://ba1myqylil0sc" path="res://addons/GViNT/Editor/FileList/save_as_and_close_file_dialog.gd" id="3_4aj84"]
@@ -15,6 +16,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
+script = ExtResource("1_4aj84")
 
 [node name="FileManager" type="Node" parent="."]
 script = ExtResource("3_ft3qa")

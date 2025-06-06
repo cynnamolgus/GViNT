@@ -9,6 +9,8 @@ var current_file: EditorGvintFileData
 
 
 func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
+	if not is_node_ready():
+		await ready
 	current_code_edit.hide()
 	if file:
 		current_file = file
