@@ -14,6 +14,11 @@ const ID_MOVE_UP = 3
 const ID_MOVE_DOWN = 4
 
 
+func _ready():
+	size.y = 0
+	size.x = 0
+
+
 func _on_id_pressed(id: int) -> void:
 	match id:
 		ID_SAVE:

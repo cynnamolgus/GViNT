@@ -114,7 +114,7 @@ func save_and_close_current_file() -> void:
 				previously_opened_saved_file.has_unsaved_changes = true
 			current_file.file_path = save_path
 			current_file.save()
-	close_current_file()
+	close_current_file_without_saving()
 
 
 func save_current_file_as(file_path: String) -> void:
@@ -143,10 +143,10 @@ func prompt_save_or_close_current_file() -> void:
 	if current_file.has_unsaved_changes:
 		$SaveChangesDialog.show()
 	else:
-		close_current_file()
+		close_current_file_without_saving()
 
 
-func close_current_file() -> void:
+func close_current_file_without_saving() -> void:
 	var closed_file_index := _close_file(current_file)
 	
 	if open_files.size() == 0:

@@ -6,6 +6,7 @@ var plugin: EditorPlugin:
 	set(value):
 		plugin = value
 		$FileManager.plugin = value
+		$HotkeyManager.plugin = value
 
 
 func open_script(script_reference: EditorGvintScriptReference):

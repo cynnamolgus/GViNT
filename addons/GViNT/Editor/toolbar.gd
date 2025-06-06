@@ -7,7 +7,11 @@ func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
 		$SaveButton.disabled = false
 		$SaveAsButton.disabled = false
 		$CloseFileButton.disabled = false
+		$MoveUpButton.disabled = false
+		$MoveDownButton.disabled = false
 	else:
 		$SaveButton.disabled = true
 		$SaveAsButton.disabled = true
 		$CloseFileButton.disabled = true
+		$MoveUpButton.disabled = true
+		$MoveDownButton.disabled = true

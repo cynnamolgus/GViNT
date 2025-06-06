@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bt8i58p4qooyi"]
+[gd_scene load_steps=11 format=3 uid="uid://bt8i58p4qooyi"]
 
 [ext_resource type="Script" uid="uid://daxbb2fye4e50" path="res://addons/GViNT/Editor/gvint_editor.gd" id="1_4aj84"]
 [ext_resource type="Script" uid="uid://ffuojyalwst4" path="res://addons/GViNT/Editor/toolbar.gd" id="2_4aj84"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://p7fy2615tlrq" path="res://addons/GViNT/Editor/FileList/save_changes_dialog.gd" id="3_luk6g"]
 [ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="3_yv202"]
 [ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="4_ft3qa"]
+[ext_resource type="Script" uid="uid://ciiow2igqddv5" path="res://addons/GViNT/Editor/hotkey_manager.gd" id="5_3ku1n"]
 [ext_resource type="Script" uid="uid://qxmd2fpi82re" path="res://addons/GViNT/Editor/FileList/file_context_menu.gd" id="7_luk6g"]
 
 [node name="GvintEditor" type="PanelContainer"]
@@ -46,6 +47,10 @@ ok_button_text = "Open"
 file_mode = 0
 filters = PackedStringArray("*.gvint;GViNT script;text/plain")
 
+[node name="HotkeyManager" type="Control" parent="."]
+layout_mode = 2
+script = ExtResource("5_3ku1n")
+
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 
@@ -55,29 +60,47 @@ script = ExtResource("2_4aj84")
 
 [node name="NewFileButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
+tooltip_text = "Ctrl + N"
 text = "New file"
 
 [node name="OpenFileButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
+tooltip_text = "Ctrl + O"
 text = "Open file"
 
 [node name="SaveButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
+tooltip_text = "Ctrl + S"
 disabled = true
-text = "Save current file"
+text = "Save"
 
 [node name="SaveAsButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
+tooltip_text = "Ctrl + Shift + S"
 disabled = true
 text = "Save as"
 
 [node name="CloseFileButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
+tooltip_text = "Ctrl + W"
 disabled = true
-text = "Close current file"
+text = "Close"
+
+[node name="MoveUpButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+tooltip_text = "Ctrl + Shift + Up"
+disabled = true
+text = "Move up"
+
+[node name="MoveDownButton" type="Button" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+tooltip_text = "Ctrl + Shift + Down"
+disabled = true
+text = "Move down"
 
 [node name="ToggleFileListButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
+tooltip_text = "Ctrl + L"
 text = "Toggle file list"
 
 [node name="HSplitContainer" type="HSplitContainer" parent="VBoxContainer"]
@@ -94,18 +117,20 @@ script = ExtResource("2_fjcf5")
 
 [node name="FileContextMenu" type="PopupMenu" parent="VBoxContainer/HSplitContainer/FileList"]
 position = Vector2i(521, 239)
-size = Vector2i(110, 143)
-item_count = 5
-item_0/text = "Save"
+size = Vector2i(259, 147)
+item_count = 6
+item_0/text = "Save                                  (Ctrl+S)"
 item_0/id = 0
-item_1/text = "Save as"
+item_1/text = "Save as                  (Ctrl+Shift+S)"
 item_1/id = 1
-item_2/text = "Close"
+item_2/text = "Close                               (Ctrl+W)"
 item_2/id = 2
-item_3/text = "Move up"
-item_3/id = 3
-item_4/text = "Move down"
-item_4/id = 4
+item_3/id = 5
+item_3/separator = true
+item_4/text = "Move up             (Ctrl+Shift+Up)"
+item_4/id = 3
+item_5/text = "Move down   (Ctrl+Shift+Down)"
+item_5/id = 4
 script = ExtResource("7_luk6g")
 
 [node name="ScriptEditor" type="VBoxContainer" parent="VBoxContainer/HSplitContainer"]
@@ -150,25 +175,37 @@ mouse_filter = 0
 text = "-1: -1"
 horizontal_alignment = 2
 
+[connection signal="all_files_closed" from="FileManager" to="HotkeyManager" method="_on_file_manager_all_files_closed"]
 [connection signal="current_file_changed" from="FileManager" to="VBoxContainer/Toolbar" method="_on_file_manager_current_file_changed"]
 [connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_current_file_changed"]
 [connection signal="current_file_changed" from="FileManager" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_file_manager_current_file_changed"]
 [connection signal="file_index_closed" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_index_closed"]
 [connection signal="file_index_moved" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_index_moved"]
+[connection signal="file_opened" from="FileManager" to="HotkeyManager" method="_on_file_manager_file_opened"]
 [connection signal="file_opened" from="FileManager" to="VBoxContainer/HSplitContainer/FileList" method="_on_file_manager_file_opened"]
 [connection signal="file_opened" from="FileManager" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_file_manager_file_opened"]
 [connection signal="custom_action" from="FileManager/SaveChangesDialog" to="FileManager/SaveChangesDialog" method="_on_custom_action"]
-[connection signal="force_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="close_current_file"]
+[connection signal="force_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="close_current_file_without_saving"]
 [connection signal="save_and_close_requested" from="FileManager/SaveChangesDialog" to="FileManager" method="save_and_close_current_file"]
 [connection signal="file_selected" from="FileManager/SaveAsFileDialog" to="FileManager" method="save_current_file_as"]
 [connection signal="file_selected" from="FileManager/SaveAsAndCloseFileDialog" to="FileManager/SaveAsAndCloseFileDialog" method="_on_file_selected"]
 [connection signal="visibility_changed" from="FileManager/SaveAsAndCloseFileDialog" to="FileManager/SaveAsAndCloseFileDialog" method="_on_visibility_changed"]
 [connection signal="file_selected" from="FileManager/OpenFileDialog" to="FileManager" method="open_file_and_set_current"]
+[connection signal="close_file_requested" from="HotkeyManager" to="FileManager" method="prompt_save_or_close_current_file"]
+[connection signal="move_down_requested" from="HotkeyManager" to="FileManager" method="move_current_file_down"]
+[connection signal="move_up_requested" from="HotkeyManager" to="FileManager" method="move_current_file_up"]
+[connection signal="new_file_requested" from="HotkeyManager" to="FileManager" method="create_new_file_and_set_current"]
+[connection signal="open_file_requested" from="HotkeyManager" to="FileManager/OpenFileDialog" method="show"]
+[connection signal="save_as_requested" from="HotkeyManager" to="FileManager/SaveAsFileDialog" method="show"]
+[connection signal="save_requested" from="HotkeyManager" to="FileManager" method="save_current_file"]
+[connection signal="toggle_file_list_requested" from="HotkeyManager" to="VBoxContainer/HSplitContainer/FileList" method="toggle_visible"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/NewFileButton" to="FileManager" method="create_new_file_and_set_current"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/OpenFileButton" to="FileManager/OpenFileDialog" method="show"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/SaveButton" to="FileManager" method="save_current_file"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/SaveAsButton" to="FileManager/SaveAsFileDialog" method="show"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/CloseFileButton" to="FileManager" method="prompt_save_or_close_current_file"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/MoveUpButton" to="FileManager" method="move_current_file_up"]
+[connection signal="pressed" from="VBoxContainer/Toolbar/MoveDownButton" to="FileManager" method="move_current_file_down"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/ToggleFileListButton" to="VBoxContainer/HSplitContainer/FileList" method="toggle_visible"]
 [connection signal="item_clicked" from="VBoxContainer/HSplitContainer/FileList" to="VBoxContainer/HSplitContainer/FileList" method="_on_item_clicked"]
 [connection signal="item_selected" from="VBoxContainer/HSplitContainer/FileList" to="FileManager" method="set_file_at_index_as_selected"]
