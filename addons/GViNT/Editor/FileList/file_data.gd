@@ -123,3 +123,18 @@ func save() -> void:
 	EditorGvintUtils.write_file(file_path, get_content())
 	modified_time = Time.get_unix_time_from_system()
 	has_unsaved_changes = false
+	if Engine.is_editor_hint():
+		EditorInterface.get_resource_filesystem().scan()
+
+
+func save_as(file_path: String) -> void:
+	flush_changes_queue()
+	EditorGvintUtils.write_file(file_path, get_content())
+	if not self.file_path:
+		self.file_path = file_path
+		filename = file_path.split("/")[-1]
+	if file_path == self.file_path:
+		modified_time = Time.get_unix_time_from_system()
+		has_unsaved_changes = false
+	if Engine.is_editor_hint():
+		EditorInterface.get_resource_filesystem().scan()

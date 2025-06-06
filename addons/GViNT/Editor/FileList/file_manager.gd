@@ -129,14 +129,8 @@ func save_current_file_as(file_path: String) -> void:
 			open_file_with_this_path.has_unsaved_changes = true
 			open_file_with_this_path.file_path = ""
 		
-		current_file.file_path = file_path
-		current_file.filename = file_path.split("/")[-1]
-		current_file.has_unsaved_changes = false
 		serialize_state()
-	EditorGvintUtils.write_file(file_path, current_file.get_content())
-	if file_path == current_file.file_path:
-		current_file.modified_time = Time.get_unix_time_from_system()
-		current_file.has_unsaved_changes = false
+	current_file.save_as(file_path)
 
 
 func prompt_save_or_close_current_file() -> void:
