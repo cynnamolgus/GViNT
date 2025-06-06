@@ -1,0 +1,2 @@
+@tool
+class_name EditorGvintScriptReference extends Resource

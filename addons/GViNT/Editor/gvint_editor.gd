@@ -8,5 +8,5 @@ var plugin: EditorPlugin:
 		$FileManager.plugin = value
 
 
-func open_script(script_reference: GvintScriptReference):
+func open_script(script_reference: EditorGvintScriptReference):
 	$FileManager.open_file_and_set_current(script_reference.resource_path)

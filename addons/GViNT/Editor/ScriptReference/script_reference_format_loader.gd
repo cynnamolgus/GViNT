@@ -1,5 +1,5 @@
 @tool
-class_name GvintScriptReferenceFormatLoader extends ResourceFormatLoader
+class_name EditorGvintScriptReferenceFormatLoader extends ResourceFormatLoader
 
 
 func _get_recognized_extensions() -> PackedStringArray:
@@ -14,7 +14,7 @@ func _get_resource_type(path: String) -> String:
 
 func _get_resource_script_class(path: String) -> String:
 	if path.get_extension() == "gvint":
-		return "GvintScriptReference"
+		return "EditorGvintScriptReference"
 	return ""
 
 
@@ -26,5 +26,5 @@ func _load(
 		path: String, _original_path: String, _use_sub_threads: bool, 
 		_cache_mode: int
 		) -> Variant:
-	var script_metadata := GvintScriptReference.new()
+	var script_metadata := EditorGvintScriptReference.new()
 	return script_metadata

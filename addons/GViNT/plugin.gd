@@ -23,7 +23,7 @@ func _has_main_screen() -> bool:
 
 
 func _handles(object: Object) -> bool:
-	if object is GvintScriptReference:
+	if object is EditorGvintScriptReference:
 		script_editor.open_script(object)
 		return true
 	return false
