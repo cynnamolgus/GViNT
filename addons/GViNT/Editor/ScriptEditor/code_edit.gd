@@ -1,8 +1,8 @@
 @tool
-class_name EditorGvintCodeEdit extends CodeEdit
+extends CodeEdit
 
 
-var file: EditorGvintFileData
+var file: Gvint.EditorFile
 var parse_delay_timer: Timer
 var line_count_before_last_edit := 1
 

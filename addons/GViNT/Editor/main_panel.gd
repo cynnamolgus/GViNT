@@ -1,5 +1,5 @@
 @tool
-class_name EditorGvintEditor extends PanelContainer
+extends PanelContainer
 
 
 var plugin: EditorPlugin:
@@ -9,5 +9,5 @@ var plugin: EditorPlugin:
 		$HotkeyManager.plugin = value
 
 
-func open_script(script_reference: EditorGvintScriptReference):
+func open_script(script_reference: Gvint.ScriptReference):
 	$FileManager.open_file_and_set_current(script_reference.resource_path)

@@ -1,12 +1,10 @@
 @tool
-class_name EditorGvintFileData extends Object
+extends Object
 
 
 signal content_changed
 signal filename_changed
 signal modified_status_changed
-signal saved
-signal closing
 
 enum Operations {
 	SET_LINE,
@@ -26,24 +24,24 @@ var has_unsaved_changes: bool = false:
 	set(value):
 		has_unsaved_changes = value
 		modified_status_changed.emit()
-var code_edit: EditorGvintCodeEdit
+var code_edit: Gvint.EditorCodeEdit
 
 var _changes_queue := []
 
 
-static func load_file(file_path: String) -> EditorGvintFileData:
-	var file := EditorGvintFileData.new()
+static func load_file(from_path: String) -> Gvint.EditorFile:
+	var file := Gvint.EditorFile.new()
 	
-	file.filename = file_path.split("/")[-1]
-	file.file_path = file_path
-	file.content_lines = FileAccess.get_file_as_string(file_path).split("\n")
-	file.modified_time = FileAccess.get_modified_time(file_path)
+	file.filename = from_path.split("/")[-1]
+	file.file_path = from_path
+	file.content_lines = FileAccess.get_file_as_string(from_path).split("\n")
+	file.modified_time = FileAccess.get_modified_time(from_path)
 	
 	return file
 
 
 func _init() -> void:
-	code_edit = EditorGvintCodeEdit.new()
+	code_edit = Gvint.EditorCodeEdit.new()
 	code_edit.file = self
 
 
@@ -120,21 +118,21 @@ func remove_lines(after_index: int, line_count: int) -> void:
 
 func save() -> void:
 	flush_changes_queue()
-	EditorGvintUtils.write_file(file_path, get_content())
-	modified_time = Time.get_unix_time_from_system()
+	Gvint.Utils.write_file(file_path, get_content())
+	modified_time = int(Time.get_unix_time_from_system())
 	has_unsaved_changes = false
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()
 
 
-func save_as(file_path: String) -> void:
+func save_as(save_path: String) -> void:
 	flush_changes_queue()
-	EditorGvintUtils.write_file(file_path, get_content())
-	if not self.file_path:
-		self.file_path = file_path
-		filename = file_path.split("/")[-1]
-	if file_path == self.file_path:
-		modified_time = Time.get_unix_time_from_system()
+	Gvint.Utils.write_file(save_path, get_content())
+	if not file_path:
+		file_path = save_path
+		filename = save_path.split("/")[-1]
+	if save_path == file_path:
+		modified_time = int(Time.get_unix_time_from_system())
 		has_unsaved_changes = false
 	if Engine.is_editor_hint():
 		EditorInterface.get_resource_filesystem().scan()

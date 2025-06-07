@@ -1,34 +1,34 @@
 [gd_scene load_steps=11 format=3 uid="uid://bt8i58p4qooyi"]
 
-[ext_resource type="Script" uid="uid://daxbb2fye4e50" path="res://addons/GViNT/Editor/gvint_editor.gd" id="1_4aj84"]
-[ext_resource type="Script" uid="uid://ffuojyalwst4" path="res://addons/GViNT/Editor/toolbar.gd" id="2_4aj84"]
-[ext_resource type="Script" uid="uid://c3wjgextgbwx" path="res://addons/GViNT/Editor/FileList/file_list.gd" id="2_fjcf5"]
-[ext_resource type="Script" uid="uid://ba1myqylil0sc" path="res://addons/GViNT/Editor/FileList/save_as_and_close_file_dialog.gd" id="3_4aj84"]
-[ext_resource type="Script" uid="uid://bqfpcvwwekf6c" path="res://addons/GViNT/Editor/FileList/file_manager.gd" id="3_ft3qa"]
-[ext_resource type="Script" uid="uid://p7fy2615tlrq" path="res://addons/GViNT/Editor/FileList/save_changes_dialog.gd" id="3_luk6g"]
-[ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="3_yv202"]
-[ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="4_ft3qa"]
-[ext_resource type="Script" uid="uid://ciiow2igqddv5" path="res://addons/GViNT/Editor/hotkey_manager.gd" id="5_3ku1n"]
-[ext_resource type="Script" uid="uid://qxmd2fpi82re" path="res://addons/GViNT/Editor/FileList/file_context_menu.gd" id="7_luk6g"]
+[ext_resource type="Script" uid="uid://daxbb2fye4e50" path="res://addons/GViNT/Editor/main_panel.gd" id="1_di22a"]
+[ext_resource type="Script" uid="uid://bqfpcvwwekf6c" path="res://addons/GViNT/Editor/FileList/file_manager.gd" id="2_61lgr"]
+[ext_resource type="Script" uid="uid://p7fy2615tlrq" path="res://addons/GViNT/Editor/FileList/save_changes_dialog.gd" id="3_c3q25"]
+[ext_resource type="Script" uid="uid://ba1myqylil0sc" path="res://addons/GViNT/Editor/FileList/save_as_and_close_file_dialog.gd" id="4_r8mmm"]
+[ext_resource type="Script" uid="uid://ciiow2igqddv5" path="res://addons/GViNT/Editor/hotkey_manager.gd" id="5_4jvre"]
+[ext_resource type="Script" uid="uid://ffuojyalwst4" path="res://addons/GViNT/Editor/toolbar.gd" id="6_daxea"]
+[ext_resource type="Script" uid="uid://c3wjgextgbwx" path="res://addons/GViNT/Editor/FileList/file_list.gd" id="7_p45me"]
+[ext_resource type="Script" uid="uid://qxmd2fpi82re" path="res://addons/GViNT/Editor/FileList/file_context_menu.gd" id="8_j2jq6"]
+[ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="9_vc3us"]
+[ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="10_lxqt3"]
 
-[node name="GvintEditor" type="PanelContainer"]
+[node name="MainPanel" type="PanelContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
-script = ExtResource("1_4aj84")
+script = ExtResource("1_di22a")
 
 [node name="FileManager" type="Node" parent="."]
-script = ExtResource("3_ft3qa")
+script = ExtResource("2_61lgr")
 
 [node name="SaveChangesDialog" type="AcceptDialog" parent="FileManager"]
 initial_position = 4
 size = Vector2i(372, 100)
 ok_button_text = "Cancel"
 dialog_text = "Current file has unsaved changes."
-script = ExtResource("3_luk6g")
+script = ExtResource("3_c3q25")
 
 [node name="SaveAsFileDialog" type="FileDialog" parent="FileManager"]
 initial_position = 4
@@ -38,7 +38,7 @@ filters = PackedStringArray("*.gvint;GViNT script;text/plain")
 auto_translate_mode = 1
 initial_position = 4
 filters = PackedStringArray("*.gvint;GViNT script;text/plain")
-script = ExtResource("3_4aj84")
+script = ExtResource("4_r8mmm")
 
 [node name="OpenFileDialog" type="FileDialog" parent="FileManager"]
 title = "Open a File"
@@ -49,14 +49,14 @@ filters = PackedStringArray("*.gvint;GViNT script;text/plain")
 
 [node name="HotkeyManager" type="Control" parent="."]
 layout_mode = 2
-script = ExtResource("5_3ku1n")
+script = ExtResource("5_4jvre")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
 
 [node name="Toolbar" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
-script = ExtResource("2_4aj84")
+script = ExtResource("6_daxea")
 
 [node name="NewFileButton" type="Button" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
@@ -113,11 +113,11 @@ drag_area_margin_begin = 200
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 allow_search = false
-script = ExtResource("2_fjcf5")
+script = ExtResource("7_p45me")
 
 [node name="FileContextMenu" type="PopupMenu" parent="VBoxContainer/HSplitContainer/FileList"]
 position = Vector2i(521, 239)
-size = Vector2i(259, 147)
+size = Vector2i(259, 2)
 item_count = 6
 item_0/text = "Save                                  (Ctrl+S)"
 item_0/id = 0
@@ -131,12 +131,12 @@ item_4/text = "Move up             (Ctrl+Shift+Up)"
 item_4/id = 3
 item_5/text = "Move down   (Ctrl+Shift+Down)"
 item_5/id = 4
-script = ExtResource("7_luk6g")
+script = ExtResource("8_j2jq6")
 
 [node name="ScriptEditor" type="VBoxContainer" parent="VBoxContainer/HSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("3_yv202")
+script = ExtResource("9_vc3us")
 
 [node name="CodeEdit" type="CodeEdit" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
 layout_mode = 2
@@ -150,7 +150,7 @@ auto_brace_completion_highlight_matching = true
 
 [node name="StatusBar" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
 layout_mode = 2
-script = ExtResource("4_ft3qa")
+script = ExtResource("10_lxqt3")
 
 [node name="FilePathLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
 layout_mode = 2

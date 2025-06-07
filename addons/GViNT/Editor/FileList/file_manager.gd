@@ -2,18 +2,18 @@
 extends Node
 
 
-signal file_opened(file: EditorGvintFileData)
-signal file_closing(file: EditorGvintFileData)
+signal file_opened(file: Gvint.EditorFile)
+signal file_closing(file: Gvint.EditorFile)
 signal file_index_closed(index: int)
 signal file_index_moved(from: int, to: int)
-signal current_file_changed(file: EditorGvintFileData)
+signal current_file_changed(file: Gvint.EditorFile)
 signal all_files_closed
 
 const STATE_SAVEFILE_PATH = "res://addons/GViNT/Editor/persistent_state.json"
 
 var plugin: EditorPlugin
 var open_files := []
-var current_file: EditorGvintFileData = null:
+var current_file: Gvint.EditorFile = null:
 	set = set_current_file
 
 
@@ -51,19 +51,19 @@ func serialize_state() -> void:
 		if file.file_path:
 			state_dict.open_files.append(file.file_path)
 	var serialized_state := JSON.stringify(state_dict)
-	EditorGvintUtils.write_file(STATE_SAVEFILE_PATH, serialized_state)
+	Gvint.Utils.write_file(STATE_SAVEFILE_PATH, serialized_state)
 
 
-func set_current_file(value: EditorGvintFileData) -> void:
+func set_current_file(value: Gvint.EditorFile) -> void:
 	current_file = value
 	current_file_changed.emit(current_file)
 
 
-func get_open_file_index(file: EditorGvintFileData) -> int:
+func get_open_file_index(file: Gvint.EditorFile) -> int:
 	return open_files.find(file)
 
 
-func get_open_file_with_path(file_path: String) -> EditorGvintFileData:
+func get_open_file_with_path(file_path: String) -> Gvint.EditorFile:
 	for file in open_files:
 		if file.file_path == file_path:
 			return file
@@ -75,7 +75,7 @@ func set_file_at_index_as_selected(index: int) -> void:
 
 
 func create_new_file_and_set_current() -> void:
-	var new_file := EditorGvintFileData.new()
+	var new_file := Gvint.EditorFile.new()
 	_add_open_file(new_file)
 
 
@@ -86,7 +86,7 @@ func open_file_and_set_current(file_path: String) -> void:
 		current_file = opened_file
 		return
 	
-	opened_file = EditorGvintFileData.load_file(file_path)
+	opened_file = Gvint.EditorFile.load_file(file_path)
 	
 	_add_open_file(opened_file)
 
@@ -177,16 +177,15 @@ func _swap_files(index_a: int, index_b: int) -> void:
 	open_files[index_b] = file_a
 
 
-func _add_open_file(file: EditorGvintFileData) -> void:
+func _add_open_file(file: Gvint.EditorFile) -> void:
 	file.manager_index = open_files.size()
 	open_files.append(file)
 	file_opened.emit(file)
 	current_file = file
 
 
-func _close_file(file: EditorGvintFileData) -> int:
+func _close_file(file: Gvint.EditorFile) -> int:
 	file_closing.emit(file)
-	file.closing.emit()
 	var file_index: int = file.manager_index
 	open_files.erase(file)
 	for i in range(file_index, open_files.size()):
@@ -209,6 +208,6 @@ func _on_editor_filesystem_changed() -> void:
 			file.has_unsaved_changes = true
 
 
-func _on_file_opened_or_closing(file: EditorGvintFileData) -> void:
+func _on_file_opened_or_closing(file: Gvint.EditorFile) -> void:
 	if file.file_path:
 		serialize_state.call_deferred()

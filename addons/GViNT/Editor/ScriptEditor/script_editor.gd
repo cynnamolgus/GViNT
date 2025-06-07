@@ -2,13 +2,13 @@
 extends VBoxContainer
 
 
-var current_file: EditorGvintFileData
+var current_file: Gvint.EditorFile
 
-@onready var status_bar: EditorGvintStatusBar = $StatusBar
+@onready var status_bar: Gvint.EditorStatusBar = $StatusBar
 @onready var current_code_edit: CodeEdit = $CodeEdit
 
 
-func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
+func _on_file_manager_current_file_changed(file: Gvint.EditorFile) -> void:
 	if not is_node_ready():
 		await ready
 	current_code_edit.hide()
@@ -27,12 +27,12 @@ func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
 	current_code_edit.show()
 
 
-func _on_file_manager_file_opened(file: EditorGvintFileData) -> void:
+func _on_file_manager_file_opened(file: Gvint.EditorFile) -> void:
 	_setup_code_edit(file.code_edit)
 	file.filename_changed.connect(_on_file_filename_changed)
 
 
-func _setup_code_edit(code_edit: EditorGvintCodeEdit) -> void:
+func _setup_code_edit(code_edit: Gvint.EditorCodeEdit) -> void:
 	add_child(code_edit)
 	move_child(code_edit, 0)
 	code_edit.caret_changed.connect(_on_code_edit_caret_changed)

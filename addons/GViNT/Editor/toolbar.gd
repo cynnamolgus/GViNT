@@ -2,7 +2,7 @@
 extends HBoxContainer
 
 
-func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
+func _on_file_manager_current_file_changed(file: Gvint.EditorFile) -> void:
 	if file:
 		$SaveButton.disabled = false
 		$SaveAsButton.disabled = false

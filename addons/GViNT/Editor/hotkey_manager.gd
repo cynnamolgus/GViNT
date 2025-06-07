@@ -65,7 +65,7 @@ func _handle_ctrl_keypress_event(event: InputEventKey):
 			get_viewport().set_input_as_handled()
 
 
-func _on_file_manager_file_opened(file: EditorGvintFileData) -> void:
+func _on_file_manager_file_opened(_file: Gvint.EditorFile) -> void:
 	file_is_open = true
 
 

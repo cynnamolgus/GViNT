@@ -2,18 +2,16 @@
 extends EditorPlugin
 
 
-const EDITOR_SCENE = preload("res://addons/GViNT/Editor/gvint_editor.tscn")
+const MAIN_PANEL = preload("uid://bt8i58p4qooyi")
 
-var script_editor: EditorGvintEditor
-
-@onready var main_screen = EditorInterface.get_editor_main_screen()
+var main_panel: Gvint.EditorMainPanel
 
 
 func _ready() -> void:
-	_setup_script_editor()
+	_setup_main_panel()
 
 func _exit_tree() -> void:
-	_unload_script_editor()
+	_unload_main_panel()
 
 func _get_plugin_name() -> String:
 	return "GViNT"
@@ -23,23 +21,23 @@ func _has_main_screen() -> bool:
 
 
 func _handles(object: Object) -> bool:
-	if object is EditorGvintScriptReference:
-		script_editor.open_script(object)
+	if object is Gvint.ScriptReference:
+		main_panel.open_script(object)
 		return true
 	return false
 
 
 func _make_visible(visible) -> void:
-	if script_editor:
-		script_editor.visible = visible
+	if main_panel:
+		main_panel.visible = visible
 
 
-func _setup_script_editor() -> void:
-	script_editor = EDITOR_SCENE.instantiate()
-	script_editor.plugin = self
-	main_screen.add_child(script_editor)
+func _setup_main_panel() -> void:
+	main_panel = MAIN_PANEL.instantiate()
+	main_panel.plugin = self
+	EditorInterface.get_editor_main_screen().add_child(main_panel)
 	_make_visible(false)
 
 
-func _unload_script_editor() -> void:
-	script_editor.queue_free()
+func _unload_main_panel() -> void:
+	main_panel.queue_free()

@@ -1,5 +1,5 @@
 @tool
-class_name EditorGvintFileList extends ItemList
+extends ItemList
 
 
 func toggle_visible() -> void:
@@ -9,7 +9,7 @@ func toggle_visible() -> void:
 		show()
 
 
-func update_displayed_filename(file: EditorGvintFileData) -> void:
+func update_displayed_filename(file: Gvint.EditorFile) -> void:
 	set_item_text(
 			file.manager_index, 
 			file.filename \
@@ -17,13 +17,13 @@ func update_displayed_filename(file: EditorGvintFileData) -> void:
 	)
 
 
-func _on_file_manager_file_opened(file: EditorGvintFileData) -> void:
+func _on_file_manager_file_opened(file: Gvint.EditorFile) -> void:
 	file.filename_changed.connect(update_displayed_filename.bind(file))
 	file.modified_status_changed.connect(update_displayed_filename.bind(file))
 	add_item(file.filename)
 
 
-func _on_file_manager_current_file_changed(file: EditorGvintFileData) -> void:
+func _on_file_manager_current_file_changed(file: Gvint.EditorFile) -> void:
 	if file:
 		select(file.manager_index)
 
@@ -34,7 +34,7 @@ func _on_file_manager_file_index_closed(index: int) -> void:
 		select(0)
 
 
-func _on_item_clicked(index: int, at_position: Vector2, mouse_button_index: int) -> void:
+func _on_item_clicked(index: int, _at_position: Vector2, mouse_button_index: int) -> void:
 	if mouse_button_index == MOUSE_BUTTON_RIGHT:
 		select(index)
 		item_selected.emit(index)

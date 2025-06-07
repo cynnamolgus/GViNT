@@ -1,5 +1,5 @@
 @tool
-class_name EditorGvintStatusBar extends HBoxContainer
+extends HBoxContainer
 
 
 var file_path := "<No file open>":
