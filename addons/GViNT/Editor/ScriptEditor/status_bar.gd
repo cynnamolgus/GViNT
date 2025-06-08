@@ -25,4 +25,4 @@ func _ready() -> void:
 
 
 func update_caret_label() -> void:
-	caret_label.text = "%s: %s" % [caret_line, caret_position]
+	caret_label.text = "%s: %s" % [caret_line + 1, caret_position + 1]

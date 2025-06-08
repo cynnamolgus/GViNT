@@ -5,7 +5,30 @@ extends VBoxContainer
 var current_file: Gvint.EditorFile
 
 @onready var status_bar: Gvint.EditorStatusBar = $StatusBar
-@onready var current_code_edit: CodeEdit = $CodeEdit
+@onready var current_code_edit: CodeEdit = $NoFileCodeEdit:
+	set = set_current_code_edit
+@onready var search_menu: Gvint.EditorSearchMenu = $SearchMenu
+
+
+func _input(event: InputEvent) -> void:
+	if not is_visible_in_tree():
+		return
+	if event is InputEventKey:
+		if (
+				event.keycode == KEY_ESCAPE 
+				and event.pressed
+				and search_menu.is_visible_in_tree()
+		):
+			search_menu.hide()
+
+
+func set_current_code_edit(code_edit: CodeEdit):
+	current_code_edit = code_edit
+	if current_code_edit == $NoFileCodeEdit:
+		$SearchMenu.current_code_edit = null
+		return
+	else:
+		$SearchMenu.current_code_edit = current_code_edit
 
 
 func _on_file_manager_current_file_changed(file: Gvint.EditorFile) -> void:
@@ -20,7 +43,7 @@ func _on_file_manager_current_file_changed(file: Gvint.EditorFile) -> void:
 		status_bar.caret_position = current_code_edit.get_caret_column()
 	else:
 		current_file = null
-		current_code_edit = $CodeEdit
+		current_code_edit = $NoFileCodeEdit
 		status_bar.file_path = "<No file open>"
 		status_bar.caret_line = -1
 		status_bar.caret_position = -1

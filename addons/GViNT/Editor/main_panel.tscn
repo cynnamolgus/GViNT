@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bt8i58p4qooyi"]
+[gd_scene load_steps=12 format=3 uid="uid://bt8i58p4qooyi"]
 
 [ext_resource type="Script" uid="uid://daxbb2fye4e50" path="res://addons/GViNT/Editor/main_panel.gd" id="1_di22a"]
 [ext_resource type="Script" uid="uid://bqfpcvwwekf6c" path="res://addons/GViNT/Editor/FileList/file_manager.gd" id="2_61lgr"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://c3wjgextgbwx" path="res://addons/GViNT/Editor/FileList/file_list.gd" id="7_p45me"]
 [ext_resource type="Script" uid="uid://qxmd2fpi82re" path="res://addons/GViNT/Editor/FileList/file_context_menu.gd" id="8_j2jq6"]
 [ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="9_vc3us"]
+[ext_resource type="Script" uid="uid://q4pmhqx85nox" path="res://addons/GViNT/Editor/ScriptEditor/search_menu.gd" id="10_61lgr"]
 [ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="10_lxqt3"]
 
 [node name="MainPanel" type="PanelContainer"]
@@ -138,7 +139,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("9_vc3us")
 
-[node name="CodeEdit" type="CodeEdit" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
+[node name="NoFileCodeEdit" type="CodeEdit" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -147,6 +148,92 @@ editable = false
 gutters_draw_line_numbers = true
 auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
+
+[node name="SearchMenu" type="PanelContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
+visible = false
+layout_mode = 2
+script = ExtResource("10_61lgr")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu"]
+layout_mode = 2
+
+[node name="SearchControls" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="SearchTextEdit" type="LineEdit" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+focus_next = NodePath("../../ReplaceControls/ReplaceTextEdit")
+placeholder_text = "Search text"
+keep_editing_on_text_submit = true
+
+[node name="SearchPreviousButton" type="Button" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+text = "↑"
+
+[node name="SearchNextButton" type="Button" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+text = "↓"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="MatchCaseCheckBox" type="CheckBox" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/HBoxContainer"]
+layout_mode = 2
+
+[node name="MatchCaseLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/HBoxContainer"]
+layout_mode = 2
+text = "Match case  "
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="WholeWordCheckBox" type="CheckBox" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/HBoxContainer2"]
+layout_mode = 2
+
+[node name="WholeWordLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/HBoxContainer2"]
+layout_mode = 2
+text = "Whole word"
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_stretch_ratio = 0.0
+text = "0/0"
+
+[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_stretch_ratio = 0.0
+text = " x "
+
+[node name="ReplaceControls" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer"]
+layout_mode = 2
+
+[node name="ReplaceTextEdit" type="LineEdit" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/ReplaceControls"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+focus_next = NodePath("../../SearchControls/SearchPreviousButton")
+focus_previous = NodePath("../../SearchControls/SearchTextEdit")
+placeholder_text = "Replace with"
+keep_editing_on_text_submit = true
+
+[node name="ReplaceButton" type="Button" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/ReplaceControls"]
+layout_mode = 2
+text = "Replace"
+
+[node name="ReplaceAllButton" type="Button" parent="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/ReplaceControls"]
+layout_mode = 2
+text = "Replace all
+"
 
 [node name="StatusBar" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
 layout_mode = 2
@@ -198,6 +285,8 @@ horizontal_alignment = 2
 [connection signal="open_file_requested" from="HotkeyManager" to="FileManager/OpenFileDialog" method="show"]
 [connection signal="save_as_requested" from="HotkeyManager" to="FileManager/SaveAsFileDialog" method="show"]
 [connection signal="save_requested" from="HotkeyManager" to="FileManager" method="save_current_file"]
+[connection signal="search_and_replace_requested" from="HotkeyManager" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="show_search_and_replace_controls"]
+[connection signal="search_requested" from="HotkeyManager" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="show_search_controls"]
 [connection signal="toggle_file_list_requested" from="HotkeyManager" to="VBoxContainer/HSplitContainer/FileList" method="toggle_visible"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/NewFileButton" to="FileManager" method="create_new_file_and_set_current"]
 [connection signal="pressed" from="VBoxContainer/Toolbar/OpenFileButton" to="FileManager/OpenFileDialog" method="show"]
@@ -215,3 +304,14 @@ horizontal_alignment = 2
 [connection signal="move_up_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager" method="move_current_file_up"]
 [connection signal="save_as_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager/SaveAsFileDialog" method="show"]
 [connection signal="save_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager" method="save_current_file"]
+[connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_visibility_changed"]
+[connection signal="text_changed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/SearchTextEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_search_text_edit_text_changed"]
+[connection signal="text_submitted" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/SearchTextEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_search_text_edit_text_submitted"]
+[connection signal="pressed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/SearchPreviousButton" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="search_previous"]
+[connection signal="pressed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/SearchNextButton" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="search_next"]
+[connection signal="toggled" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/HBoxContainer/MatchCaseCheckBox" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_match_case_check_box_toggled"]
+[connection signal="toggled" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/HBoxContainer2/WholeWordCheckBox" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_whole_word_check_box_toggled"]
+[connection signal="pressed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/CloseButton" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="hide"]
+[connection signal="text_submitted" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/ReplaceControls/ReplaceTextEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_replace_text_edit_text_submitted"]
+[connection signal="pressed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/ReplaceControls/ReplaceButton" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="replace_occurence"]
+[connection signal="pressed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/ReplaceControls/ReplaceAllButton" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="replace_all_occurences"]

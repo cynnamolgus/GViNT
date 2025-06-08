@@ -9,6 +9,7 @@ var line_count_before_last_edit := 1
 
 func _ready() -> void:
 	gutters_draw_line_numbers = true
+	highlight_current_line = true
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	text = file.get_content()
 	line_count_before_last_edit = get_line_count()
@@ -48,4 +49,5 @@ func _on_lines_edited(from_line: int, to_line: int) -> void:
 
 
 func _on_parse_delay_timeout() -> void:
+	end_action()
 	file.flush_changes_queue()

@@ -9,6 +9,8 @@ signal open_file_requested
 signal move_up_requested
 signal move_down_requested
 signal toggle_file_list_requested
+signal search_requested
+signal search_and_replace_requested
 
 var plugin: EditorPlugin
 var ctrl_pressed: bool = false
@@ -16,8 +18,9 @@ var shift_pressed: bool = false
 
 var file_is_open: bool = false
 
+
 func _input(event: InputEvent) -> void:
-	if (not plugin) or (not Engine.is_editor_hint()):
+	if (not plugin) and Engine.is_editor_hint():
 		return
 	if not is_visible_in_tree():
 		return
@@ -27,6 +30,7 @@ func _input(event: InputEvent) -> void:
 			_handle_ctrl_shift_keypress_event(event)
 		elif event.pressed and event.ctrl_pressed:
 			_handle_ctrl_keypress_event(event)
+
 
 func _handle_ctrl_shift_keypress_event(event: InputEventKey):
 	match event.keycode:
@@ -62,6 +66,12 @@ func _handle_ctrl_keypress_event(event: InputEventKey):
 			get_viewport().set_input_as_handled()
 		KEY_L:
 			toggle_file_list_requested.emit()
+			get_viewport().set_input_as_handled()
+		KEY_F:
+			search_requested.emit()
+			get_viewport().set_input_as_handled()
+		KEY_R:
+			search_and_replace_requested.emit()
 			get_viewport().set_input_as_handled()
 
 
