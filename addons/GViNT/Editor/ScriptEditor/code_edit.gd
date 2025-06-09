@@ -8,7 +8,6 @@ var line_count_before_last_edit := 1
 
 
 func _ready() -> void:
-	gutters_draw_line_numbers = true
 	highlight_current_line = true
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	text = file.get_content()

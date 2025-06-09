@@ -7,6 +7,8 @@ var plugin: EditorPlugin:
 		plugin = value
 		$FileManager.plugin = value
 		$HotkeyManager.plugin = value
+		$VBoxContainer/Toolbar.plugin = value
+		$VBoxContainer/HSplitContainer/FileList/FileContextMenu.plugin = value
 
 
 func open_script(script_reference: Gvint.ScriptReference):

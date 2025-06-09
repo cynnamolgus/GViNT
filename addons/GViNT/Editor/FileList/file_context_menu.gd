@@ -13,10 +13,22 @@ const ID_CLOSE = 2
 const ID_MOVE_UP = 3
 const ID_MOVE_DOWN = 4
 
+const ID_SEPARATOR = 100
+
+var plugin: EditorPlugin
+
 
 func _ready():
 	size.y = 0
 	size.x = 0
+	if (not plugin) and Engine.is_editor_hint():
+		return
+	add_item("Save", ID_SAVE, KEY_MASK_CTRL | KEY_S)
+	add_item("Save as", ID_SAVE_AS, KEY_MASK_CTRL | KEY_MASK_SHIFT | KEY_S)
+	add_item("Close", ID_CLOSE, KEY_MASK_CTRL | KEY_W)
+	add_separator("", ID_SEPARATOR)
+	add_item("Move up", ID_MOVE_UP, KEY_MASK_SHIFT | KEY_MASK_ALT | KEY_UP)
+	add_item("Move down", ID_MOVE_DOWN, KEY_MASK_SHIFT | KEY_MASK_ALT | KEY_DOWN)
 
 
 func _on_id_pressed(id: int) -> void:

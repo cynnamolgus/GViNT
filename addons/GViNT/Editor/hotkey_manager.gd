@@ -25,10 +25,12 @@ func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
 	
-	if event is InputEventKey:
-		if event.pressed and event.ctrl_pressed and event.shift_pressed:
+	if event is InputEventKey and event.pressed:
+		if event.ctrl_pressed and event.shift_pressed:
 			_handle_ctrl_shift_keypress_event(event)
-		elif event.pressed and event.ctrl_pressed:
+		elif event.alt_pressed and event.shift_pressed:
+			_handle_shift_alt_keypress_event(event)
+		elif event.ctrl_pressed:
 			_handle_ctrl_keypress_event(event)
 
 
@@ -38,6 +40,10 @@ func _handle_ctrl_shift_keypress_event(event: InputEventKey):
 			if file_is_open:
 				save_as_requested.emit()
 			get_viewport().set_input_as_handled()
+
+
+func _handle_shift_alt_keypress_event(event: InputEventKey):
+	match event.keycode:
 		KEY_UP:
 			if file_is_open:
 				move_up_requested.emit()

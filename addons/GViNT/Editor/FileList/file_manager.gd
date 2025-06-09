@@ -9,7 +9,7 @@ signal file_index_moved(from: int, to: int)
 signal current_file_changed(file: Gvint.EditorFile)
 signal all_files_closed
 
-const STATE_SAVEFILE_PATH = "res://addons/GViNT/Editor/persistent_state.json"
+const STATE_SAVEFILE_PATH = "res://addons/GViNT/Editor/open_files.json"
 
 var plugin: EditorPlugin
 var open_files := []
@@ -29,8 +29,9 @@ func _ready() -> void:
 
 
 func restore_state() -> void:
-	var serialized_state = FileAccess.get_file_as_string(STATE_SAVEFILE_PATH)
-	var state_dict: Dictionary = JSON.parse_string(serialized_state)
+	var state_dict := Gvint.Utils.read_json_dict(STATE_SAVEFILE_PATH)
+	if state_dict.is_empty():
+		return
 	for file_path in state_dict.open_files:
 		if FileAccess.file_exists(file_path):
 			open_file_and_set_current(file_path)
@@ -39,19 +40,13 @@ func restore_state() -> void:
 
 
 func serialize_state() -> void:
-	# for some reason, when this function is called when the editor is closed,
-	# eg from _exit_tree, it serializes the open_files array as empty.
-	# so instead, this should be called every time the file list is updated
-	# (if the update is concerning a file with a set file path;
-	# "Untitled" files are ignored)
-	var state_dict = {
+	var state = {
 		"open_files": [],
 	}
 	for file in open_files:
 		if file.file_path:
-			state_dict.open_files.append(file.file_path)
-	var serialized_state := JSON.stringify(state_dict)
-	Gvint.Utils.write_file(STATE_SAVEFILE_PATH, serialized_state)
+			state.open_files.append(file.file_path)
+	Gvint.Utils.write_json(STATE_SAVEFILE_PATH, state)
 
 
 func set_current_file(value: Gvint.EditorFile) -> void:
@@ -92,7 +87,8 @@ func open_file_and_set_current(file_path: String) -> void:
 
 
 func save_current_file() -> void:
-	assert(current_file)
+	if not current_file:
+		return
 	if current_file.file_path:
 		current_file.save()
 	else:
@@ -100,7 +96,8 @@ func save_current_file() -> void:
 
 
 func save_and_close_current_file() -> void:
-	assert(current_file)
+	if not current_file:
+		return
 	if current_file.file_path:
 		current_file.save()
 	else:
@@ -118,7 +115,8 @@ func save_and_close_current_file() -> void:
 
 
 func save_current_file_as(file_path: String) -> void:
-	assert(current_file)
+	if not current_file:
+		return
 	if not current_file.file_path:
 		# if a file with the specified path is already open,
 		# make it an "Untitled" file instead to prevent having the same
@@ -134,6 +132,8 @@ func save_current_file_as(file_path: String) -> void:
 
 
 func prompt_save_or_close_current_file() -> void:
+	if not current_file:
+		return
 	if current_file.has_unsaved_changes:
 		$SaveChangesDialog.show()
 	else:
@@ -141,6 +141,8 @@ func prompt_save_or_close_current_file() -> void:
 
 
 func close_current_file_without_saving() -> void:
+	if not current_file:
+		return
 	var closed_file_index := _close_file(current_file)
 	
 	if open_files.size() == 0:
@@ -154,6 +156,8 @@ func close_current_file_without_saving() -> void:
 
 
 func move_current_file_up() -> void:
+	if not current_file:
+		return
 	if current_file.manager_index == 0:
 		return
 	var swapped_from = current_file.manager_index
@@ -163,6 +167,8 @@ func move_current_file_up() -> void:
 
 
 func move_current_file_down() -> void:
+	if not current_file:
+		return
 	if current_file.manager_index == (open_files.size() - 1):
 		return
 	var swapped_from = current_file.manager_index
@@ -172,6 +178,8 @@ func move_current_file_down() -> void:
 
 
 func move_current_file(to_index: int):
+	if not current_file:
+		return
 	var from_index = current_file.manager_index
 	if to_index > from_index:
 		for index in range(from_index, to_index):
