@@ -168,6 +168,17 @@ func move_current_file_down() -> void:
 	file_index_moved.emit(swapped_from, swapped_to)
 
 
+func move_current_file(to_index: int):
+	var from_index = current_file.manager_index
+	if to_index > from_index:
+		for index in range(from_index, to_index):
+			_swap_files(index, index + 1)
+	elif to_index < from_index:
+		for index in range(from_index, to_index, -1):
+			_swap_files(index, index - 1)
+	file_index_moved.emit(from_index, to_index)
+
+
 func _swap_files(index_a: int, index_b: int) -> void:
 	var file_a = open_files[index_a]
 	var file_b = open_files[index_b]

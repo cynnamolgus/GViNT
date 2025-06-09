@@ -118,7 +118,7 @@ script = ExtResource("7_p45me")
 
 [node name="FileContextMenu" type="PopupMenu" parent="VBoxContainer/HSplitContainer/FileList"]
 position = Vector2i(521, 239)
-size = Vector2i(259, 2)
+size = Vector2i(259, 147)
 item_count = 6
 item_0/text = "Save                                  (Ctrl+S)"
 item_0/id = 0
@@ -259,7 +259,7 @@ layout_mode = 2
 layout_mode = 2
 tooltip_text = "Line: Column"
 mouse_filter = 0
-text = "-1: -1"
+text = "0: 0"
 horizontal_alignment = 2
 
 [connection signal="all_files_closed" from="FileManager" to="HotkeyManager" method="_on_file_manager_all_files_closed"]
@@ -298,6 +298,7 @@ horizontal_alignment = 2
 [connection signal="pressed" from="VBoxContainer/Toolbar/ToggleFileListButton" to="VBoxContainer/HSplitContainer/FileList" method="toggle_visible"]
 [connection signal="item_clicked" from="VBoxContainer/HSplitContainer/FileList" to="VBoxContainer/HSplitContainer/FileList" method="_on_item_clicked"]
 [connection signal="item_selected" from="VBoxContainer/HSplitContainer/FileList" to="FileManager" method="set_file_at_index_as_selected"]
+[connection signal="move_current_file_requested" from="VBoxContainer/HSplitContainer/FileList" to="FileManager" method="move_current_file"]
 [connection signal="close_file_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager" method="prompt_save_or_close_current_file"]
 [connection signal="id_pressed" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="VBoxContainer/HSplitContainer/FileList/FileContextMenu" method="_on_id_pressed"]
 [connection signal="move_down_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager" method="move_current_file_down"]

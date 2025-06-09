@@ -2,6 +2,40 @@
 extends ItemList
 
 
+signal move_current_file_requested(to_index: int)
+
+
+func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+	if (
+			data is Dictionary
+			and "type" in data
+			and data.type == "gvint_filelist_item"
+	):
+		return true
+	return false
+
+
+func _get_drag_data(_at_position: Vector2) -> Variant:
+	var selected_items := get_selected_items()
+	if selected_items:
+		assert(selected_items.size() == 1)
+		var dragged_item := selected_items[0]
+		var preview := Label.new()
+		preview.modulate.a = 0.5
+		preview.text = get_item_text(dragged_item)
+		set_drag_preview(preview)
+		return {
+			"type": "gvint_filelist_item",
+			#"gvint_filelist_item": dragged_item,
+		}
+	return null
+
+
+func _drop_data(at_position: Vector2, _data: Variant) -> void:
+	var drop_index := get_item_at_position(at_position)
+	move_current_file_requested.emit(drop_index)
+
+
 func toggle_visible() -> void:
 	if visible:
 		hide()
