@@ -34,7 +34,7 @@ func restore_state() -> void:
 	for file_path in state_dict.open_files:
 		if FileAccess.file_exists(file_path):
 			open_file_and_set_current(file_path)
-	if open_files:
+	if open_files and current_file.manager_index != 0:
 		set_file_at_index_as_selected(0)
 
 
@@ -147,7 +147,10 @@ func close_current_file_without_saving() -> void:
 		current_file = null
 		all_files_closed.emit()
 	else:
-		set_file_at_index_as_selected(closed_file_index - 1)
+		if closed_file_index == 0:
+			set_file_at_index_as_selected(0)
+		else:
+			set_file_at_index_as_selected(closed_file_index - 1)
 
 
 func move_current_file_up() -> void:
