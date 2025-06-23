@@ -1,9 +1,10 @@
-extends RefCounted
+extends Gvint.ParseNode
 
 
 #region: token types constants
 const IDENTIFIER = "IDENTIFIER"
 const TYPE = "TYPE"
+const BUILTIN_TYPE = "BUILTIN_TYPE"
 const ENGINE_SINGLETON = "ENGINE_SINGLETON"
 const BUILTIN_CONST = "BUILTIN_CONST"
 const BUILTIN_FUNC = "BUILTIN_FUNC"
@@ -87,6 +88,10 @@ var end_column: int
 
 
 func _to_string() -> String:
+	return text_content
+
+
+func to_debug_string() -> String:
 	match type:
 		IDENTIFIER:
 			return IDENTIFIER + ":" + text_content

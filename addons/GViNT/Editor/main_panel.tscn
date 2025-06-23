@@ -95,7 +95,7 @@ allow_search = false
 script = ExtResource("7_p45me")
 
 [node name="FileContextMenu" type="PopupMenu" parent="VBoxContainer/HSplitContainer/FileList"]
-size = Vector2i(20, 8)
+size = Vector2i(20, 2)
 script = ExtResource("8_j2jq6")
 
 [node name="ScriptEditor" type="VBoxContainer" parent="VBoxContainer/HSplitContainer"]

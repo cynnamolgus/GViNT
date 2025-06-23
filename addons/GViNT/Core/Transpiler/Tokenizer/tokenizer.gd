@@ -132,34 +132,26 @@ var _custom_types: Array = ProjectSettings.get_global_class_list().map(func(elem
 var result := Gvint.TokenizeResult.new()
 
 
-func _init(source_code: String, from_line: int, line_count: int) -> void:
-	source_code += LINEBREAK
-	
-	_position = 0
-	var lines = 0
-	while lines < from_line:
-		_position = source_code.find(LINEBREAK, _position)
-		lines += 1
-		if self._position == -1:
-			assert(false)
-			break
+func _init(source_code: String) -> void:
+	if not source_code.ends_with(LINEBREAK):
+		source_code += LINEBREAK
 	
 	_source_code = source_code
+	_position = 0
 	_current_column = 0
-	_current_line = from_line
-	_target_line = from_line + line_count
+	_current_line = 0
 	
 
 
-static func tokenize_text(text: String, from_line: int, line_count: int) -> Gvint.TokenizeResult:
-	var tokenizer := Gvint.Tokenizer.new(text, from_line, line_count)
+static func tokenize_text(text: String) -> Gvint.TokenizeResult:
+	var tokenizer := Gvint.Tokenizer.new(text)
 	while not tokenizer.end_reached():
 		tokenizer.scan_next_token()
 	return tokenizer.result
 
 
 func end_reached() -> bool:
-	return _current_line >= _target_line
+	return _position >= _source_code.length()
 
 
 func scan_next_token() -> void:
@@ -346,13 +338,13 @@ func _skip_whitespace() -> void:
 func _skip_linebreaks() -> void:
 	var is_crlf: bool = (_peek() == CARRIAGE_RETURN and _peek(1) == LINEBREAK)
 	while _peek() == LINEBREAK or is_crlf:
+		_token_start_line = _current_line
+		_token_start_column = _current_column
 		if is_crlf:
 			_advance()
 			_advance()
 		else:
 			_advance()
-		_token_start_line = _current_line - 1
-		_token_start_column = _current_column
 		_add_token(Token.LINEBREAK, LINEBREAK)
 		is_crlf = (_peek() == CARRIAGE_RETURN and _peek(1) == LINEBREAK)
 
@@ -368,8 +360,12 @@ func _add_token(type: String, text_content: String = "") -> void:
 	token.text_content = text_content
 	token.start_line = _token_start_line
 	token.start_column = _token_start_column
-	token.end_line = _current_line
-	token.end_column = _current_column
+	if type == Token.LINEBREAK:
+		token.end_line = _current_line - 1
+		token.end_column = _token_start_column + 1
+	else:
+		token.end_line = _current_line
+		token.end_column = _current_column
 	result.tokens.append(token)
 
 
@@ -395,20 +391,12 @@ func _add_valid_identifier() -> void:
 		_add_token(Token.BUILTIN_CONST, token_text)
 	elif Engine.has_singleton(token_text):
 		_add_token(Token.ENGINE_SINGLETON, token_text)
-	elif _type_exists(token_text):
+	elif token_text in GDScriptBuiltins.BUILTIN_TYPES:
+		_add_token(Token.BUILTIN_TYPE, token_text)
+	elif type_exists(token_text) or token_text in _custom_types:
 		_add_token(Token.TYPE, token_text)
 	else:
 		_add_token(Token.IDENTIFIER, token_text)
-
-
-func _type_exists(type: String) -> bool:
-	if type in _custom_types:
-		return true
-	if type in GDScriptBuiltins.BUILTIN_TYPES:
-		return true
-	if type_exists(type):
-		return true
-	return false
 
 
 func _add_number() -> void:
