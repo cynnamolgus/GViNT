@@ -5,6 +5,7 @@ extends Object
 signal content_changed
 signal filename_changed
 signal modified_status_changed
+signal parse_result_updated
 
 enum Operations {
 	SET_LINE,
@@ -25,6 +26,13 @@ var has_unsaved_changes: bool = false:
 		has_unsaved_changes = value
 		modified_status_changed.emit()
 var code_edit: Gvint.EditorCodeEdit
+var parse_result: Gvint.ParseResult = null
+var last_successful_parse_result: Gvint.ParseResult = null
+var changes_since_successful_parse := {
+	"start_line": 2 ** 62,
+	"end_line": -1,
+	"line_count_change": 0,
+}
 
 var _changes_queue := []
 
@@ -49,8 +57,14 @@ func free() -> void:
 	code_edit.queue_free()
 	super.free()
 
+
 func get_content() -> String:
 	return "\n".join(content_lines)
+
+
+func get_content_lines(from: int, to: int) -> String:
+	var sliced_lines := content_lines.slice(from, to)
+	return "\n".join(sliced_lines)
 
 
 func queue_set_line(index: int, text: String) -> void:
@@ -80,16 +94,76 @@ func queue_remove_lines(after_index: int, line_count: int) -> void:
 
 
 func flush_changes_queue() -> void:
+	if _changes_queue.is_empty():
+		return
+	
 	for operation in _changes_queue:
 		match operation[0]:
 			Operations.SET_LINE:
-				set_line(operation[1], operation[2])
+				var changed_line_index: int = operation[1]
+				if changed_line_index < changes_since_successful_parse.start_line:
+					changes_since_successful_parse.start_line = changed_line_index
+				if changed_line_index + 1 > changes_since_successful_parse.end_line:
+					changes_since_successful_parse.end_line = changed_line_index + 1
+				set_line(changed_line_index, operation[2])
 			Operations.INSERT_LINES:
-				insert_lines(operation[1], operation[2])
+				var insert_index: int = operation[1]
+				var inserted_lines_count: int = operation[2].size()
+				changes_since_successful_parse.line_count_change += inserted_lines_count
+				if insert_index < changes_since_successful_parse.start_line:
+					changes_since_successful_parse.start_line = insert_index
+				if insert_index > changes_since_successful_parse.end_line:
+					changes_since_successful_parse.end_line = insert_index
+				insert_lines(insert_index, operation[2])
 			Operations.REMOVE_LINES:
-				remove_lines(operation[1], operation[2])
+				var removed_after_index: int = operation[1]
+				var remove_index = removed_after_index + 1
+				var removed_line_count: int = operation[2]
+				if remove_index < changes_since_successful_parse.start_line:
+					changes_since_successful_parse.start_line = remove_index
+				if remove_index > changes_since_successful_parse.end_line:
+					changes_since_successful_parse.end_line = remove_index
+				changes_since_successful_parse.line_count_change -= removed_line_count
+				remove_lines(removed_after_index, removed_line_count)
 			_:
 				assert(false, "invalid file change operation")
+	
+	
+	if last_successful_parse_result:
+		var line_count_change: int = changes_since_successful_parse.line_count_change
+		var update_start_line: int = changes_since_successful_parse.start_line
+		var update_end_line: int = changes_since_successful_parse.end_line + max(line_count_change, 0)
+		var instruction_on_first_changed_line := parse_result.get_instruction_on_line(update_start_line)
+		if instruction_on_first_changed_line:
+			update_start_line = instruction_on_first_changed_line.start_line
+			if instruction_on_first_changed_line.end_line + max(line_count_change, 0) > update_end_line:
+				update_end_line = instruction_on_first_changed_line.end_line + max(line_count_change, 0)
+		
+		if changes_since_successful_parse.end_line + max(line_count_change, 0) > update_end_line:
+			update_end_line = changes_since_successful_parse.end_line + max(line_count_change, 0)
+			var instruction_on_last_changed_line := parse_result.get_instruction_on_line(update_end_line)
+			if instruction_on_last_changed_line:
+				update_end_line = instruction_on_last_changed_line.end_line
+				
+		update_end_line = max(update_end_line, update_start_line)
+		var update_source_code := get_content_lines(update_start_line, max(update_end_line, update_start_line))
+		parse_result = Gvint.Parser.update_parse_result(
+			last_successful_parse_result,
+			update_source_code,
+			update_start_line,
+			changes_since_successful_parse.line_count_change
+		)
+	else:
+		parse_result = Gvint.Parser.parse_text(get_content())
+	if parse_result.errors.is_empty():
+		last_successful_parse_result = parse_result
+		changes_since_successful_parse = {
+			"start_line": 2 ** 62,
+			"end_line": -1,
+			"line_count_change": 0,
+		}
+	parse_result.debug_print_instructions()
+	parse_result_updated.emit()
 	_changes_queue.clear()
 
 

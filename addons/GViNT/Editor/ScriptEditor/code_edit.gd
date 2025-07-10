@@ -5,6 +5,8 @@ extends CodeEdit
 var file: Gvint.EditorFile
 var parse_delay_timer: Timer
 var line_count_before_last_edit := 1
+var current_error: Gvint.TranspileError:
+	set = set_current_error
 
 
 func _ready() -> void:
@@ -15,6 +17,17 @@ func _ready() -> void:
 	_init_parse_delay_timer()
 	clear_undo_history()
 	lines_edited_from.connect(_on_lines_edited)
+
+
+func set_current_error(error: Gvint.TranspileError):
+	if current_error and current_error.line < get_line_count():
+		set_line_background_color(current_error.line, Color.TRANSPARENT)
+	current_error = error
+	if current_error:
+		var mark_color = Color(1.0, 0, 0, 0.5)
+		if Engine.is_editor_hint():
+			mark_color = EditorInterface.get_editor_settings().get_setting("text_editor/theme/highlighting/mark_color")
+		set_line_background_color(current_error.line, mark_color)
 
 
 func _init_parse_delay_timer() -> void:
@@ -48,5 +61,4 @@ func _on_lines_edited(from_line: int, to_line: int) -> void:
 
 
 func _on_parse_delay_timeout() -> void:
-	end_action()
 	file.flush_changes_queue()

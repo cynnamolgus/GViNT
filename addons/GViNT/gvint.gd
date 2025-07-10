@@ -6,6 +6,8 @@ class_name Gvint
 
 const Utils = preload("uid://dxt7dnlqrxbdr")
 
+const TranspileError = preload("uid://twm3ukhfbqc")
+
 const Tokenizer = preload("uid://bwcy0bhyx2che")
 const TokenizeResult = preload("uid://bh63vqjhjdx43")
 const TokenizeError = preload("uid://oa5bkyvc7cyk")

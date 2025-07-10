@@ -13,6 +13,7 @@ var wrap_lines: bool = false:
 @onready var status_bar: Gvint.EditorStatusBar = $StatusBar
 @onready var current_code_edit: CodeEdit = $NoFileCodeEdit:
 	set = set_current_code_edit
+@onready var error_label: Label = $ErrorLabel
 @onready var search_menu: Gvint.EditorSearchMenu = $SearchMenu
 @onready var file_list := $"../FileList"
 
@@ -86,6 +87,19 @@ func restore_state() -> void:
 		file_list.hide()
 
 
+func show_error(error: Gvint.TranspileError):
+	error_label.text = error.to_string()
+	error_label.show()
+	current_code_edit.current_error = error
+
+
+func hide_error():
+	error_label.text = ""
+	error_label.hide()
+	if "current_error" in current_code_edit:
+		current_code_edit.current_error = null
+
+
 func _on_file_list_visibility_changed() -> void:
 	serialize_state()
 
@@ -93,10 +107,16 @@ func _on_file_list_visibility_changed() -> void:
 func _on_file_manager_current_file_changed(file: Gvint.EditorFile) -> void:
 	if not is_node_ready():
 		await ready
+	if current_file:
+		current_file.parse_result_updated.disconnect(_on_file_parse_result_updated)
 	current_code_edit.hide()
+	hide_error()
 	if file:
 		current_file = file
 		current_code_edit = current_file.code_edit
+		current_file.parse_result_updated.connect(_on_file_parse_result_updated.bind(current_file))
+		if current_file.parse_result.errors:
+			show_error(current_file.parse_result.errors[0])
 		status_bar.file_path = current_file.file_path if current_file.file_path else current_file.filename
 		status_bar.caret_line = current_code_edit.get_caret_line()
 		status_bar.caret_position = current_code_edit.get_caret_column()
@@ -129,6 +149,19 @@ func _on_file_filename_changed() -> void:
 	status_bar.file_path = current_file.file_path if current_file.file_path else current_file.filename
 
 
+func _on_file_parse_result_updated(file: Gvint.EditorFile) -> void:
+	if file.parse_result.errors:
+		show_error(file.parse_result.errors[0])
+	else:
+		hide_error()
+
+
 func _on_code_edit_caret_changed() -> void:
 	status_bar.caret_line = current_code_edit.get_caret_line()
 	status_bar.caret_position = current_code_edit.get_caret_column()
+
+
+func _on_error_label_clicked() -> void:
+	var error := current_file.parse_result.errors[0]
+	current_code_edit.set_caret_line(error.line)
+	current_code_edit.set_caret_column(error.column)

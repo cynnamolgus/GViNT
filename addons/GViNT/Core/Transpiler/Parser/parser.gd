@@ -14,7 +14,10 @@ static func parse_text(source_code: String) -> Gvint.ParseResult:
 	var parser = Gvint.Parser.new()
 	var tokenize_result := Gvint.Tokenizer.tokenize_text(source_code)
 	if tokenize_result.errors:
-		parser.result.errors = tokenize_result.errors
+		parser.result.errors = tokenize_result.errors as Array[Gvint.TranspileError]
+		return parser.result
+	
+	if not tokenize_result.tokens:
 		return parser.result
 	
 	parser._source_tokens = tokenize_result.tokens
@@ -31,19 +34,63 @@ static func parse_text(source_code: String) -> Gvint.ParseResult:
 	return parser.result
 
 
-#TODO method for partial re-parsing of source code,
-# to be used as an optimization - most of the time, only a small
-# part of the file will change between parses, so it'll be wasteful
-# to parse the entire file from scratch every time,
-# which could very well become a noticable issue when editing large files
-@warning_ignore("unused_parameter")
 static func update_parse_result(
 	parse_result: Gvint.ParseResult,
 	update_source_code: String,
 	update_from_line: int,
 	line_count_change: int
-):
-	pass
+) -> Gvint.ParseResult:
+	# start by duplicating the existing instructions
+	var new_result := Gvint.ParseResult.new()
+	new_result.instructions = parse_result.instructions.duplicate()
+	
+	# parse the update source code
+	var parse_update_result = parse_text(update_source_code)
+	# if there's errors, don't proceed with the update
+	if parse_update_result.errors:
+		new_result.errors = parse_update_result.errors
+		for error in new_result.errors:
+			error.line += update_from_line
+		return new_result
+	
+	# remove instructions that had their source code lines modified or removed
+	var update_source_code_line_count: int = update_source_code.count("\n") + 1
+	for line_index in range(
+			update_from_line,
+			update_from_line + update_source_code_line_count - line_count_change
+	):
+		var removed_instruction = new_result.get_instruction_on_line(line_index)
+		if removed_instruction:
+			new_result.instructions.erase(removed_instruction)
+	
+	# the updated instructions will be spliced into the instructions array
+	# after the last instruction before the update source code block,
+	# or at index 0 if there's no instructions before the update.
+	# calculate that index:
+	var updated_instructions_splice_index: int = 0
+	var last_instruction_before_update: Gvint.ParseInstruction = null
+	var i: int = update_from_line - 1
+	while last_instruction_before_update == null and i >= 0:
+		last_instruction_before_update = new_result.get_instruction_on_line(i)
+		if last_instruction_before_update != null:
+			updated_instructions_splice_index = new_result.instructions.find(last_instruction_before_update) + 1
+		i -= 1
+	
+	# if lines were added or removed, adjust start_line & end_line on each instruction after the update
+	if line_count_change != 0:
+		for index in range(updated_instructions_splice_index, new_result.instructions.size()):
+			new_result.instructions[index].start_line += line_count_change
+			new_result.instructions[index].end_line += line_count_change
+	
+	# splice the updated instructions into new_result.instructions
+	i = 0
+	for instruction in parse_update_result.instructions:
+		instruction.start_line += update_from_line
+		instruction.end_line += update_from_line
+		new_result.instructions.insert(updated_instructions_splice_index + i, instruction)
+		i += 1
+	
+	return new_result
 
 
 func _process_next_instruction() -> Gvint.ParseInstruction:

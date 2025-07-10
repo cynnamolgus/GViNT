@@ -201,6 +201,9 @@ func _swap_files(index_a: int, index_b: int) -> void:
 
 func _add_open_file(file: Gvint.EditorFile) -> void:
 	file.manager_index = open_files.size()
+	file.parse_result = Gvint.Parser.parse_text(file.get_content())
+	if file.parse_result.errors.is_empty():
+		file.last_successful_parse_result = file.parse_result
 	open_files.append(file)
 	file_opened.emit(file)
 	current_file = file

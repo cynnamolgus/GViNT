@@ -1,9 +1,4 @@
-extends RefCounted
-
-
-var text: String
-var line: int
-var column: int
+extends Gvint.TranspileError
 
 
 func _to_string() -> String:

@@ -122,7 +122,6 @@ var _position: int
 var _current_character: String
 var _current_line
 var _current_column
-var _target_line: int
 var _token_start_position: int
 var _token_start_line: int
 var _token_start_column: int

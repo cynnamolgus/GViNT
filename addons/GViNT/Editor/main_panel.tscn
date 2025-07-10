@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bt8i58p4qooyi"]
+[gd_scene load_steps=16 format=3 uid="uid://bt8i58p4qooyi"]
 
 [ext_resource type="Script" uid="uid://daxbb2fye4e50" path="res://addons/GViNT/Editor/main_panel.gd" id="1_di22a"]
 [ext_resource type="Script" uid="uid://bqfpcvwwekf6c" path="res://addons/GViNT/Editor/FileList/file_manager.gd" id="2_61lgr"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://d1hbeqlnady0n" path="res://addons/GViNT/Editor/ScriptEditor/script_editor.gd" id="9_vc3us"]
 [ext_resource type="Script" uid="uid://q4pmhqx85nox" path="res://addons/GViNT/Editor/ScriptEditor/search_menu.gd" id="10_61lgr"]
 [ext_resource type="Script" uid="uid://dqglci3kmxuxy" path="res://addons/GViNT/Editor/ScriptEditor/status_bar.gd" id="10_lxqt3"]
+[ext_resource type="Script" uid="uid://d1j316qglcvay" path="res://addons/GViNT/Editor/ScriptEditor/error_label.gd" id="13_daxea"]
 
 [node name="MainPanel" type="PanelContainer"]
 anchors_preset = 15
@@ -113,6 +114,15 @@ gutters_draw_line_numbers = true
 auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 
+[node name="ErrorLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
+visible = false
+layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 0.33, 0.33, 1)
+autowrap_mode = 2
+script = ExtResource("13_daxea")
+
 [node name="SearchMenu" type="PanelContainer" parent="VBoxContainer/HSplitContainer/ScriptEditor"]
 visible = false
 layout_mode = 2
@@ -208,14 +218,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "<No file open>"
 
-[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
-layout_mode = 2
-
-[node name="StatusLabel" type="Label" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "Parser idle"
-
 [node name="VSeparator" type="VSeparator" parent="VBoxContainer/HSplitContainer/ScriptEditor/StatusBar"]
 layout_mode = 2
 
@@ -270,6 +272,7 @@ horizontal_alignment = 2
 [connection signal="move_up_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager" method="move_current_file_up"]
 [connection signal="save_as_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager/SaveAsFileDialog" method="show"]
 [connection signal="save_requested" from="VBoxContainer/HSplitContainer/FileList/FileContextMenu" to="FileManager" method="save_current_file"]
+[connection signal="clicked" from="VBoxContainer/HSplitContainer/ScriptEditor/ErrorLabel" to="VBoxContainer/HSplitContainer/ScriptEditor" method="_on_error_label_clicked"]
 [connection signal="visibility_changed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_visibility_changed"]
 [connection signal="text_changed" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/SearchTextEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_search_text_edit_text_changed"]
 [connection signal="text_submitted" from="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu/VBoxContainer/SearchControls/SearchTextEdit" to="VBoxContainer/HSplitContainer/ScriptEditor/SearchMenu" method="_on_search_text_edit_text_submitted"]
