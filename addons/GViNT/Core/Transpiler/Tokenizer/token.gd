@@ -87,6 +87,89 @@ var end_line: int
 var end_column: int
 
 
+static func is_binary_operator(token: Gvint.Token) -> bool:
+	match token.type:
+		KEYWORD_IS,\
+		STAR_STAR,\
+		STAR,\
+		SLASH,\
+		PERCENT,\
+		PLUS,\
+		MINUS,\
+		GREATER_GREATER,\
+		LESS_LESS,\
+		AMPERSAND,\
+		CARET,\
+		PIPE,\
+		EQUALS_EQUALS,\
+		EXCLAMATION_EQUALS,\
+		LESS,\
+		GREATER,\
+		LESS_EQUALS,\
+		GREATER_EQUALS,\
+		KEYWORD_IN,\
+		KEYWORD_AND,\
+		AMPERSAND_AMPERSAND,\
+		KEYWORD_OR,\
+		PIPE_PIPE,\
+		KEYWORD_AS:
+			return true
+		_:
+			return false
+
+
+static func is_unary_operator(token: Gvint.Token) -> bool:
+	match token.type:
+		KEYWORD_AWAIT,\
+		TILDE,\
+		PLUS,\
+		MINUS,\
+		KEYWORD_NOT,\
+		EXCLAMATION:
+			return true
+		_:
+			return false
+
+
+static func is_assignment_operator(token: Gvint.Token) -> bool:
+	match token.type:
+		EQUALS,\
+		PLUS_EQUALS,\
+		MINUS_EQUALS,\
+		STAR_EQUALS,\
+		SLASH_EQUALS,\
+		STAR_STAR_EQUALS,\
+		PERCENT_EQUALS,\
+		AMPERSAND_EQUALS,\
+		PIPE_EQUALS,\
+		CARET_EQUALS,\
+		LESS_LESS_EQUALS,\
+		GREATER_GREATER_EQUALS:
+			return true
+		_:
+			return false
+
+
+static func is_beginning_of_expression(token: Gvint.Token) -> bool:
+	if is_unary_operator(token):
+		return true
+	match token.type:
+		LITERAL,\
+		BUILTIN_CONST,\
+		BUILTIN_FUNC,\
+		IDENTIFIER,\
+		ENGINE_SINGLETON,\
+		TYPE,\
+		BUILTIN_TYPE,\
+		BRACKET_OPEN,\
+		BRACE_OPEN,\
+		PARENTHESIS_OPEN:
+			return true
+		_:
+			return false
+
+
+
 func _to_string() -> String:
 	return text_content
 

@@ -242,6 +242,8 @@ func scan_next_token() -> void:
 				else:
 					_advance()
 					_add_token(Token.STAR_STAR, STAR + STAR)
+			else:
+				_add_token(Token.STAR, STAR)
 		SLASH:
 			if _peek() == EQUALS:
 				_advance()
@@ -319,14 +321,22 @@ func scan_next_token() -> void:
 			else:
 				_add_token(Token.GREATER, GREATER)
 		_:
-			_add_error('Invalid character "%s" (U+%X)' \
+			_add_error('Invalid character "%s" (U+%04X)' \
 					% [_current_character, _current_character.unicode_at(0)])
 
 
 func _skip_whitespace_and_linebreaks() -> void:
-	_skip_whitespace()
-	_skip_linebreaks()
-	_skip_whitespace()
+	while _peek() in (WHITESPACE + CARRIAGE_RETURN + LINEBREAK):
+		var is_crlf: bool = (_peek() == CARRIAGE_RETURN and _peek(1) == LINEBREAK)
+		var is_linebreak: bool = (_peek() == LINEBREAK) or is_crlf
+		if is_linebreak:
+			_token_start_line = _current_line
+			_token_start_column = _current_column
+		_advance()
+		if is_crlf:
+			_advance()
+		if is_linebreak:
+			_add_token(Token.LINEBREAK, LINEBREAK)
 
 
 func _skip_whitespace() -> void:

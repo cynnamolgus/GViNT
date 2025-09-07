@@ -136,14 +136,14 @@ func flush_changes_queue() -> void:
 		var instruction_on_first_changed_line := parse_result.get_instruction_on_line(update_start_line)
 		if instruction_on_first_changed_line:
 			update_start_line = instruction_on_first_changed_line.start_line
-			if instruction_on_first_changed_line.end_line + max(line_count_change, 0) > update_end_line:
-				update_end_line = instruction_on_first_changed_line.end_line + max(line_count_change, 0)
+			if instruction_on_first_changed_line.end_line + 1 + max(line_count_change, 0) > update_end_line:
+				update_end_line = instruction_on_first_changed_line.end_line + 1 + max(line_count_change, 0)
 		
 		if changes_since_successful_parse.end_line + max(line_count_change, 0) > update_end_line:
 			update_end_line = changes_since_successful_parse.end_line + max(line_count_change, 0)
 			var instruction_on_last_changed_line := parse_result.get_instruction_on_line(update_end_line)
 			if instruction_on_last_changed_line:
-				update_end_line = instruction_on_last_changed_line.end_line
+				update_end_line = instruction_on_last_changed_line.end_line + 1
 				
 		update_end_line = max(update_end_line, update_start_line)
 		var update_source_code := get_content_lines(update_start_line, max(update_end_line, update_start_line))

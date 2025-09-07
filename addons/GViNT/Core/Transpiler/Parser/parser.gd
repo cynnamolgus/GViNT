@@ -101,11 +101,12 @@ func _process_next_instruction() -> Gvint.ParseInstruction:
 	if _current_token.type == Token.KEYWORD_IF:
 		return _process_if_condition()
 	
-	if not _token_is_beginning_of_expression(_current_token):
+	if not Token.is_beginning_of_expression(_current_token):
 		_add_error()
 		return null
 	
 	var instruction_start_line: int = _current_token.start_line
+	var instruction_end_line: int = instruction_start_line
 	var initial_expression := _process_expression()
 	if not initial_expression:
 		# return null on error
@@ -127,7 +128,6 @@ func _process_next_instruction() -> Gvint.ParseInstruction:
 			if expecting_expression:
 				_add_error('Expected value expression, found: end of instruction.')
 				return null
-			var instruction_end_line = _current_token.end_line
 			if assignment_operator and assignment_value:
 				var instruction = Gvint.ParseInstructionSetVariable.new()
 				instruction.variable_identifier = expressions_before_colon[0].components[0]
@@ -169,8 +169,10 @@ func _process_next_instruction() -> Gvint.ParseInstruction:
 		if _end_reached():
 			end_of_instruction_reached = true
 			continue
+		else:
+			instruction_end_line = _current_token.end_line
 		
-		if _token_is_assignment_operator(_current_token):
+		if Token.is_assignment_operator(_current_token):
 			var has_assignable_identifier: bool = false
 			if (
 					expressions_before_colon.size() == 1
@@ -209,9 +211,9 @@ func _process_next_instruction() -> Gvint.ParseInstruction:
 				_advance()
 				continue
 			else:
-				_add_error('Assignable identifier not found before assignment operator; invalid "set variable" instruction.' % _current_token)
+				_add_error('Assignable identifier not found before assignment operator; invalid "set variable" instruction.')
 				return null
-		elif _token_is_beginning_of_expression(_current_token):
+		elif Token.is_beginning_of_expression(_current_token):
 			if expecting_expression:
 				if assignment_operator:
 					if assignment_value != null:
@@ -244,6 +246,9 @@ func _process_next_instruction() -> Gvint.ParseInstruction:
 				end_of_instruction_reached = true
 				continue
 			Token.COMMA:
+				if assignment_value != null:
+					_add_error()
+					return null
 				if accept_comma:
 					expecting_expression = true
 					accept_colon = false
@@ -254,6 +259,9 @@ func _process_next_instruction() -> Gvint.ParseInstruction:
 					_add_error()
 					return null
 			Token.COLON:
+				if assignment_value != null:
+					_add_error()
+					return null
 				if accept_colon:
 					has_colon = true
 					expecting_expression = true
@@ -283,7 +291,7 @@ func _process_if_condition() -> Gvint.ParseInstructionIfCondition:
 	
 	while true:
 		if not processing_else_branch:
-			if not _token_is_beginning_of_expression(_current_token):
+			if not Token.is_beginning_of_expression(_current_token):
 				_add_error()
 				return null
 			var condition_expression := _process_expression()
@@ -292,23 +300,31 @@ func _process_if_condition() -> Gvint.ParseInstructionIfCondition:
 				return null
 			current_branch.condition = condition_expression
 		
-		if _current_token.type != Token.BRACE_OPEN:
+		if _end_reached() or _current_token.type != Token.BRACE_OPEN:
 			_add_error('Expected opening brace ("{") after conditional statement.')
 			return null
 		_advance()
 		
+		if _end_reached():
+			_add_error('Expected instruction or closing brace ("}"), found: end of parsing.')
+			return null
+		
 		while _current_token.type != Token.BRACE_CLOSE:
-			if _end_reached():
-				_add_error('Expected instruction or closing brace ("}"), found: end of file.')
-				return null
+			# the tokenizer always adds a linebreak at the end of the file,
+			# therefore current token will never be null here; checking it is safe
+			# and this if condition will always be triggered just before end is reached
 			if _current_token.type == Token.LINEBREAK:
 				_skip_linebreaks()
+				if _end_reached():
+					_add_error('Expected instruction or closing brace ("}"), found: end of parsing.')
+					return null
 				continue
 			var next_instruction := _process_next_instruction()
 			if not next_instruction:
 				# return null on error
 				return null
 			current_branch.instructions.append(next_instruction)
+		assert(_current_token and _current_token.type == Token.BRACE_CLOSE)
 		instruction_end_line = _current_token.end_line
 		_advance()
 		if_condition.branches.append(current_branch)
@@ -317,12 +333,18 @@ func _process_if_condition() -> Gvint.ParseInstructionIfCondition:
 			break
 		match _current_token.type:
 			Token.KEYWORD_ELIF:
+				if processing_else_branch:
+					_add_error('Expected end of conditional statement after "else" branch.')
+					return null
 				current_branch = Gvint.ParseInstructionConditionalBranch.new()
 				_advance()
 				continue
 			Token.KEYWORD_ELSE:
-				current_branch = Gvint.ParseInstructionConditionalBranch.new()
+				if processing_else_branch:
+					_add_error('Expected end of conditional statement after "else" branch.')
+					return null
 				processing_else_branch = true
+				current_branch = Gvint.ParseInstructionConditionalBranch.new()
 				_advance()
 				continue
 			_:
@@ -341,7 +363,7 @@ func _process_expression(skip_ternary_if_linebreaks: bool = false) -> Gvint.Pars
 	var has_open_parenthesis: bool = false
 	var has_close_parenthesis: bool = false
 	
-	while _token_is_unary_operator(_current_token):
+	while Token.is_unary_operator(_current_token):
 		expression.prefix_unary_operators.append(_current_token)
 		_advance()
 	
@@ -356,7 +378,7 @@ func _process_expression(skip_ternary_if_linebreaks: bool = false) -> Gvint.Pars
 				_add_error('Expected value expression, found: end of statement.')
 			break
 		
-		if _token_is_binary_operator(_current_token):
+		if Token.is_binary_operator(_current_token):
 			if has_close_parenthesis:
 				var sub_expression = expression
 				expression = Gvint.ParseExpression.new()
@@ -384,14 +406,14 @@ func _process_expression(skip_ternary_if_linebreaks: bool = false) -> Gvint.Pars
 				continue
 			else:
 				# "+" and "-" are simultaneously binary and unary operators
-				if _token_is_unary_operator(_current_token):
+				if Token.is_unary_operator(_current_token):
 					expression.components.append(_current_token)
 					_advance()
 					continue
 				else:
 					_add_error('Expected value expression, found operator: "%s".' % _current_token)
 					return null
-		elif _token_is_unary_operator(_current_token):
+		elif Token.is_unary_operator(_current_token):
 			if expecting_value:
 				expression.components.append(_current_token)
 				_advance()
@@ -415,7 +437,7 @@ func _process_expression(skip_ternary_if_linebreaks: bool = false) -> Gvint.Pars
 						return null
 				_add_error('Expected binary operator or end of expression, found unary operator: "%s".' % _current_token)
 				return null
-		elif _token_is_assignment_operator(_current_token):
+		elif Token.is_assignment_operator(_current_token):
 			if expecting_value:
 				_add_error('Expected value expression, found assignment operator: "%s".' % _current_token)
 			break
@@ -514,7 +536,7 @@ func _process_expression(skip_ternary_if_linebreaks: bool = false) -> Gvint.Pars
 				
 				if skip_ternary_if_linebreaks:
 					_skip_linebreaks()
-				if not _token_is_beginning_of_expression(_current_token):
+				if not Token.is_beginning_of_expression(_current_token):
 					_add_error('Expected value expression after "else".')
 				var else_value_expression = _process_expression(skip_ternary_if_linebreaks)
 				if not else_value_expression:
@@ -638,11 +660,11 @@ func _process_compound_identifier(prefix_call_or_expression: Gvint.ParseNode = n
 				_add_error("Expected identifier or method name, found: end of statement.")
 			break
 		
-		if _token_is_binary_operator(_current_token):
+		if Token.is_binary_operator(_current_token):
 			if expecting_identifier:
 				_add_error('Expected identifier or method name, found operator "%s".' % _current_token)
 			break
-		elif _token_is_assignment_operator(_current_token):
+		elif Token.is_assignment_operator(_current_token):
 			if expecting_identifier:
 				_add_error('Expected identifier or method name, found assignment operator "%s".' % _current_token)
 			break
@@ -794,7 +816,7 @@ func _process_call(prefix_identifier: Gvint.ParseIdentifier) -> Gvint.ParseNode:
 				)
 			break
 		
-		if _token_is_beginning_of_expression(_current_token):
+		if Token.is_beginning_of_expression(_current_token):
 			if expecting_expression:
 				var expression := _process_expression(true)
 				if not expression:
@@ -825,7 +847,7 @@ func _process_call(prefix_identifier: Gvint.ParseIdentifier) -> Gvint.ParseNode:
 			else:
 				_add_error('Expected comma (",") or closing parenthesis (")"), found: "%s".' % _current_token)
 				return null
-		elif _token_is_binary_operator(_current_token):
+		elif Token.is_binary_operator(_current_token):
 			if has_close_parenthesis:
 				break
 			else:
@@ -915,7 +937,7 @@ func _process_dictionary() -> Gvint.ParseNode:
 				_add_error('Expected comma or closing brace ("}") after key-value pair, found: "%s".' % _current_token)
 				return null
 		
-		if not _token_is_beginning_of_expression(_current_token):
+		if not Token.is_beginning_of_expression(_current_token):
 			_add_error('Expected dictionary key, found: "%s".' % _current_token)
 			return null
 		
@@ -937,7 +959,7 @@ func _process_dictionary() -> Gvint.ParseNode:
 		if _end_reached():
 			_add_error("Expected dictionary value, found: end of statement.")
 			return null
-		if not _token_is_beginning_of_expression(_current_token):
+		if not Token.is_beginning_of_expression(_current_token):
 			_add_error('Expected dictionary value, found: "%s".' % _current_token)
 			return null
 		
@@ -972,7 +994,7 @@ func _process_array() -> Gvint.ParseArray:
 			_add_error('Expected value expression or closing bracket ("]"), found: end of statement.')
 			return null
 		
-		if _token_is_beginning_of_expression(_current_token):
+		if Token.is_beginning_of_expression(_current_token):
 			var expression = _process_expression(true)
 			if not expression:
 				# return null on error
@@ -1017,94 +1039,16 @@ func _process_array() -> Gvint.ParseArray:
 			return array
 
 
-func _token_is_binary_operator(token: Token) -> bool:
-	match token.type:
-		Token.KEYWORD_IS,\
-		Token.STAR_STAR,\
-		Token.STAR,\
-		Token.SLASH,\
-		Token.PERCENT,\
-		Token.PLUS,\
-		Token.MINUS,\
-		Token.GREATER_GREATER,\
-		Token.LESS_LESS,\
-		Token.AMPERSAND,\
-		Token.CARET,\
-		Token.PIPE,\
-		Token.EQUALS_EQUALS,\
-		Token.EXCLAMATION_EQUALS,\
-		Token.LESS,\
-		Token.GREATER,\
-		Token.LESS_EQUALS,\
-		Token.GREATER_EQUALS,\
-		Token.KEYWORD_IN,\
-		Token.KEYWORD_AND,\
-		Token.AMPERSAND_AMPERSAND,\
-		Token.KEYWORD_OR,\
-		Token.PIPE_PIPE,\
-		Token.KEYWORD_AS:
-			return true
-		_:
-			return false
-
-
-func _token_is_unary_operator(token: Token) -> bool:
-	match token.type:
-		Token.KEYWORD_AWAIT,\
-		Token.TILDE,\
-		Token.PLUS,\
-		Token.MINUS,\
-		Token.KEYWORD_NOT,\
-		Token.EXCLAMATION:
-			return true
-		_:
-			return false
-
-
-func _token_is_assignment_operator(token: Token) -> bool:
-	match token.type:
-		Token.EQUALS,\
-		Token.PLUS_EQUALS,\
-		Token.MINUS_EQUALS,\
-		Token.STAR_EQUALS,\
-		Token.SLASH_EQUALS,\
-		Token.STAR_STAR_EQUALS,\
-		Token.PERCENT_EQUALS,\
-		Token.AMPERSAND_EQUALS,\
-		Token.PIPE_EQUALS,\
-		Token.CARET_EQUALS,\
-		Token.LESS_LESS_EQUALS,\
-		Token.GREATER_GREATER_EQUALS:
-			return true
-		_:
-			return false
-
-
-func _token_is_beginning_of_expression(token: Token) -> bool:
-	if _token_is_unary_operator(token):
-		return true
-	match token.type:
-		Token.LITERAL,\
-		Token.BUILTIN_CONST,\
-		Token.BUILTIN_FUNC,\
-		Token.IDENTIFIER,\
-		Token.ENGINE_SINGLETON,\
-		Token.TYPE,\
-		Token.BUILTIN_TYPE,\
-		Token.BRACKET_OPEN,\
-		Token.BRACE_OPEN,\
-		Token.PARENTHESIS_OPEN:
-			return true
-		_:
-			return false
-
-
 func _add_error(text: String = "") -> void:
 	if text == "":
 		text = 'Unexpected token: "%s".' % _current_token
 	var error := Gvint.ParseError.new()
-	error.line = _current_token.start_line
-	error.column = _current_token.start_column
+	if _end_reached():
+		error.line = _source_tokens.back().end_line
+		error.column = _source_tokens.back().end_column
+	else:
+		error.line = _current_token.start_line
+		error.column = _current_token.start_column
 	error.text = text.replace('"\n"', "linebreak")
 	result.errors.append(error)
 
