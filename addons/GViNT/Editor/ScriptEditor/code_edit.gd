@@ -2,21 +2,93 @@
 extends CodeEdit
 
 
+
+const Tokenizer = Gvint.Tokenizer
+const DEFAULT_HIGHLIGHTER_SETTINGS: Dictionary = {
+	"Gvint/editor_highlighting/number_color": Color("eb9433"),
+	"Gvint/editor_highlighting/symbol_color": Color("badeff"),
+	"Gvint/editor_highlighting/function_color": Color("66a3cf"),
+	"Gvint/editor_highlighting/member_variable_color": Color("e64f59"),
+	"Gvint/editor_highlighting/keyword_color": Color("ffffb3"),
+	"Gvint/editor_highlighting/gdscript_function_color": Color("a3a3f5"),
+	"Gvint/editor_highlighting/base_type_color": Color("a3ffd4"),
+	"Gvint/editor_highlighting/comment_color": Color("666666"),
+	"Gvint/editor_highlighting/string_color": Color("f06ebf"),
+	"Gvint/editor_highlighting/blocked_keyword_color": Color.RED,
+	"Gvint/editor_highlighting/mark_color": Color("ff666666"),
+}
+
 var file: Gvint.EditorFile
 var parse_delay_timer: Timer
 var line_count_before_last_edit := 1
 var current_error: Gvint.TranspileError:
 	set = set_current_error
-
+@onready var mark_color = ProjectSettings.get("Gvint/editor_highlighting/mark_color")
 
 func _ready() -> void:
 	highlight_current_line = true
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	text = file.get_content()
+	setup_syntax_highlighter()
 	line_count_before_last_edit = get_line_count()
 	_init_parse_delay_timer()
 	clear_undo_history()
 	lines_edited_from.connect(_on_lines_edited)
+
+
+func setup_syntax_highlighter():
+	syntax_highlighter = CodeHighlighter.new()
+	
+	syntax_highlighter.number_color = ProjectSettings.get_setting("Gvint/editor_highlighting/number_color")
+	syntax_highlighter.symbol_color = ProjectSettings.get_setting("Gvint/editor_highlighting/symbol_color")
+	syntax_highlighter.function_color = ProjectSettings.get_setting("Gvint/editor_highlighting/function_color")
+	syntax_highlighter.member_variable_color = ProjectSettings.get_setting("Gvint/editor_highlighting/member_variable_color")
+	
+	var keyword_color: Color = ProjectSettings.get_setting("Gvint/editor_highlighting/keyword_color")
+	var gdscript_function_color: Color = ProjectSettings.get_setting("Gvint/editor_highlighting/gdscript_function_color")
+	var base_type_color: Color = ProjectSettings.get_setting("Gvint/editor_highlighting/base_type_color")
+	var comment_color: Color = ProjectSettings.get_setting("Gvint/editor_highlighting/comment_color")
+	var string_color: Color = ProjectSettings.get_setting("Gvint/editor_highlighting/string_color")
+	var blocked_keyword_color: Color = ProjectSettings.get_setting("Gvint/editor_highlighting/blocked_keyword_color")
+	
+	for keyword in (
+			Tokenizer.KEYWORDS 
+			+ Tokenizer.KEYWORD_LITERALS
+			+ Gvint.GDScriptBuiltins.BUILTIN_CONSTANTS
+	):
+		syntax_highlighter.add_keyword_color(
+			keyword,
+			keyword_color
+		)
+	
+	for function in Gvint.GDScriptBuiltins.BUILTIN_FUNCTIONS:
+		syntax_highlighter.add_keyword_color(
+			function,
+			gdscript_function_color
+		)
+	
+	for type in Gvint.GDScriptBuiltins.BUILTIN_TYPES:
+		syntax_highlighter.add_keyword_color(
+			type,
+			base_type_color
+		)
+	
+	for keyword in Gvint.GDScriptBuiltins.RESERVED_KEYWORDS:
+		syntax_highlighter.add_keyword_color(
+			keyword,
+			blocked_keyword_color
+		)
+	
+	syntax_highlighter.add_color_region(
+		Tokenizer.COMMENT_MARK, "", comment_color
+	)
+	syntax_highlighter.add_color_region(
+		Tokenizer.SINGLE_QUOTE, Tokenizer.SINGLE_QUOTE, string_color
+	)
+	syntax_highlighter.add_color_region(
+		Tokenizer.QUOTE, Tokenizer.QUOTE, string_color
+	)
+	
 
 
 func set_current_error(error: Gvint.TranspileError):
@@ -24,9 +96,6 @@ func set_current_error(error: Gvint.TranspileError):
 		set_line_background_color(current_error.line, Color.TRANSPARENT)
 	current_error = error
 	if current_error:
-		var mark_color = Color(1.0, 0, 0, 0.5)
-		if Engine.is_editor_hint():
-			mark_color = EditorInterface.get_editor_settings().get_setting("text_editor/theme/highlighting/mark_color")
 		set_line_background_color(current_error.line, mark_color)
 
 

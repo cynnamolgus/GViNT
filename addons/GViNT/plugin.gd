@@ -8,6 +8,7 @@ var main_panel: Gvint.EditorMainPanel
 
 
 func _ready() -> void:
+	_add_project_settings()
 	_setup_main_panel()
 
 func _exit_tree() -> void:
@@ -30,6 +31,15 @@ func _handles(object: Object) -> bool:
 func _make_visible(visible) -> void:
 	if main_panel:
 		main_panel.visible = visible
+
+
+func _add_project_settings():
+	for setting in Gvint.EditorCodeEdit.DEFAULT_HIGHLIGHTER_SETTINGS:
+		if not ProjectSettings.has_setting(setting):
+			ProjectSettings.set_setting(
+					setting,
+					Gvint.EditorCodeEdit.DEFAULT_HIGHLIGHTER_SETTINGS[setting] 
+			)
 
 
 func _setup_main_panel() -> void:

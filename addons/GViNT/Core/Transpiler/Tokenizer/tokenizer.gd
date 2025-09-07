@@ -24,7 +24,7 @@ const COMMA = ","
 
 const QUOTE = '"'
 const SINGLE_QUOTE = "'"
-const R = "r"
+const RAW_STRING_MARK = "r"
 const U = "u"
 const UPPERCASE_U = "U"
 const ESCAPE_CHARACTERS = "abfnrtv'\"\\uU"
@@ -526,7 +526,7 @@ func _add_string_literal() -> void:
 	var token_text: String = ""
 	
 	# consume raw string prefix
-	if _current_character == R:
+	if _current_character == RAW_STRING_MARK:
 		is_raw = true
 		token_text += _current_character
 		_advance()

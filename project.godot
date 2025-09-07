@@ -8,6 +8,20 @@
 
 config_version=5
 
+[Gvint]
+
+editor_highlighting/number_color=Color(0.921569, 0.580392, 0.2, 1)
+editor_highlighting/symbol_color=Color(0.729412, 0.870588, 1, 1)
+editor_highlighting/function_color=Color(0.4, 0.639216, 0.811765, 1)
+editor_highlighting/comment_color=Color(0.4, 0.4, 0.4, 1)
+editor_highlighting/string_color=Color(0.941176, 0.431373, 0.74902, 1)
+editor_highlighting/keyword_color=Color(1, 1, 0.701961, 1)
+editor_highlighting/gdscript_function_color=Color(0.639216, 0.639216, 0.960784, 1)
+editor_highlighting/base_type_color=Color(0.639216, 1, 0.831373, 1)
+editor_highlighting/blocked_keyword_color=Color(1, 0, 0, 1)
+editor_highlighting/mark_color=Color(1, 0.4, 0.4, 0.4)
+editor_highlighting/member_variable_color=Color(0.901961, 0.309804, 0.34902, 1)
+
 [application]
 
 config/name="GViNT"
